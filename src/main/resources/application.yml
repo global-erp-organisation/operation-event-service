@@ -1,0 +1,14 @@
+axon:
+  events:
+    database: operation-events-store
+    snapshot-limit: 3
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: operation-cmd
+  data:
+    mongodb:
+      database: operation-view-store
+server:
+  port: 8093
