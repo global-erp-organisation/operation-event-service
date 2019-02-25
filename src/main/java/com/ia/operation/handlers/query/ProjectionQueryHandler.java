@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import com.ia.operation.documents.Projection;
 import com.ia.operation.handlers.Handler;
 import com.ia.operation.queries.projection.ProjectionByAccountQuery;
+import com.ia.operation.queries.projection.ProjectionByYearQuery;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class ProjectionQueryHandler implements Handler {
     private final QueryGateway gateway;
-    
+
     public Mono<ServerResponse> projectionByAccount(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
@@ -31,13 +32,9 @@ public class ProjectionQueryHandler implements Handler {
         if (year == null || !StringUtils.isNumeric(year)) {
             return badRequestComplete(() -> YEAR);
         }
-        return queryComplete(() -> ProjectionByAccountQuery.builder()
-                .accountId(accountId)
-                .userId(userId)
-                .year(year)
-                .build(), Projection.class, gateway);
+        return queryComplete(() -> ProjectionByAccountQuery.builder().accountId(accountId).userId(userId).year(year).build(), Projection.class, gateway);
     }
-    
+
     public Mono<ServerResponse> projectionByYear(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
@@ -47,7 +44,7 @@ public class ProjectionQueryHandler implements Handler {
         if (year == null || !StringUtils.isNumeric(year)) {
             return badRequestComplete(() -> YEAR);
         }
-        return queryComplete(()->ProjectionByAccountQuery.builder().year(year).userId(userId).build(), Projection.class, gateway);
-        
+        return queryComplete(() -> ProjectionByYearQuery.builder().year(year).userId(userId).build(), Projection.class, gateway);
+
     }
 }

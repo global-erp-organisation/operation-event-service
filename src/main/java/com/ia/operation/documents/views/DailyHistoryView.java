@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.ia.operation.documents.Operation;
-import com.ia.operation.enums.OperationType;
+import com.ia.operation.enums.AccountType;
 
 import lombok.Builder;
 import lombok.Data;
@@ -22,14 +22,14 @@ public class DailyHistoryView {
     private String id;
     private BigDecimal refAmount;
     private BigDecimal curAmount;
-    private OperationType type;
+    private AccountType type;
     private LocalDate date;
     
     public static DailyHistoryViewBuilder from (Operation r) {
         return DailyHistoryView.builder()
                 .date(r.getOperationDate())
                 .refAmount(BigDecimal.ZERO)
-                .type(r.getAccount().getOperationType())
+                .type(r.getAccount().getAccountType())
                 .curAmount(r.getAmount());
     }
     

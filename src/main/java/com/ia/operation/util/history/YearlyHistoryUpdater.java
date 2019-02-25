@@ -24,10 +24,10 @@ public class YearlyHistoryUpdater implements HistoryUpdater<YearlyHistoryView> {
     @Override
     public void update(Operation event) {
         final Flux<YearlyHistoryView> refs =
-                yearlyHistoryRepository.findByYearAndType(event.getOperationDate().minusYears(1).getYear(), event.getAccount().getOperationType());
+                yearlyHistoryRepository.findByYearAndType(event.getOperationDate().minusYears(1).getYear(), event.getAccount().getAccountType());
         final Flux<YearlyHistoryView> histories =
-                convert(operationRepository.findByPeriod_yearAndAccount_operationType(event.getOperationDate().getYear(),
-                        event.getAccount().getOperationType()), (r) -> YearlyHistoryView.from(r).build());
+                convert(operationRepository.findByPeriod_yearAndAccount_accountType(event.getOperationDate().getYear(),
+                        event.getAccount().getAccountType()), (r) -> YearlyHistoryView.from(r).build());
         // yearlyHistoryRepository.findByYearAndType(event.getOperationDate().getYear(), event.getAccount().getOperationType());
 
         refs.collectList().subscribe(reference -> {
@@ -54,7 +54,7 @@ public class YearlyHistoryUpdater implements HistoryUpdater<YearlyHistoryView> {
                         });
                     } else {
                         final YearlyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getAccount().getOperationType())).findFirst().orElse(null);
+                                history.stream().filter(r -> r.getType().equals(event.getAccount().getAccountType())).findFirst().orElse(null);
                         if (v != null) {
                             v.setCurAmount(v.getCurAmount().add(event.getAmount()));
                             yearlyHistoryRepository.save(v).subscribe(o -> {

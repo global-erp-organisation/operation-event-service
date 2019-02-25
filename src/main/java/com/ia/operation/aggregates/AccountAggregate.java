@@ -11,7 +11,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 import com.ia.operation.commands.creation.AccountCreationCmd;
 import com.ia.operation.commands.delete.AccountDeletionCmd;
 import com.ia.operation.commands.update.AccountUpdateCmd;
-import com.ia.operation.enums.OperationType;
+import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.deleted.AccountDeletedEvent;
@@ -29,7 +29,7 @@ public class AccountAggregate {
     @AggregateIdentifier
     private String id;
     private String description;
-    private OperationType operationType;
+    private AccountType accountType;
     private String userId;
     private RecurringMode recurringMode;
     private BigDecimal defaultAmount;
@@ -44,7 +44,7 @@ public class AccountAggregate {
     public void onOperationCreated(AccountCreatedEvent event) {
         this.id = event.getId();
         this.description = event.getDescription();
-        this.operationType = event.getOperationType();
+        this.accountType = event.getAccountType();
         this.userId = event.getUserId();
         this.recurringMode = event.getRecurringMode();
         this.defaultAmount = event.getDefaultAmount();
@@ -60,7 +60,7 @@ public class AccountAggregate {
     public void onOperationCreated(AccountUpdatedEvent event) {
         this.id = event.getId();
         this.description = event.getDescription();
-        this.operationType = event.getOperationType();
+        this.accountType = event.getAccountType();
         this.userId = event.getUserId();
         this.recurringMode = event.getRecurringMode();
         this.defaultAmount = event.getDefaultAmount();

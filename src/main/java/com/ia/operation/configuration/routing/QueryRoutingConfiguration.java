@@ -39,14 +39,14 @@ public class QueryRoutingConfiguration {
 
     @Bean
     public RouterFunction<ServerResponse> projectionQueryRoute(ProjectionQueryHandler handler) {
-        return RouterFunctions.route(GET("periods/{year}/users/{userId}/projections"), handler::projectionByYear)
-                .andRoute(GET("periods/{year}/operations/{operationId}/projections"), handler::projectionByAccount);
+        return RouterFunctions.route(GET("/periods/{year}/users/{userId}/projections"), handler::projectionByYear)
+                .andRoute(GET("/periods/{year}/operations/{operationId}/projections"), handler::projectionByAccount);
     }
 
     @Bean
     public RouterFunction<ServerResponse> operationQueryRoute(OperationQueryHandler handler) {
-        return RouterFunctions.route(GET("periods/{year}/users/{userId}/operations"), handler::operationGetByear)
-                .andRoute(GET("operations/{operationId}"), handler::operationGet)
+        return RouterFunctions.route(GET("/periods/{year}/users/{userId}/operations"), handler::operationGetByear)
+                .andRoute(GET("/operations/{operationId}"), handler::operationGet)
                 .andRoute(GET("/users/{userId}/operations"), handler::operationGetAll);
     }
 

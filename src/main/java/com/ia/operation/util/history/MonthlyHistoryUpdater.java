@@ -23,9 +23,9 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
     @Override
     public void update(Operation event) {
         final String prev = event.getOperationDate().getMonth() + "-" + event.getOperationDate().minusYears(1).getYear();
-        final Flux<MonthlyHistoryView> refs = monthlyHistoryRepository.findByMonthAndType(prev.toUpperCase(), event.getAccount().getOperationType());
+        final Flux<MonthlyHistoryView> refs = monthlyHistoryRepository.findByMonthAndType(prev.toUpperCase(), event.getAccount().getAccountType());
         final Flux<MonthlyHistoryView> histories = convert(
-                operationRepository.findByPeriod_descriptionAndAccount_operationType(event.getPeriod().getDescription(), event.getAccount().getOperationType()),
+                operationRepository.findByPeriod_descriptionAndAccount_accountType(event.getPeriod().getDescription(), event.getAccount().getAccountType()),
                 (r) -> MonthlyHistoryView.from(r).build());
         // monthlyHistoryRepository.findByMonthAndType(event.getPeriod().getDescription().toUpperCase(), event.getAccount().getOperationType());
 
@@ -53,7 +53,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
                         });
                     } else {
                         final MonthlyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getAccount().getOperationType())).findFirst().orElse(null);
+                                history.stream().filter(r -> r.getType().equals(event.getAccount().getAccountType())).findFirst().orElse(null);
                         if (v != null) {
                             v.setCurAmount(v.getCurAmount().add(event.getAmount()));
                             monthlyHistoryRepository.save(v).subscribe(o -> {

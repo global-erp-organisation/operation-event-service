@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.AccountCategoryAggregate;
 import com.ia.operation.aggregates.UserAggregate;
-import com.ia.operation.enums.OperationType;
+import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
 import com.ia.operation.util.AggregateUtil;
@@ -31,7 +31,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
     @JsonProperty("user_id")
     private String userId;
     @JsonProperty("operation_type")
-    private OperationType operationType;
+    private AccountType accountType;
     @JsonProperty("recurring_mode")
     private RecurringMode recurringMode;
     @JsonProperty("default_amount")
@@ -45,7 +45,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
                 .id(cmd.getId())
                 .userId(cmd.getUserId())
                 .recurringMode(cmd.getRecurringMode())
-                .operationType(cmd.getOperationType())
+                .accountType(cmd.getAccountType())
                 .categoryId(cmd.getCategoryId());
     }
     
@@ -56,7 +56,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
                 .id(cmd.getId())
                 .userId(cmd.getUserId())
                 .recurringMode(cmd.getRecurringMode())
-                .operationType(cmd.getOperationType())
+                .accountType(cmd.getAccountType())
                 .categoryId(cmd.getCategoryId());
     }
 
@@ -87,8 +87,8 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
         if(StringUtils.isEmpty(description)) {
             errors.add("The operation description shouldnt be null or empty");
         }
-        if(!OperationType.check(operationType)) {
-            errors.add("The input operation type doesnt match with the available domain. Here is the domain value: " + OperationType.values());
+        if(!AccountType.check(accountType)) {
+            errors.add("The input operation type doesnt match with the available domain. Here is the domain value: " + AccountType.values());
         }
         if(!RecurringMode.check(recurringMode)) {
             errors.add("The input recurring mode doesnt match with the available domain. Here is the domain value: " + RecurringMode.values());

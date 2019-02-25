@@ -26,9 +26,9 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     @Override
     public void update(Operation event) {
         final Flux<DailyHistoryView> refs =
-                historyByDateRepository.findBydateAndType(event.getOperationDate().minusMonths(1), event.getAccount().getOperationType());
+                historyByDateRepository.findBydateAndType(event.getOperationDate().minusMonths(1), event.getAccount().getAccountType());
         final Flux<DailyHistoryView> histories = convert(
-                operationRepository.findByOperationDateAndAccount_operationType(event.getOperationDate(), event.getAccount().getOperationType()),
+                operationRepository.findByOperationDateAndAccount_accountType(event.getOperationDate(), event.getAccount().getAccountType()),
                 (r) -> DailyHistoryView.from(r).build());
         // historyByDateRepository.findBydateAndType(event.getOperationDate(), event.getOperation().getOperationType());
         refs.collectList().subscribe(reference -> {
@@ -55,7 +55,7 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
                         });
                     } else {
                         final DailyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getAccount().getOperationType())).findFirst().orElse(null);
+                                history.stream().filter(r -> r.getType().equals(event.getAccount().getAccountType())).findFirst().orElse(null);
                         if (v != null) {
 
                             v.setCurAmount(v.getCurAmount().add(event.getAmount()));

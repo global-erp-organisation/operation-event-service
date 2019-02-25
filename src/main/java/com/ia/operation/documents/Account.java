@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.enums.OperationType;
+import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
@@ -26,7 +26,7 @@ public class Account {
     @Id
     private String id;
     private String description;
-    private OperationType operationType;
+    private AccountType accountType;
     private RecurringMode recurringMode;
     private BigDecimal defaultAmount;
     @DBRef
@@ -49,7 +49,7 @@ public class Account {
                 .user(user)
                 .description(event.getDescription())
                 .recurringMode(event.getRecurringMode())
-                .operationType(event.getOperationType())
+                .accountType(event.getAccountType())
                 .defaultAmount(event.getDefaultAmount())
                 .category(category)
                 .build();
@@ -61,7 +61,7 @@ public class Account {
                 .user(user)
                 .description(event.getDescription())
                 .recurringMode(event.getRecurringMode())
-                .operationType(event.getOperationType())
+                .accountType(event.getAccountType())
                 .defaultAmount(event.getDefaultAmount())
                 .category(category)
                 .build();
