@@ -20,7 +20,7 @@ public class UserQueryHandler implements Handler {
     public Mono<ServerResponse> userGet(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
-            return queryVariableBadRequest(USER_ID);
+            return badRequestComplete(() -> USER_ID);
         }
         return queryComplete(() -> UserGetByIdQuery.builder().userId(userId).build(), User.class, gateway);
     }

@@ -20,7 +20,7 @@ public class AccountQueryHandler implements Handler {
     public Mono<ServerResponse> accountGetAll(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
-            return queryVariableBadRequest(USER_ID);
+            return badRequestComplete(() -> USER_ID);
         }
         return queryComplete(() -> AccountGetAllQuery.builder().userId(userId).build(), Account.class, gateway);
     }
@@ -28,7 +28,7 @@ public class AccountQueryHandler implements Handler {
     public Mono<ServerResponse> accountGet(ServerRequest request) {
         final String accountId = request.pathVariable(ACCOUNT_ID);
         if (accountId == null) {
-            return queryVariableBadRequest(ACCOUNT_ID);
+            return badRequestComplete(() -> ACCOUNT_ID);
         }
         return queryComplete(() -> AccountGetByIdQuery.builder().accountId(accountId).build(), Account.class, gateway);
     }

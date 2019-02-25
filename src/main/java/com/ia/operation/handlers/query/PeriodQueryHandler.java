@@ -21,7 +21,7 @@ public class PeriodQueryHandler implements Handler {
     public Mono<ServerResponse> periodGetByYear(ServerRequest request) {
         final String year = request.pathVariable(YEAR);
         if (year == null) {
-            return queryVariableBadRequest(YEAR);
+            return badRequestComplete(() -> YEAR);
         }
         return queryComplete(() -> PeriodGetByYearQuery.builder().year(year).build(), Period.class, gateway);
     }
@@ -29,7 +29,7 @@ public class PeriodQueryHandler implements Handler {
     public Mono<ServerResponse> periodGetById(ServerRequest request) {
         final String periodId = request.pathVariable(PERIOD_ID);
         if (periodId == null) {
-            return queryVariableBadRequest(PERIOD_ID);
+            return badRequestComplete(() -> PERIOD_ID);
         }
         return queryComplete(() -> PeriodGetByIdQuery.builder().periodId(periodId).build(), Period.class, gateway);
     }

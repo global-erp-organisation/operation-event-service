@@ -21,15 +21,15 @@ public class ProjectionQueryHandler implements Handler {
     public Mono<ServerResponse> projectionByAccount(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
-            return queryVariableBadRequest(USER_ID);
+            return badRequestComplete(() -> USER_ID);
         }
         final String accountId = request.pathVariable(ACCOUNT_ID);
         if (accountId == null) {
-            return queryVariableBadRequest(ACCOUNT_ID);
+            return badRequestComplete(() -> ACCOUNT_ID);
         }
         final String year = request.pathVariable(YEAR);
         if (year == null || !StringUtils.isNumeric(year)) {
-            return queryVariableBadRequest(YEAR);
+            return badRequestComplete(() -> YEAR);
         }
         return queryComplete(() -> ProjectionByAccountQuery.builder()
                 .accountId(accountId)
@@ -41,11 +41,11 @@ public class ProjectionQueryHandler implements Handler {
     public Mono<ServerResponse> projectionByYear(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         if (userId == null) {
-            return queryVariableBadRequest(USER_ID);
+            return badRequestComplete(() -> USER_ID);
         }
         final String year = request.pathVariable(YEAR);
         if (year == null || !StringUtils.isNumeric(year)) {
-            return queryVariableBadRequest(YEAR);
+            return badRequestComplete(() -> YEAR);
         }
         return queryComplete(()->ProjectionByAccountQuery.builder().year(year).userId(userId).build(), Projection.class, gateway);
         

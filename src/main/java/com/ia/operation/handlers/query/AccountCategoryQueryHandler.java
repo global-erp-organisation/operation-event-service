@@ -21,7 +21,7 @@ public class AccountCategoryQueryHandler implements Handler {
     public Mono<ServerResponse> accountCategoryGet(ServerRequest request) {
         final String categoryId = request.pathVariable(CATEGORY_ID);
         if (categoryId == null) {
-            return queryVariableBadRequest(CATEGORY_ID);
+            return badRequestComplete(() -> CATEGORY_ID);
         }
         return queryComplete(() -> CategoryGetQuery.builder().categoryId(categoryId).build(), AccountCategory.class, gateway);
     }
