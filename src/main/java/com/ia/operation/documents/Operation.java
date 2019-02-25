@@ -1,70 +1,61 @@
 package com.ia.operation.documents;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.enums.OperationType;
-import com.ia.operation.enums.RecurringMode;
-import com.ia.operation.events.created.OperationCreatedEvent;
+import com.ia.operation.events.created.RealisationCreatedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
 
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.JoinProperty;
-import io.github.kaiso.relmongo.annotation.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 
-@Document
 @Builder
 @Data
+@Document
 public class Operation {
     @Id
     private String id;
     private String description;
-    private OperationType operationType;
-    private RecurringMode recurringMode;
-    private BigDecimal defaultAmount;
-    @DBRef
-    private OperationCategory category;
-   
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinProperty(name = "realisations")
-    private Collection<Realisation> realisations = new ArrayList<Realisation>();
-    
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinProperty(name = "projections")
-    private Collection<Projection> projections = new ArrayList<Projection>();
-    private User user;
+    private Account account;
+    private LocalDate operationDate;
+    private Period period;
+    private BigDecimal amount;
 
-    public static Operation of(OperationCreatedEvent event, User user, OperationCategory category) {
+    
+    public static Operation of(RealisationCreatedEvent event, Period period, Account account) {
         return Operation.builder()
                 .id(event.getId())
-                .user(user)
                 .description(event.getDescription())
-                .recurringMode(event.getRecurringMode())
-                .operationType(event.getOperationType())
-                .defaultAmount(event.getDefaultAmount())
-                .category(category)
+                .account(account)
+                .operationDate(event.getOperationDate())
+                .period(period)
+                .amount(event.getAmount())
                 .build();
     }
     
-    public static Operation of(OperationUpdatedEvent event, User user, OperationCategory category) {
+    public static Operation of(OperationUpdatedEvent event, Period period, Account account) {
         return Operation.builder()
                 .id(event.getId())
-                .user(user)
                 .description(event.getDescription())
-                .recurringMode(event.getRecurringMode())
-                .operationType(event.getOperationType())
-                .defaultAmount(event.getDefaultAmount())
-                .category(category)
+                .account(account)
+                .operationDate(event.getOperationDate())
+                .period(period)
+                .amount(event.getAmount())
                 .build();
+    }
+
+    
+    public static OperationBuilder from(Operation event) {
+        return Operation.builder()
+                .id(event.getId())
+                .description(event.getDescription())
+                .account(event.getAccount())
+                .operationDate(event.getOperationDate())
+                .period(event.getPeriod())
+                .amount(event.getAmount());
     }
 
 }

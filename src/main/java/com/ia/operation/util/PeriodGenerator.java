@@ -10,7 +10,7 @@ import com.ia.operation.events.created.PeriodCreatedEvent;
 @FunctionalInterface
 public interface PeriodGenerator {
    
-    Collection<PeriodCreatedEvent> generate(int year);
+    Collection<PeriodCreatedEvent> generate(String year);
 
     default Optional<Period> resolve(LocalDate date, Collection<Period> periods) {
         return periods.stream()

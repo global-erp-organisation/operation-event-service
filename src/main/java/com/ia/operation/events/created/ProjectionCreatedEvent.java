@@ -11,7 +11,7 @@ import lombok.Value;
 @Builder
 public class ProjectionCreatedEvent implements Serializable {
     private String id;
-    private String operationId;
+    private String accountId;
     private BigDecimal amount;
     private String periodId;
 

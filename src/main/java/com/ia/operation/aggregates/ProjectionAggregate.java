@@ -9,7 +9,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.ProjectionCreationCmd;
-import com.ia.operation.commands.delete.ProjectionDeleteCmd;
+import com.ia.operation.commands.delete.ProjectionDeletionCmd;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.deleted.ProjectionDeletedEvent;
 
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class ProjectionAggregate {
     @AggregateIdentifier
     private String id;
-    private String operationId;
+    private String accountId;
     private BigDecimal amount;
     private String periodId;
 
@@ -36,14 +36,13 @@ public class ProjectionAggregate {
     @EventSourcingHandler
     public void onProjectionCreated(ProjectionCreatedEvent event) {
         this.id = event.getId();
-        this.operationId = event.getOperationId();
+        this.accountId = event.getAccountId();
         this.amount = event.getAmount();
         this.periodId = event.getPeriodId();
     }
 
     @CommandHandler
-    public void handleProjectionDeletionCmd(ProjectionDeleteCmd cmd) {
-
+    public void handleProjectionDeletionCmd(ProjectionDeletionCmd cmd) {
         AggregateLifecycle.apply(ProjectionDeletedEvent.builder().id(cmd.getId()).build());
         AggregateLifecycle.markDeleted();
     }

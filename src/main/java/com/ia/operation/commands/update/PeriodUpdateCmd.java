@@ -1,6 +1,6 @@
 package com.ia.operation.commands.update;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
@@ -12,6 +12,7 @@ import lombok.Value;
 public class PeriodUpdateCmd {
     @TargetAggregateIdentifier
     private String id;
-    private Date start;
-    private Date end;
+    private LocalDate start;
+    private LocalDate end;
+    private String year;
 }

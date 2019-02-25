@@ -11,7 +11,7 @@ import lombok.Value;
 public class RealisationCreatedEvent {
     private String id;
     private String description;
-    private String operationId;
+    private String accountId;
     private LocalDate operationDate;
     private BigDecimal amount;
 

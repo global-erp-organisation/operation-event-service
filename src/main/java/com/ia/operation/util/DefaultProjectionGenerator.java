@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
-import com.ia.operation.repositories.OperationRepository;
+import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.PeriodRepository;
 
 import lombok.AllArgsConstructor;
@@ -17,16 +17,16 @@ import reactor.core.publisher.Flux;
 public class DefaultProjectionGenerator implements ProjectionGenerator {
 
     private final PeriodRepository periodRepository;
-    private final OperationRepository operationRepository;
+    private final AccountRepository accountRepository;
 
     @Override
-    public Flux<ProjectionCreatedEvent> generate(int year) {
+    public Flux<ProjectionCreatedEvent> generate(String year) {
         return periodRepository.findByYear(year).flatMap(period -> {
-            return operationRepository.findAll().map(operation -> {
+            return accountRepository.findAll().map(account -> {
                 return ProjectionCreatedEvent.builder()
-                        .amount(compute(operation.getDefaultAmount(), operation.getRecurringMode()))
+                        .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
                         .id(ObjectIdUtil.id())
-                        .operationId(operation.getId())
+                        .accountId(account.getId())
                         .periodId(period.getId())
                         .build();
             });

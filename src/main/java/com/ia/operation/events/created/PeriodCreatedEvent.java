@@ -13,7 +13,7 @@ import lombok.Value;
 @Builder
 public class PeriodCreatedEvent implements Serializable {
     private String id;
-    private int year;
+    private String year;
     private LocalDate start;
     private LocalDate end;
     private String description;

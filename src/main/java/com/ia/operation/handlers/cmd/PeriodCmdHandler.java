@@ -1,32 +1,34 @@
 package com.ia.operation.handlers.cmd;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.creation.PeriodCreationCmd;
+import com.ia.operation.handlers.Handler;
 import com.ia.operation.util.PeriodGenerator;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@RestController
-@AllArgsConstructor
-@RequestMapping(value = "/periods")
-public class PeriodCmdHandler {
+@Component
+@RequiredArgsConstructor
+public class PeriodCmdHandler implements Handler {
     private final CommandGateway gateway;
     private final PeriodGenerator generator;
 
-    @PostMapping
-    public ResponseEntity<List<String>> periodAdd(@RequestBody PeriodCreationCmd request) {
-        List<String> ids = generator.generate(request.getYear()).stream().map(e -> {
-            return gateway.sendAndWait(PeriodCreationCmd.from(e).build());
-        }).map(o -> o.toString()).collect(Collectors.toList());
-        return ResponseEntity.accepted().body(ids);
+    public Mono<ServerResponse> periodAdd(ServerRequest request) {
+        final Mono<PeriodCreationCmd> bodyMono = request.bodyToMono(PeriodCreationCmd.class).filter(body -> body.getYear() != null);
+        return bodyMono.map(body -> {
+            return generator.generate(body.getYear()).stream().map(e -> {
+                return gateway.sendAndWait(PeriodCreationCmd.from(e).build());
+            }).map(o -> o.toString()).collect(Collectors.toList());
+        }).flatMap(ids -> ServerResponse.accepted().body(Flux.fromIterable(ids), String.class))
+                .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY + " or the year property is missing"), String.class));
+
     }
 }

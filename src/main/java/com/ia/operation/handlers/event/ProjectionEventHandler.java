@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 import com.ia.operation.documents.Projection;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
-import com.ia.operation.queries.projection.ProjectionByOperationQuery;
-import com.ia.operation.queries.projection.ProjectionByPeriodQuery;
+import com.ia.operation.queries.projection.ProjectionByAccountQuery;
+import com.ia.operation.queries.projection.ProjectionByYearQuery;
 import com.ia.operation.queries.projection.ProjectionGenerationQuery;
-import com.ia.operation.repositories.OperationRepository;
+import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.PeriodRepository;
 import com.ia.operation.repositories.ProjectionRepository;
 import com.ia.operation.util.ProjectionGenerator;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectionEventHandler {
 
     private final ProjectionRepository projectionRepository;
-    private final OperationRepository OperationRepository;
+    private final AccountRepository AccountRepository;
     private final PeriodRepository PeriodRepository;
     private final ProjectionGenerator generator;
     private final RabbitTemplate rabbitTemplate;
@@ -37,7 +37,7 @@ public class ProjectionEventHandler {
     public void on(ProjectionCreatedEvent event) {
         log.info("Event recieved: value=[{}]", event);
         PeriodRepository.findById(event.getPeriodId()).subscribe(p -> {
-            OperationRepository.findById(event.getOperationId()).subscribe(o -> {
+            AccountRepository.findById(event.getAccountId()).subscribe(o -> {
                 projectionRepository.save(Projection.of(event, o, p)).subscribe(pr -> {
                     log.info("Projection succesfully saved. value=[{}]", pr);
                 });
@@ -53,17 +53,20 @@ public class ProjectionEventHandler {
     }
 
     @QueryHandler
-    public Object projectionByOperation(ProjectionByOperationQuery query) {
-        return projectionRepository.findByOperation_IdAndOperation_UserId(query.getOperationId(), query.getUserId());
+    public Object projectionByAccount(ProjectionByAccountQuery query) {
+        log.info("ProjectionByAccount query recieved: value=[{}]", query);
+        return projectionRepository.findByAccount_IdAndAccount_UserIdAndPeriod_year(query.getAccountId(), query.getUserId(), query.getYear());
     }
 
     @QueryHandler
-    public Object projectionByPeriod(ProjectionByPeriodQuery query) {
-        return projectionRepository.findByPeriod_IdAndOperation_UserIdOrderByOperation_description(query.getPeriodId(), query.getUserId());
+    public Object projectionByyear(ProjectionByYearQuery query) {
+        log.info("ProjectionByYear query recieved: value=[{}]", query);
+        return projectionRepository.findByAccount_User_IdAndPeriod_year(query.getUserId(), query.getYear());
     }
 
     @QueryHandler
     public Object projectionGenerate(ProjectionGenerationQuery query) {
+        log.info("ProjectionGeneration query recieved: value=[{}]", query);
         return generator.generate(query.getYear());
     }
 }

@@ -9,7 +9,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.UserCreationCmd;
-import com.ia.operation.commands.delete.UserDeleteCmd;
+import com.ia.operation.commands.delete.UserDeletionCmd;
 import com.ia.operation.commands.update.UserUpdateCmd;
 import com.ia.operation.events.created.UserCreatedEvent;
 import com.ia.operation.events.deleted.UserDeletedEvent;
@@ -63,7 +63,7 @@ public class UserAggregate {
     }
 
     @CommandHandler
-    public void handleUserDeletionCmd(UserDeleteCmd cmd) {
+    public void handleUserDeletionCmd(UserDeletionCmd cmd) {
         AggregateLifecycle.apply(UserDeletedEvent.builder().userId(cmd.getId()).build());
         AggregateLifecycle.markDeleted();
     }

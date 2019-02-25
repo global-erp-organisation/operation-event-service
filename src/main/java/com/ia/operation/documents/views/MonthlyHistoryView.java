@@ -5,7 +5,7 @@ import java.time.Month;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.documents.Realisation;
+import com.ia.operation.documents.Operation;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.util.ObjectIdUtil;
 
@@ -23,11 +23,11 @@ public class MonthlyHistoryView {
     private String month;
     private Month key;
     
-    public static MonthlyHistoryViewBuilder from (Realisation r) {
+    public static MonthlyHistoryViewBuilder from (Operation r) {
         return MonthlyHistoryView.builder()
                 .id(ObjectIdUtil.id())
                 .curAmount(r.getAmount())
-                .type(r.getOperation().getOperationType())
+                .type(r.getAccount().getOperationType())
                 .refAmount(BigDecimal.ZERO)
                 .month(r.getPeriod().getDescription().toUpperCase())
                 .key(r.getOperationDate().getMonth());

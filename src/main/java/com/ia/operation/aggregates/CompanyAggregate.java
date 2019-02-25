@@ -9,7 +9,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.CompanyCreationCmd;
-import com.ia.operation.commands.delete.CompanyDeleteCmd;
+import com.ia.operation.commands.delete.CompanyDeletionCmd;
 import com.ia.operation.commands.update.CompanyUpdateCmd;
 import com.ia.operation.events.created.CompanyCreatedEvent;
 import com.ia.operation.events.deleted.CompanyDeletedEvent;
@@ -54,7 +54,7 @@ public class CompanyAggregate {
     }
 
     @CommandHandler
-    public void handleCompanyDeletionCmd(CompanyDeleteCmd cmd) {
+    public void handleCompanyDeletionCmd(CompanyDeletionCmd cmd) {
         AggregateLifecycle.apply(CompanyDeletedEvent.builder().companyId(cmd.getId()).build());
         AggregateLifecycle.markDeleted();
     }

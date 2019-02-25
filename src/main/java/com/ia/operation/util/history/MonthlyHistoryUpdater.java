@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.ia.operation.documents.Realisation;
+import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.MonthlyHistoryView;
 import com.ia.operation.repositories.MonthlyHistoryRepository;
-import com.ia.operation.repositories.RealisationRepository;
+import com.ia.operation.repositories.OperationRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,16 +18,16 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView> {
     private final MonthlyHistoryRepository monthlyHistoryRepository;
-    private final RealisationRepository realisationRepository;
+    private final OperationRepository operationRepository;
 
     @Override
-    public void update(Realisation event) {
+    public void update(Operation event) {
         final String prev = event.getOperationDate().getMonth() + "-" + event.getOperationDate().minusYears(1).getYear();
-        final Flux<MonthlyHistoryView> refs = monthlyHistoryRepository.findByMonthAndType(prev.toUpperCase(), event.getOperation().getOperationType());
+        final Flux<MonthlyHistoryView> refs = monthlyHistoryRepository.findByMonthAndType(prev.toUpperCase(), event.getAccount().getOperationType());
         final Flux<MonthlyHistoryView> histories = convert(
-                realisationRepository.findByPeriod_descriptionAndOperation_operationType(event.getPeriod().getDescription(), event.getOperation().getOperationType()),
+                operationRepository.findByPeriod_descriptionAndAccount_operationType(event.getPeriod().getDescription(), event.getAccount().getOperationType()),
                 (r) -> MonthlyHistoryView.from(r).build());
-        // monthlyHistoryRepository.findByMonthAndType(event.getPeriod().getDescription().toUpperCase(), event.getOperation().getOperationType());
+        // monthlyHistoryRepository.findByMonthAndType(event.getPeriod().getDescription().toUpperCase(), event.getAccount().getOperationType());
 
         refs.collectList().subscribe(reference -> {
             final Optional<MonthlyHistoryView> ref = reference.stream().filter(r -> isMatch(r, event)).findFirst();
@@ -53,7 +53,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
                         });
                     } else {
                         final MonthlyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getOperation().getOperationType())).findFirst().orElse(null);
+                                history.stream().filter(r -> r.getType().equals(event.getAccount().getOperationType())).findFirst().orElse(null);
                         if (v != null) {
                             v.setCurAmount(v.getCurAmount().add(event.getAmount()));
                             monthlyHistoryRepository.save(v).subscribe(o -> {
@@ -70,7 +70,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
         });
     }
 
-    private Boolean isMatch(MonthlyHistoryView r, Realisation event) {
+    private Boolean isMatch(MonthlyHistoryView r, Operation event) {
         return (r.getKey().equals(event.getOperationDate().getMonth()));
     }
 

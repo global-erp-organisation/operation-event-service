@@ -9,7 +9,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.PeriodCreationCmd;
-import com.ia.operation.commands.delete.PeriodDeleteCmd;
+import com.ia.operation.commands.delete.PeriodDeletionCmd;
 import com.ia.operation.events.created.PeriodCreatedEvent;
 import com.ia.operation.events.deleted.PeriodDeletedEvent;
 
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class PeriodAggregate {
     @AggregateIdentifier
     private String id;
-    private int year;
+    private String year;
     private LocalDate start;
     private LocalDate end;
     private String description;
@@ -44,7 +44,7 @@ public class PeriodAggregate {
     }
 
     @CommandHandler
-    public void handlePeriodDeleteCmd(PeriodDeleteCmd cmd) {
+    public void handlePeriodDeleteCmd(PeriodDeletionCmd cmd) {
         if (getClose()) {
             throw new IllegalStateException("Deleting closed periods is prohibited");
         }

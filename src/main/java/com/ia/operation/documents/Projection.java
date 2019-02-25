@@ -20,14 +20,14 @@ public class Projection {
     private String id;
     @ManyToOne
     @JoinProperty
-    private Operation operation;
+    private Account account;
     private BigDecimal amount;
     private Period period;
     
-    public static Projection of(ProjectionCreatedEvent event, Operation operation, Period period) {
+    public static Projection of(ProjectionCreatedEvent event, Account account, Period period) {
         return Projection.builder()
                 .id(event.getId())
-                .operation(operation)
+                .account(account)
                 .amount(event.getAmount())
                 .period(period)
                 .build();

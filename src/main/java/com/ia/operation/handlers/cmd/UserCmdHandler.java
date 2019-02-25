@@ -1,41 +1,56 @@
 package com.ia.operation.handlers.cmd;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.creation.UserCreationCmd;
-import com.ia.operation.commands.delete.UserDeleteCmd;
+import com.ia.operation.commands.delete.UserDeletionCmd;
 import com.ia.operation.commands.update.UserUpdateCmd;
+import com.ia.operation.handlers.Handler;
+import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.ObjectIdUtil;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
-@AllArgsConstructor
-@RestController
-public class UserCmdHandler {
-    private CommandGateway gateway;
-
-    @PostMapping(value = "companies/{companyId}/users")
-    public ResponseEntity<String> userAdd(@RequestBody UserCreationCmd request, @PathVariable String companyId) {
-        final UserCreationCmd cmd = UserCreationCmd.from(request).id(ObjectIdUtil.id()).companyId(companyId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+@RequiredArgsConstructor
+@Component
+public class UserCmdHandler implements Handler {
+    
+    private final CommandGateway gateway;
+    private final AggregateUtil util;
+    
+    public Mono<ServerResponse> userAdd(ServerRequest request) {
+        final String companyId = request.pathVariable(COMPANY_ID);
+        final Mono<UserCreationCmd> bodyMono = request.bodyToMono(UserCreationCmd.class);
+        return bodyMono.map(body->UserCreationCmd.from(body)
+                .id(ObjectIdUtil.id())
+                .companyId(companyId)
+                .build()
+                .validate(util))
+                .flatMap(r -> response(r, gateway))
+                .switchIfEmpty(ServerResponse.badRequest()
+                        .body(Mono.just(MISSING_REQUEST_BODY), String.class));
     }
 
-    @PutMapping(value = "/users/{userId}")
-    public ResponseEntity<String> userUpdate(@RequestBody UserUpdateCmd request, @PathVariable String userId) {
-        final UserUpdateCmd cmd = UserUpdateCmd.from(request).id(userId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> userUpdate(ServerRequest request) {
+        final String userId = request.pathVariable(USER_ID);
+        final Mono<UserUpdateCmd> bodyMono = request.bodyToMono(UserUpdateCmd.class);
+        return bodyMono.map(body->UserUpdateCmd.from(body)
+                .id(userId)
+                .build()
+                .validate(util))
+                .flatMap(r -> response(r, gateway))
+                .switchIfEmpty(ServerResponse.badRequest()
+                        .body(Mono.just(MISSING_REQUEST_BODY), String.class));
     }
 
     @DeleteMapping(value = "/users/{userId}")
-    public ResponseEntity<String> userDelete(@PathVariable String userId) {
-        final UserDeleteCmd cmd = UserDeleteCmd.builder().id(userId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> userDelete(ServerRequest request) {
+        final String userId = request.pathVariable(USER_ID);
+        return response( UserDeletionCmd.builder().id(userId).build().validate(util), gateway);
     }
 }

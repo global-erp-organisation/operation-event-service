@@ -8,5 +8,5 @@ import reactor.core.publisher.Flux;
 
 public interface PeriodRepository extends ReactiveMongoRepository<Period, String> {
 
-    Flux<Period> findByYear(Integer year);
+    Flux<Period> findByYear(String year);
 }

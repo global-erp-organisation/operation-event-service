@@ -1,53 +1,80 @@
 package com.ia.operation.commands.update;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ia.operation.enums.OperationType;
-import com.ia.operation.enums.RecurringMode;
+import com.ia.operation.aggregates.AccountAggregate;
+import com.ia.operation.aggregates.OperationAggregate;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
+import com.ia.operation.util.AggregateUtil;
+import com.ia.operation.util.validator.CommandValidator;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-@Value
 @Builder
-public class OperationUpdateCmd {
-    @TargetAggregateIdentifier
+@Value
+@EqualsAndHashCode(callSuper = false)
+public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
     private String id;
     private String description;
-    @JsonProperty("user_id")
-    private String userId;
-    @JsonProperty("operation_type")
-    private OperationType operationType;
-    @JsonProperty("recurring_mode")
-    private RecurringMode recurringMode;
-    @JsonProperty("default_amount")
-    private BigDecimal defaultAmount;
-    private String categoryId;
-    
+    @JsonProperty("account_id")
+    private String accountId;
+    @JsonProperty("operation_date")
+    private LocalDate operationDate;
+    @JsonProperty("period_id")
+    private String periodId;
+    private BigDecimal amount;
+
     public static OperationUpdateCmdBuilder from(OperationUpdateCmd cmd) {
         return OperationUpdateCmd.builder()
-                .defaultAmount(cmd.getDefaultAmount())
-                .description(cmd.getDescription())
                 .id(cmd.getId())
-                .userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode())
-                .operationType(cmd.getOperationType())
-                .categoryId(cmd.getCategoryId());
+                .description(cmd.getDescription())
+                .operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId())
+                .amount(cmd.getAmount());
     }
+
     
     public static OperationUpdatedEvent.OperationUpdatedEventBuilder of(OperationUpdateCmd cmd) {
         return OperationUpdatedEvent.builder()
-                .defaultAmount(cmd.getDefaultAmount())
-                .description(cmd.getDescription())
                 .id(cmd.getId())
-                .userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode())
-                .operationType(cmd.getOperationType())
-                .categoryId(cmd.getCategoryId());
+                .description(cmd.getDescription())
+                .operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId())
+                .amount(cmd.getAmount());
+    }
+
+    @Override
+    public ValidationResult<OperationUpdateCmd> validate(AggregateUtil util) {
+        final List<String> errors = new ArrayList<>();
+        if (StringUtils.isEmpty(accountId)) {
+            errors.add("Account identifier shouldn't be null or empty");
+        } else {
+            if (!util.aggregateGet(accountId, AccountAggregate.class).isPresent()) {
+                errors.add("The account with id " + accountId + " doesnt exist");
+            }
+        }
+        if(StringUtils.isEmpty(id)) {
+            errors.add("The operation identifier shouldnt be null nor empty.");
+        }else {
+            if (util.aggregateGet(id, OperationAggregate.class).isPresent()) {
+                errors.add("The operation with id " + id + " doesnt exists");
+            }
+        }
+        if(StringUtils.isEmpty(description)) {
+            errors.add("The operation description shouldnt be null or empty");
+        }
+        if(amount.doubleValue()<=0.0) {
+            errors.add("The operation amount should be greater than zero.");
+        }
+        return buildResult(errors);
     }
 
 }

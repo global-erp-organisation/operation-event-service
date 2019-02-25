@@ -21,11 +21,11 @@ public class Period {
     @Id
     private String id;
     @Indexed(unique = false)
-    private Integer year;
+    private String year;
     private LocalDate start;
     private LocalDate end;
     private String description;
-    private Collection<Realisation> realisations;
+    private Collection<Operation> operations;
     private Collection<Projection> projections;
     @Builder.Default
     private Boolean close = false;

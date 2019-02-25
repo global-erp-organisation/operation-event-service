@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.documents.Realisation;
+import com.ia.operation.documents.Operation;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.util.ObjectIdUtil;
 
@@ -21,12 +21,12 @@ public class YearlyHistoryView {
     private OperationType type;
     private int year;
 
-    public static YearlyHistoryViewBuilder from(Realisation r) {
+    public static YearlyHistoryViewBuilder from(Operation r) {
         return YearlyHistoryView.builder()
                 .id(ObjectIdUtil.id())
                 .curAmount(r.getAmount())
                 .refAmount(BigDecimal.ZERO)
                 .year(r.getOperationDate().getYear())
-                .type(r.getOperation().getOperationType());
+                .type(r.getAccount().getOperationType());
     }
 }

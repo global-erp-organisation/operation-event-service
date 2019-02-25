@@ -9,26 +9,30 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.axonframework.common.Assert;
 import org.springframework.stereotype.Component;
 
 import com.ia.operation.events.created.PeriodCreatedEvent;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MonthlyPeriodGenerator implements PeriodGenerator {
 
     private static final int YEAR_LENGTH_IN_MONTH = 12;
     private final Locale locale;
 
     @Override
-    public Collection<PeriodCreatedEvent> generate(int year) {
+    public Collection<PeriodCreatedEvent> generate(String year) {
+        if(!StringUtils.isNumeric(year)) {
+           throw new IllegalArgumentException("The provided year should be a number."); 
+        }
         return IntStream
                 .range(1, YEAR_LENGTH_IN_MONTH + 1)
-                .mapToObj(i -> of(year, i))
+                .mapToObj(i -> of(Integer.valueOf(year), i))
                 .map(p -> PeriodCreatedEvent.of(p, locale).build())
                 .collect(Collectors.toList());
     }
@@ -61,7 +65,7 @@ public class MonthlyPeriodGenerator implements PeriodGenerator {
                 .id(ObjectIdUtil.id())
                 .end(LocalDate.of(year, month, lastDay))
                 .start(LocalDate.of(year, month, startDay))
-                .year(year);
+                .year(String.valueOf(year));
     }
 
     enum ClassOfMonth {

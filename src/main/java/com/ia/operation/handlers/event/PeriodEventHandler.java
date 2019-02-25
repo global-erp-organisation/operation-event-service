@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.ia.operation.documents.Period;
 import com.ia.operation.events.created.PeriodCreatedEvent;
 import com.ia.operation.queries.period.PeriodGetByIdQuery;
-import com.ia.operation.queries.period.PeriodGetByYear;
+import com.ia.operation.queries.period.PeriodGetByYearQuery;
 import com.ia.operation.repositories.PeriodRepository;
 
 import lombok.AllArgsConstructor;
@@ -32,11 +32,13 @@ public class PeriodEventHandler {
     
     @QueryHandler
     public Object periodGetById(PeriodGetByIdQuery query) {
+        log.info("periodGetById query recieved: value=[{}]", query);
         return periodRepository.findById(query.getPeriodId());
     }
     
     @QueryHandler
-    public Object periodGetByYear(PeriodGetByYear query) {
+    public Object periodGetByYearQuery(PeriodGetByYearQuery query) {
+        log.info("periodGetByYear query recieved: value=[{}]", query);
         return periodRepository.findByYear(query.getYear());
     }
 }

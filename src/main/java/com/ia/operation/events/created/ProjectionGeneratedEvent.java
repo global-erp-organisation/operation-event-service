@@ -9,7 +9,7 @@ import lombok.Value;
 @Value
 @Builder
 public class ProjectionGeneratedEvent implements Serializable {
-    private int year;
+    private String year;
     @Builder.Default
     private String routingKey = "event";
 }

@@ -1,42 +1,46 @@
 package com.ia.operation.handlers.cmd;
 
+import java.time.LocalDate;
+
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.creation.OperationCreationCmd;
-import com.ia.operation.commands.delete.OperationDeleteCmd;
+import com.ia.operation.commands.delete.OperationDeletionCmd;
 import com.ia.operation.commands.update.OperationUpdateCmd;
+import com.ia.operation.handlers.Handler;
+import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.ObjectIdUtil;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
-@RestController
-@AllArgsConstructor
-public class OperationCmdHandler {
+@RequiredArgsConstructor
+@Component
+public class OperationCmdHandler implements Handler {
+
     private final CommandGateway gateway;
+    private final AggregateUtil util;
 
-    @PostMapping(value = "users/{userId}/operations")
-    public ResponseEntity<String> operationAdd(@RequestBody OperationCreationCmd request, @PathVariable String userId) {
-        final OperationCreationCmd cmd = OperationCreationCmd.from(request).id(ObjectIdUtil.id()).userId(userId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> operationAdd(ServerRequest request) {
+        final String accountId = request.pathVariable(ACCOUNT_ID);
+        return commandComplete(request.bodyToMono(OperationCreationCmd.class).map(body -> {
+            final LocalDate date = body.getOperationDate() == null ? LocalDate.now() : body.getOperationDate();
+            return OperationCreationCmd.from(body).id(ObjectIdUtil.id()).operationDate(date).accountId(accountId).build().validate(util);
+        }), gateway);
     }
 
-    @PutMapping(value = "/operations/{operationId}")
-    public ResponseEntity<String> operationUpdate(@RequestBody OperationUpdateCmd request, @PathVariable String operationId) {
-        final OperationUpdateCmd cmd = OperationUpdateCmd.from(request).id(operationId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> operationUpdate(ServerRequest request) {
+        final String operationId = request.pathVariable(OPERATION_ID);
+        return commandComplete(request.bodyToMono(OperationUpdateCmd.class).map(body -> {
+            return OperationUpdateCmd.from(body).id(operationId).build().validate(util);
+        }), gateway);
     }
 
-    @DeleteMapping(value = "/operations/{operationId}")
-    public ResponseEntity<String> operationDelete(@PathVariable String operationId) {
-        final OperationDeleteCmd cmd = OperationDeleteCmd.builder().id(operationId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> operationDelete(ServerRequest request) {
+        final String operationId = request.pathVariable(OPERATION_ID);
+        return response(OperationDeletionCmd.builder().id(operationId).build().validate(util), gateway);
     }
-
 }

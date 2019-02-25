@@ -1,42 +1,32 @@
 package com.ia.operation.handlers.query;
 
-import java.util.concurrent.ExecutionException;
-
 import org.axonframework.queryhandling.QueryGateway;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.documents.Company;
-import com.ia.operation.queries.company.CompanyByDescriptionQuery;
+import com.ia.operation.handlers.Handler;
 import com.ia.operation.queries.company.CompanyGetAllQuery;
 import com.ia.operation.queries.company.CompanyGetQuery;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
+@Component
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
-public class CompanyQueryHandler {
+public class CompanyQueryHandler implements Handler {
     private final QueryGateway gateway;
 
-    @GetMapping(value = "/companies/{companyId}")
-    public Mono<Company> companyGet(@PathVariable String companyId) throws InterruptedException, ExecutionException {
-        return (Mono<Company>) gateway.query(CompanyGetQuery.builder().companyId(companyId).build(), Object.class).get();
+    public Mono<ServerResponse> companyGet(ServerRequest request) {
+        final String companyId = request.pathVariable(COMPANY_ID);
+        if (companyId == null) {
+            return ServerResponse.badRequest().body(Mono.just("the company identifier variable is missing."), String.class);
+        }
+        return queryComplete(() -> CompanyGetQuery.builder().companyId(companyId).build(), Company.class, gateway);
     }
 
-    @GetMapping(value = "/companies")
-    public Flux<Company> companyGetAll() throws InterruptedException, ExecutionException {
-        return (Flux<Company>) gateway.query(new CompanyGetAllQuery(), Object.class).get();
+    public Mono<ServerResponse> companyGetAll(ServerRequest request) {
+        return queryComplete(() -> new CompanyGetAllQuery(), Company.class, gateway);
     }
-    
-    @PostMapping(value = "/companies/description")
-    public Flux<Company> companyByDescription(@RequestBody CompanyByDescriptionQuery request) throws InterruptedException, ExecutionException {
-        return (Flux<Company>) gateway.query(request, Object.class).get();
-    }
-
 }

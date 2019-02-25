@@ -9,8 +9,9 @@ import lombok.Value;
 @Builder
 public class ProjectionUpdatedEvent {
     private String id;
-    private String operationId;
+    private String accountId;
     private BigDecimal amount;
     private String periodId;
+    private String year;
 
 }

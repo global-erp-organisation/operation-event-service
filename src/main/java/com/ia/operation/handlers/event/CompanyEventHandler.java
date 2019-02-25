@@ -49,6 +49,7 @@ public class CompanyEventHandler {
 
     @QueryHandler
     public Object companyGet(CompanyGetQuery query) {
+        log.info("A new query for companyGet have been recieved: {}", query);
         return companyRepository.findById(query.getCompanyId());
     }
 

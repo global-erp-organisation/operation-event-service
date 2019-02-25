@@ -1,44 +1,49 @@
 package com.ia.operation.handlers.query;
 
-import java.util.concurrent.ExecutionException;
-
 import org.axonframework.queryhandling.QueryGateway;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.ia.operation.documents.Projection;
+import com.ia.operation.documents.Operation;
+import com.ia.operation.handlers.Handler;
+import com.ia.operation.queries.operation.OperationGetAllQuery;
 import com.ia.operation.queries.operation.OperationGetByIdQuery;
-import com.ia.operation.queries.operation.OperationGetByUser;
-import com.ia.operation.queries.projection.ProjectionByOperationQuery;
-import com.ia.operation.queries.projection.ProjectionByPeriodQuery;
+import com.ia.operation.queries.operation.OperationGetByYearQuery;
 
-import lombok.AllArgsConstructor;
-import reactor.core.publisher.Flux;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
-@RestController
-@AllArgsConstructor
-public class OperationQueryHandler {
-    private final QueryGateway gateway;
+@Component
+@RequiredArgsConstructor
+public class OperationQueryHandler implements Handler {
+    private QueryGateway gateway;
 
-    @GetMapping(value="users/{userId}/operations")
-    public Object operationGetAll(@PathVariable String userId) throws InterruptedException, ExecutionException {
-        return gateway.query(OperationGetByUser.builder().build(), Object.class).get();
+    public Mono<ServerResponse> operationGet(ServerRequest request) {
+        final String operationId = request.pathVariable(OPERATION_ID);
+        if (operationId == null) {
+            return queryVariableBadRequest(OPERATION_ID);
+        }
+        return queryComplete(() -> OperationGetByIdQuery.builder().operationId(operationId).build(), Operation.class, gateway);
     }
 
-    @GetMapping(value = "operations/{operationId}")
-    public Object operationGet(@PathVariable String operationId) throws InterruptedException, ExecutionException {
-        return gateway.query(OperationGetByIdQuery.builder().operationId(operationId).build(), Object.class).get();
+    public Mono<ServerResponse> operationGetByear(ServerRequest request) {
+        final String year = request.pathVariable(YEAR);
+        if (year == null) {
+            return queryVariableBadRequest(YEAR);
+        }
+        final String userId = request.pathVariable(USER_ID);
+        if (userId == null) {
+            return queryVariableBadRequest(USER_ID);
+        }
+        return queryComplete(() -> OperationGetByYearQuery.builder().year(year).userId(userId).build(), Operation.class, gateway);
     }
 
-    @GetMapping(value = "/{operationId}/users/{userId}/projections")
-    public Object projectionByOperation(@PathVariable String operationId,@PathVariable String userId) throws InterruptedException, ExecutionException {
-        return gateway.query(ProjectionByOperationQuery.builder().operationId(operationId).userId(userId).build(), Object.class).get();
+    public Mono<ServerResponse> operationGetAll(ServerRequest request) {
+        final String userId = request.pathVariable(USER_ID);
+        if (userId == null) {
+            return queryVariableBadRequest(USER_ID);
+        }
+        return queryComplete(() -> OperationGetAllQuery.builder().userId(userId).build(), Operation.class, gateway);
     }
-   
-    @SuppressWarnings("unchecked")
-    @GetMapping(value = "periods/{periodId}/users/{}userId/projections")
-    public Flux<Projection>  projectionsGenerationQuery(@PathVariable String periodId, @PathVariable String userId) throws InterruptedException, ExecutionException {
-        return (Flux<Projection>) gateway.query(ProjectionByPeriodQuery.builder().periodId(periodId).userId(userId).build(), Object.class).get();
-     }
 }

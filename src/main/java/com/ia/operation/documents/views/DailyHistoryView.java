@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.documents.Realisation;
+import com.ia.operation.documents.Operation;
 import com.ia.operation.enums.OperationType;
 
 import lombok.Builder;
@@ -25,11 +25,11 @@ public class DailyHistoryView {
     private OperationType type;
     private LocalDate date;
     
-    public static DailyHistoryViewBuilder from (Realisation r) {
+    public static DailyHistoryViewBuilder from (Operation r) {
         return DailyHistoryView.builder()
                 .date(r.getOperationDate())
                 .refAmount(BigDecimal.ZERO)
-                .type(r.getOperation().getOperationType())
+                .type(r.getAccount().getOperationType())
                 .curAmount(r.getAmount());
     }
     

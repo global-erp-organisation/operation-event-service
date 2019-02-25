@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.ia.operation.documents.Realisation;
+import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.YearlyHistoryView;
-import com.ia.operation.repositories.RealisationRepository;
+import com.ia.operation.repositories.OperationRepository;
 import com.ia.operation.repositories.YearlyHistoryRepository;
 
 import lombok.AllArgsConstructor;
@@ -19,16 +19,16 @@ import reactor.core.publisher.Flux;
 public class YearlyHistoryUpdater implements HistoryUpdater<YearlyHistoryView> {
 
     private final YearlyHistoryRepository yearlyHistoryRepository;
-    private final RealisationRepository realisationRepository;
+    private final OperationRepository operationRepository;
 
     @Override
-    public void update(Realisation event) {
+    public void update(Operation event) {
         final Flux<YearlyHistoryView> refs =
-                yearlyHistoryRepository.findByYearAndType(event.getOperationDate().minusYears(1).getYear(), event.getOperation().getOperationType());
+                yearlyHistoryRepository.findByYearAndType(event.getOperationDate().minusYears(1).getYear(), event.getAccount().getOperationType());
         final Flux<YearlyHistoryView> histories =
-                convert(realisationRepository.findByPeriod_yearAndOperation_operationType(event.getOperationDate().getYear(),
-                        event.getOperation().getOperationType()), (r) -> YearlyHistoryView.from(r).build());
-        // yearlyHistoryRepository.findByYearAndType(event.getOperationDate().getYear(), event.getOperation().getOperationType());
+                convert(operationRepository.findByPeriod_yearAndAccount_operationType(event.getOperationDate().getYear(),
+                        event.getAccount().getOperationType()), (r) -> YearlyHistoryView.from(r).build());
+        // yearlyHistoryRepository.findByYearAndType(event.getOperationDate().getYear(), event.getAccount().getOperationType());
 
         refs.collectList().subscribe(reference -> {
             final Optional<YearlyHistoryView> ref = reference.stream().filter(r -> isMatch(r, event)).findFirst();
@@ -54,7 +54,7 @@ public class YearlyHistoryUpdater implements HistoryUpdater<YearlyHistoryView> {
                         });
                     } else {
                         final YearlyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getOperation().getOperationType())).findFirst().orElse(null);
+                                history.stream().filter(r -> r.getType().equals(event.getAccount().getOperationType())).findFirst().orElse(null);
                         if (v != null) {
                             v.setCurAmount(v.getCurAmount().add(event.getAmount()));
                             yearlyHistoryRepository.save(v).subscribe(o -> {
@@ -71,7 +71,7 @@ public class YearlyHistoryUpdater implements HistoryUpdater<YearlyHistoryView> {
         });
     }
 
-    private Boolean isMatch(YearlyHistoryView r, Realisation event) {
+    private Boolean isMatch(YearlyHistoryView r, Operation event) {
         return (r.getYear() == event.getOperationDate().minusYears(1).getYear());
     }
 

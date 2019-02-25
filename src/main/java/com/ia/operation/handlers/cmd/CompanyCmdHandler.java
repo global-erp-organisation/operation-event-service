@@ -1,43 +1,48 @@
 package com.ia.operation.handlers.cmd;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.creation.CompanyCreationCmd;
-import com.ia.operation.commands.delete.CompanyDeleteCmd;
+import com.ia.operation.commands.delete.CompanyDeletionCmd;
 import com.ia.operation.commands.update.CompanyUpdateCmd;
+import com.ia.operation.handlers.Handler;
+import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.ObjectIdUtil;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
-@RestController
-@AllArgsConstructor
-@RequestMapping(value = "/companies")
-public class CompanyCmdHandler {
+@Component
+@RequiredArgsConstructor
+public class CompanyCmdHandler implements Handler {
     private final CommandGateway gateway;
+    private final AggregateUtil util;
+    
+    public Mono<ServerResponse> companyAdd(ServerRequest request) {
+        final Mono<CompanyCreationCmd> bodyMono = request.bodyToMono(CompanyCreationCmd.class);
+        return commandComplete(bodyMono.map(body -> CompanyCreationCmd.of(body)
+                .id(ObjectIdUtil.id())
+                .build()
+                .validate(util)), gateway);
+    }
 
-    @PostMapping
-    public ResponseEntity<String> companyAdd(@RequestBody CompanyCreationCmd request) {
-        final CompanyCreationCmd cmd = CompanyCreationCmd.of(request).id(ObjectIdUtil.id()).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
+    public Mono<ServerResponse> companyUpdate(ServerRequest request) {
+        final String companyId = request.pathVariable(COMPANY_ID);
+        final Mono<CompanyUpdateCmd> bodyMono = request.bodyToMono(CompanyUpdateCmd.class);
+        return commandComplete(bodyMono.map(body->CompanyUpdateCmd.of(body)
+                    .id(companyId)
+                    .build()
+                    .validate(util)),gateway);
     }
-    
-    @PutMapping(value="/{companyId}")
-    public ResponseEntity<String> companyUpdate(@PathVariable String companyId,@RequestBody CompanyUpdateCmd request) {
-        final CompanyUpdateCmd cmd = CompanyUpdateCmd.of(request).id(companyId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));
-    }
-    
-    @DeleteMapping(value="/{companyId}")
-    public ResponseEntity<String> companyRemove(@PathVariable String companyId){
-        final CompanyDeleteCmd cmd =CompanyDeleteCmd.builder().id(companyId).build();
-        return ResponseEntity.accepted().body(gateway.sendAndWait(cmd));       
+
+    public Mono<ServerResponse>  companyRemove(ServerRequest request) {
+        final String companyId = request.pathVariable(COMPANY_ID);
+        return response(CompanyDeletionCmd.builder()
+                .id(companyId)
+                .build()
+                .validate(util), gateway);
     }
 }
