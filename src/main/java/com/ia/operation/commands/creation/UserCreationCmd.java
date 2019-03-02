@@ -33,7 +33,7 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
     private String password;
     
     
-    public static UserCreatedEvent.UserCreatedEventBuilder of(UserCreationCmd cmd){
+    public static UserCreatedEvent.UserCreatedEventBuilder eventFrom(UserCreationCmd cmd){
         return UserCreatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -43,7 +43,7 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
                 .password(cmd.getPassword());
     }
     
-    public static UserCreationCmdBuilder from(UserCreationCmd cmd){
+    public static UserCreationCmdBuilder cmdFrom(UserCreationCmd cmd){
         return UserCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())

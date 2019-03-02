@@ -16,7 +16,7 @@ public class CompanyAggregateTest {
     @Test
     public void should_emit_companyCreationEvent_when_a_companyCreationCmd_is_apply() {
         final CompanyCreationCmd cmd = CompanyCreationCmd.builder().id("id").description("description").details(new HashMap<>()).build();
-        fixture.given().when(cmd).expectSuccessfulHandlerExecution().expectEvents(CompanyCreationCmd.from(cmd).build());
+        fixture.given().when(cmd).expectSuccessfulHandlerExecution().expectEvents(CompanyCreationCmd.eventFrom(cmd).build());
     }
 
     @Test

@@ -35,7 +35,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     @JsonIgnore
     private ProjectionCreatedEvent event;
     
-    public static ProjectionCreationCmdBuilder from(ProjectionCreationCmd cmd) {
+    public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreationCmd cmd) {
         return ProjectionCreationCmd.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
@@ -43,7 +43,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .amount(cmd.getAmount());
     }
     
-    public static ProjectionCreatedEvent of(ProjectionCreationCmd cmd) {
+    public static ProjectionCreatedEvent eventFrom(ProjectionCreationCmd cmd) {
         return ProjectionCreatedEvent.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
@@ -52,7 +52,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .build();
     }
     
-    public static ProjectionCreationCmdBuilder from(ProjectionCreatedEvent event) {
+    public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreatedEvent event) {
         return ProjectionCreationCmd.builder()
                 .id(event.getId())
                 .accountId(event.getAccountId())

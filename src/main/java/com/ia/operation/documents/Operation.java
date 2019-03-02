@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.events.created.RealisationCreatedEvent;
+import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
 
 import lombok.Builder;
@@ -25,7 +25,7 @@ public class Operation {
     private BigDecimal amount;
 
     
-    public static Operation of(RealisationCreatedEvent event, Period period, Account account) {
+    public static Operation of(OperationCreatedEvent event, Period period, Account account) {
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())

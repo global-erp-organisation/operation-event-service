@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+import com.ia.operation.documents.Account;
+import com.ia.operation.documents.Period;
 import com.ia.operation.documents.Projection;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
@@ -20,6 +22,7 @@ import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
@@ -36,8 +39,10 @@ public class ProjectionEventHandler {
     @EventHandler
     public void on(ProjectionCreatedEvent event) {
         log.info("Event recieved: value=[{}]", event);
-        PeriodRepository.findById(event.getPeriodId()).subscribe(p -> {
-            AccountRepository.findById(event.getAccountId()).subscribe(o -> {
+        final Mono<Period> period = PeriodRepository.findById(event.getPeriodId());
+        final Mono<Account> account = AccountRepository.findById(event.getAccountId());
+        period.subscribe(p -> {
+            account.subscribe(o -> {
                 projectionRepository.save(Projection.of(event, o, p)).subscribe(pr -> {
                     log.info("Projection succesfully saved. value=[{}]", pr);
                 });

@@ -25,7 +25,7 @@ public class PeriodCmdHandler implements Handler {
         final Mono<PeriodCreationCmd> bodyMono = request.bodyToMono(PeriodCreationCmd.class).filter(body -> body.getYear() != null);
         return bodyMono.map(body -> {
             return generator.generate(body.getYear()).stream().map(e -> {
-                return gateway.sendAndWait(PeriodCreationCmd.from(e).build());
+                return gateway.sendAndWait(PeriodCreationCmd.cmdFrom(e).build());
             }).map(o -> o.toString()).collect(Collectors.toList());
         }).flatMap(ids -> ServerResponse.accepted().body(Flux.fromIterable(ids), String.class))
                 .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY + " or the year property is missing"), String.class));

@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.OperationAggregate;
-import com.ia.operation.events.created.RealisationCreatedEvent;
+import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
@@ -32,7 +32,7 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
     private LocalDate operationDate;
     private BigDecimal amount;
     
-    public static OperationCreationCmdBuilder from(OperationCreationCmd cmd) {
+    public static OperationCreationCmdBuilder cmdFrom(OperationCreationCmd cmd) {
         return OperationCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -41,8 +41,8 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 .amount(cmd.getAmount());
     }
     
-    public static RealisationCreatedEvent.RealisationCreatedEventBuilder of(OperationCreationCmd cmd) {
-        return RealisationCreatedEvent.builder()
+    public static OperationCreatedEvent.OperationCreatedEventBuilder eventFrom(OperationCreationCmd cmd) {
+        return OperationCreatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
                 .operationDate(cmd.getOperationDate())

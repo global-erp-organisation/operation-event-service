@@ -28,7 +28,7 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public AccountCategoryAggregate(AccountCategoryCreationCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryCreationCmd.from(cmd).build());
+        AggregateLifecycle.apply(AccountCategoryCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -39,7 +39,7 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public void handleOperationCategoryUpdateCmd(AccountCategoryUpdateCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryUpdateCmd.from(cmd).build());
+        AggregateLifecycle.apply(AccountCategoryUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler

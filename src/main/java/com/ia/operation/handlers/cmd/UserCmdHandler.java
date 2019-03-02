@@ -26,7 +26,7 @@ public class UserCmdHandler implements Handler {
     public Mono<ServerResponse> userAdd(ServerRequest request) {
         final String companyId = request.pathVariable(COMPANY_ID);
         final Mono<UserCreationCmd> bodyMono = request.bodyToMono(UserCreationCmd.class);
-        return bodyMono.map(body->UserCreationCmd.from(body)
+        return bodyMono.map(body->UserCreationCmd.cmdFrom(body)
                 .id(ObjectIdUtil.id())
                 .companyId(companyId)
                 .build()
@@ -39,7 +39,7 @@ public class UserCmdHandler implements Handler {
     public Mono<ServerResponse> userUpdate(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID);
         final Mono<UserUpdateCmd> bodyMono = request.bodyToMono(UserUpdateCmd.class);
-        return bodyMono.map(body->UserUpdateCmd.from(body)
+        return bodyMono.map(body->UserUpdateCmd.cmdFrom(body)
                 .id(userId)
                 .build()
                 .validate(util))

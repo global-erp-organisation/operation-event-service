@@ -34,7 +34,7 @@ public class UserAggregate {
 
     @CommandHandler
     public UserAggregate(UserCreationCmd cmd) {
-        AggregateLifecycle.apply(UserCreationCmd.of(cmd).build());
+        AggregateLifecycle.apply(UserCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -49,7 +49,7 @@ public class UserAggregate {
 
     @CommandHandler
     public void handleUserUpdateCmd(UserUpdateCmd cmd) {
-        AggregateLifecycle.apply(UserUpdateCmd.of(cmd).build());
+        AggregateLifecycle.apply(UserUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler

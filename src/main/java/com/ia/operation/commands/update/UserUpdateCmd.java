@@ -32,7 +32,7 @@ public class UserUpdateCmd extends CommandValidator<UserUpdateCmd>{
     private String companyId;
     private String password;
     
-    public static UserUpdatedEvent.UserUpdatedEventBuilder of(UserUpdateCmd cmd){
+    public static UserUpdatedEvent.UserUpdatedEventBuilder eventFrom(UserUpdateCmd cmd){
         return UserUpdatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -42,7 +42,7 @@ public class UserUpdateCmd extends CommandValidator<UserUpdateCmd>{
                 .password(cmd.getPassword());
     }
     
-    public static UserUpdateCmdBuilder from(UserUpdateCmd cmd){
+    public static UserUpdateCmdBuilder cmdFrom(UserUpdateCmd cmd){
         return UserUpdateCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())

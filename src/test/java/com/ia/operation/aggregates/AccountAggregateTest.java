@@ -19,7 +19,7 @@ public class AccountAggregateTest {
     public void should_emit_a_operationCreatedEvent_when_a_operationCreationCmd_is_apply() {
         final AccountCreationCmd cmd = AccountCreationCmd.builder().id("id").defaultAmount(BigDecimal.ZERO).description("description")
                 .accountType(AccountType.EXPENSE).userId("userId").recurringMode(RecurringMode.MONTHLY).build();
-        fixture.given().when(cmd).expectSuccessfulHandlerExecution().expectEvents(AccountCreationCmd.of(cmd));
+        fixture.given().when(cmd).expectSuccessfulHandlerExecution().expectEvents(AccountCreationCmd.enventFrom(cmd));
     }
 
     @Test
@@ -29,6 +29,6 @@ public class AccountAggregateTest {
         final AccountCreationCmd other = AccountCreationCmd.builder().id("id").defaultAmount(BigDecimal.ZERO).description("description")
                 .accountType(AccountType.REVENUE).userId("userId").recurringMode(RecurringMode.MONTHLY).build();
 
-        fixture.given(AccountCreationCmd.of(cmd)).when(other).expectException(EventStoreException.class).expectEvents(AccountCreationCmd.of(other));
+        fixture.given(AccountCreationCmd.enventFrom(cmd)).when(other).expectException(EventStoreException.class).expectEvents(AccountCreationCmd.enventFrom(other));
     }
 }

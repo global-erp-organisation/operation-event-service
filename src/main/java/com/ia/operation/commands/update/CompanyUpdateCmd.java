@@ -26,14 +26,14 @@ public class CompanyUpdateCmd extends CommandValidator<CompanyUpdateCmd>{
     private String description;
     private Map<String, Object> details;
     
-    public static CompanyUpdateCmdBuilder of(CompanyUpdateCmd cmd) {
+    public static CompanyUpdateCmdBuilder cmdFrom(CompanyUpdateCmd cmd) {
         return CompanyUpdateCmd.builder()
                 .description(cmd.getDescription())
                 .details(cmd.getDetails())
                 .id(cmd.getId());
     }
     
-    public static CompanyUpdatedEvent.CompanyUpdatedEventBuilder from(CompanyUpdateCmd cmd) {
+    public static CompanyUpdatedEvent.CompanyUpdatedEventBuilder eventFrom(CompanyUpdateCmd cmd) {
         return CompanyUpdatedEvent.builder()
                 .description(cmd.getDescription())
                 .details(cmd.getDetails())

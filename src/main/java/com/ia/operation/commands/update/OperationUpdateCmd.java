@@ -32,7 +32,7 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
     private String periodId;
     private BigDecimal amount;
 
-    public static OperationUpdateCmdBuilder from(OperationUpdateCmd cmd) {
+    public static OperationUpdateCmdBuilder cmdFrom(OperationUpdateCmd cmd) {
         return OperationUpdateCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -42,7 +42,7 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
     }
 
     
-    public static OperationUpdatedEvent.OperationUpdatedEventBuilder of(OperationUpdateCmd cmd) {
+    public static OperationUpdatedEvent.OperationUpdatedEventBuilder eventFrom(OperationUpdateCmd cmd) {
         return OperationUpdatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())

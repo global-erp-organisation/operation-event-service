@@ -28,20 +28,20 @@ public class CompanyCreationCmd extends CommandValidator<CompanyCreationCmd>{
     private String description;
     private Map<String, Object> details;
     
-    public static CompanyCreatedEventBuilder from(CompanyCreationCmd cmd) {
+    public static CompanyCreatedEventBuilder eventFrom(CompanyCreationCmd cmd) {
         return CompanyCreatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
                 .details(cmd.getDetails());
     }
-    public static CompanyCreationCmdBuilder of(CompanyCreationCmd cmd) {
+    public static CompanyCreationCmdBuilder cmdFrom(CompanyCreationCmd cmd) {
         return CompanyCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
                 .details(cmd.getDetails());
     }
     
-    public static CompanyCreationCmdBuilder of(CompanyUpdateCmd cmd) {
+    public static CompanyCreationCmdBuilder cmdFrom(CompanyUpdateCmd cmd) {
         return CompanyCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())

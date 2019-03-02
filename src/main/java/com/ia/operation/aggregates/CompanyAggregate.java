@@ -31,7 +31,7 @@ public class CompanyAggregate {
 
     @CommandHandler
     public CompanyAggregate(CompanyCreationCmd cmd) {
-        AggregateLifecycle.apply(CompanyCreationCmd.from(cmd).build());
+        AggregateLifecycle.apply(CompanyCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -43,7 +43,7 @@ public class CompanyAggregate {
 
     @CommandHandler
     public void handleCompanyUpdateCmd(CompanyUpdateCmd cmd) {
-        AggregateLifecycle.apply(CompanyUpdateCmd.from(cmd).build());
+        AggregateLifecycle.apply(CompanyUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler

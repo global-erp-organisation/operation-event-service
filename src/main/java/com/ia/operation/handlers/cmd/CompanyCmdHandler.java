@@ -23,7 +23,7 @@ public class CompanyCmdHandler implements Handler {
     
     public Mono<ServerResponse> companyAdd(ServerRequest request) {
         final Mono<CompanyCreationCmd> bodyMono = request.bodyToMono(CompanyCreationCmd.class);
-        return commandComplete(bodyMono.map(body -> CompanyCreationCmd.of(body)
+        return commandComplete(bodyMono.map(body -> CompanyCreationCmd.cmdFrom(body)
                 .id(ObjectIdUtil.id())
                 .build()
                 .validate(util)), gateway);
@@ -32,7 +32,7 @@ public class CompanyCmdHandler implements Handler {
     public Mono<ServerResponse> companyUpdate(ServerRequest request) {
         final String companyId = request.pathVariable(COMPANY_ID);
         final Mono<CompanyUpdateCmd> bodyMono = request.bodyToMono(CompanyUpdateCmd.class);
-        return commandComplete(bodyMono.map(body->CompanyUpdateCmd.of(body)
+        return commandComplete(bodyMono.map(body->CompanyUpdateCmd.cmdFrom(body)
                     .id(companyId)
                     .build()
                     .validate(util)),gateway);

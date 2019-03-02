@@ -38,7 +38,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
     private BigDecimal defaultAmount;
     private String categoryId;
     
-    public static AccountUpdateCmdBuilder from(AccountUpdateCmd cmd) {
+    public static AccountUpdateCmdBuilder cmdFrom(AccountUpdateCmd cmd) {
         return AccountUpdateCmd.builder()
                 .defaultAmount(cmd.getDefaultAmount())
                 .description(cmd.getDescription())
@@ -49,7 +49,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
                 .categoryId(cmd.getCategoryId());
     }
     
-    public static AccountUpdatedEvent.AccountUpdatedEventBuilder of(AccountUpdateCmd cmd) {
+    public static AccountUpdatedEvent.AccountUpdatedEventBuilder eventFrom(AccountUpdateCmd cmd) {
         return AccountUpdatedEvent.builder()
                 .defaultAmount(cmd.getDefaultAmount())
                 .description(cmd.getDescription())

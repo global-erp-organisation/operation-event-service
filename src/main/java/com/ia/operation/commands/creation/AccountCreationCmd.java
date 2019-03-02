@@ -40,7 +40,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     private BigDecimal defaultAmount;
     private String categoryId;
     
-    public static AccountCreationCmdBuilder from(AccountCreationCmd cmd) {
+    public static AccountCreationCmdBuilder cmdFrom(AccountCreationCmd cmd) {
         return AccountCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -52,7 +52,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     }
     
     
-    public static AccountCreatedEvent of(AccountCreationCmd cmd) {
+    public static AccountCreatedEvent enventFrom(AccountCreationCmd cmd) {
         return AccountCreatedEvent.builder()
                 .id(cmd.getId())
                 .userId(cmd.getUserId())

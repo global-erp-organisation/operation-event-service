@@ -28,14 +28,14 @@ public class OperationCmdHandler implements Handler {
         final String accountId = request.pathVariable(ACCOUNT_ID);
         return commandComplete(request.bodyToMono(OperationCreationCmd.class).map(body -> {
             final LocalDate date = body.getOperationDate() == null ? LocalDate.now() : body.getOperationDate();
-            return OperationCreationCmd.from(body).id(ObjectIdUtil.id()).operationDate(date).accountId(accountId).build().validate(util);
+            return OperationCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).operationDate(date).accountId(accountId).build().validate(util);
         }), gateway);
     }
 
     public Mono<ServerResponse> operationUpdate(ServerRequest request) {
         final String operationId = request.pathVariable(OPERATION_ID);
         return commandComplete(request.bodyToMono(OperationUpdateCmd.class).map(body -> {
-            return OperationUpdateCmd.from(body).id(operationId).build().validate(util);
+            return OperationUpdateCmd.cmdFrom(body).id(operationId).build().validate(util);
         }), gateway);
     }
 

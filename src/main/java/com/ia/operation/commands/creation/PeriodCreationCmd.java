@@ -33,7 +33,7 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
     @JsonIgnore
     private PeriodCreatedEvent event;
     
-    public static PeriodCreatedEvent.PeriodCreatedEventBuilder of(PeriodCreationCmd cmd) {
+    public static PeriodCreatedEvent.PeriodCreatedEventBuilder eventFrom(PeriodCreationCmd cmd) {
         return PeriodCreatedEvent.builder()
                 .year(cmd.getYear())
                 .id(cmd.getId())
@@ -42,7 +42,7 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
                 .close(cmd.getClose());
     }
     
-    public static PeriodCreationCmdBuilder buildFrom(PeriodCreationCmd cmd) {
+    public static PeriodCreationCmdBuilder cmdFrom(PeriodCreationCmd cmd) {
         return PeriodCreationCmd.builder()
                 .year(cmd.getYear())
                 .id(cmd.getId())
@@ -51,7 +51,7 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
                  .close(cmd.getClose());
     }
     
-    public static PeriodCreationCmdBuilder from(PeriodCreatedEvent event) {
+    public static PeriodCreationCmdBuilder cmdFrom(PeriodCreatedEvent event) {
         return PeriodCreationCmd.builder()
                 .id(event.getId())
                 .year(event.getYear())

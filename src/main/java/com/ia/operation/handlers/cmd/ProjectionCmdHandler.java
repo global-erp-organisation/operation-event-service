@@ -36,14 +36,14 @@ public class ProjectionCmdHandler implements Handler {
         final Mono<ProjectionCreationCmd> bodyMono = request.bodyToMono(ProjectionCreationCmd.class);
         return commandComplete(
                 bodyMono.map(
-                        body -> ProjectionCreationCmd.from(body).id(ObjectIdUtil.id()).accountId(accountId).periodId(periodId).build().validate(util)),
+                        body -> ProjectionCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).accountId(accountId).periodId(periodId).build().validate(util)),
                 gateway);
     }
 
     public Mono<ServerResponse> projectionUpdate(ServerRequest request) {
         final Mono<ProjectionUpdateCmd> bodyMono = request.bodyToMono(ProjectionUpdateCmd.class);
         final String projectionId = request.pathVariable(PROJECTION_ID);
-        return commandComplete(bodyMono.map(body -> ProjectionUpdateCmd.from(body).id(projectionId).build().validate(util)), gateway);
+        return commandComplete(bodyMono.map(body -> ProjectionUpdateCmd.cmdFrom(body).id(projectionId).build().validate(util)), gateway);
 
     }
 
@@ -63,6 +63,6 @@ public class ProjectionCmdHandler implements Handler {
 
     @RabbitListener(queues = {"projection-event-queue"})
     public void handleProjectionGenerationEvents(List<ProjectionCreatedEvent> events) {
-        events.forEach(event -> gateway.send(ProjectionCreationCmd.from(event).build()));
+        events.forEach(event -> gateway.send(ProjectionCreationCmd.cmdFrom(event).build()));
     }
 }

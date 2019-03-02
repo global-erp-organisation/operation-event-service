@@ -31,7 +31,7 @@ public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd>{
     @JsonProperty("period_id")
     private String periodId;
     
-    public static ProjectionUpdateCmdBuilder from (ProjectionUpdateCmd cmd) {
+    public static ProjectionUpdateCmdBuilder cmdFrom (ProjectionUpdateCmd cmd) {
         return ProjectionUpdateCmd.builder()
                 .amount(cmd.getAmount())
                 .id(cmd.getId())

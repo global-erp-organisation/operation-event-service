@@ -8,7 +8,7 @@ import lombok.Value;
 
 @Builder
 @Value
-public class RealisationCreatedEvent {
+public class OperationCreatedEvent {
     private String id;
     private String description;
     private String accountId;

@@ -6,6 +6,8 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.Account;
+import com.ia.operation.documents.AccountCategory;
+import com.ia.operation.documents.User;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.deleted.AccountDeletedEvent;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
@@ -17,6 +19,7 @@ import com.ia.operation.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -30,9 +33,11 @@ public class AccountEventHandler {
     @EventHandler
     public void on(AccountCreatedEvent event) {
         log.info("event recieved: value=[{}]", event);
-        userRepository.findById(event.getUserId()).subscribe(user -> {
-            accountCategoryRepository.findById(event.getCategoryId()).subscribe(category -> {
-                accountRepository.save(Account.of(event, user, category)).subscribe(o -> {
+        final Mono<User> user = userRepository.findById(event.getUserId());
+        final Mono<AccountCategory> category = accountCategoryRepository.findById(event.getCategoryId());
+        user.subscribe(u -> {
+            category.subscribe(c -> {
+                accountRepository.save(Account.of(event, u, c)).subscribe(o -> {
                     log.info("Account successfully saved. value=[{}]", o);
                 });
             });
@@ -42,10 +47,12 @@ public class AccountEventHandler {
     @EventHandler
     public void on(AccountUpdatedEvent event) {
         log.info("event recieved: value=[{}]", event);
-        userRepository.findById(event.getUserId()).subscribe(user -> {
-            accountCategoryRepository.findById(event.getCategoryId()).subscribe(category -> {
-                accountRepository.save(Account.of(event, user, category)).subscribe(o -> {
-                    log.info("Account successfully saved. value=[{}]", o);
+        final Mono<User> user = userRepository.findById(event.getUserId());
+        final Mono<AccountCategory> category = accountCategoryRepository.findById(event.getCategoryId());
+        user.subscribe(u -> {
+            category.subscribe(c -> {
+                accountRepository.save(Account.of(event, u, c)).subscribe(o -> {
+                    log.info("Account successfully updated. value=[{}]", o);
                 });
             });
         });

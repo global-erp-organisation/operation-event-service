@@ -30,7 +30,7 @@ public class ProjectionAggregate {
 
     @CommandHandler
     public ProjectionAggregate(ProjectionCreationCmd cmd) {
-        AggregateLifecycle.apply(ProjectionCreationCmd.of(cmd));
+        AggregateLifecycle.apply(ProjectionCreationCmd.eventFrom(cmd));
     }
 
     @EventSourcingHandler

@@ -12,7 +12,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 import com.ia.operation.commands.creation.OperationCreationCmd;
 import com.ia.operation.commands.delete.OperationDeletionCmd;
 import com.ia.operation.commands.update.OperationUpdateCmd;
-import com.ia.operation.events.created.RealisationCreatedEvent;
+import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.deleted.OperationDeletedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
 
@@ -34,7 +34,7 @@ public class OperationAggregate {
 
     @CommandHandler
     public OperationAggregate(OperationCreationCmd cmd) {
-        AggregateLifecycle.apply(OperationCreationCmd.of(cmd).build());
+        AggregateLifecycle.apply(OperationCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -48,11 +48,11 @@ public class OperationAggregate {
 
     @CommandHandler
     public void handleRealisationUpdateCmd(OperationUpdateCmd cmd) {
-        AggregateLifecycle.apply(OperationUpdateCmd.of(cmd).build());
+        AggregateLifecycle.apply(OperationUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
-    public void onRealisationCreated(RealisationCreatedEvent event) {
+    public void onRealisationCreated(OperationCreatedEvent event) {
         this.id = event.getId();
         this.description = event.getDescription();
         this.accountId = event.getAccountId();

@@ -24,13 +24,13 @@ public class AccountCategoryCreationCmd extends CommandValidator<AccountCategory
     private String id;
     private String description;
     
-    public static AccountCategoryCreatedEvent.AccountCategoryCreatedEventBuilder from (AccountCategoryCreationCmd cmd){
+    public static AccountCategoryCreatedEvent.AccountCategoryCreatedEventBuilder eventFrom (AccountCategoryCreationCmd cmd){
         return AccountCategoryCreatedEvent.builder()
             .id(cmd.getId())
             .description(cmd.getDescription());
     }
     
-    public static AccountCategoryCreationCmdBuilder of (AccountCategoryCreationCmd cmd){
+    public static AccountCategoryCreationCmdBuilder cmdFrom (AccountCategoryCreationCmd cmd){
         return AccountCategoryCreationCmd.builder()
             .id(cmd.getId())
             .description(cmd.getDescription());
