@@ -69,7 +69,7 @@ public interface Handler {
             beanValidate(supplier, responseType, gateway);
             return ServerResponse.ok().body((Publisher<T>) gateway.query(supplier.get(), Object.class).get(), responseType);
         } catch (Exception e) {
-            return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just(e.getMessage()), String.class);
+            return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just(e.getLocalizedMessage()), String.class);
         }
     }
 

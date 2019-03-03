@@ -17,10 +17,10 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class OperationDeletionCmd extends CommandValidator<OperationDeletionCmd>{
+public class OperationDeletionCmd extends CommandValidator<OperationDeletionCmd> {
     @TargetAggregateIdentifier
     private String id;
-    
+
     @Override
     public ValidationResult<OperationDeletionCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();

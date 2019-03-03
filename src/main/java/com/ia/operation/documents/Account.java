@@ -66,5 +66,4 @@ public class Account {
                 .category(category)
                 .build();
     }
-
 }

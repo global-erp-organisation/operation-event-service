@@ -21,7 +21,7 @@ public class CompanyQueryHandler implements Handler {
     public Mono<ServerResponse> companyGet(ServerRequest request) {
         final String companyId = request.pathVariable(COMPANY_ID);
         if (companyId == null) {
-            return ServerResponse.badRequest().body(Mono.just("the company identifier variable is missing."), String.class);
+            return badRequestComplete(() -> COMPANY_ID);
         }
         return queryComplete(() -> CompanyGetQuery.builder().companyId(companyId).build(), Company.class, gateway);
     }

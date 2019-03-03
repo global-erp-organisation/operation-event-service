@@ -18,30 +18,26 @@ import lombok.Value;
 
 @Value
 @Builder
-@EqualsAndHashCode( callSuper = false)
-public class AccountCategoryUpdateCmd extends CommandValidator<AccountCategoryUpdateCmd>{
+@EqualsAndHashCode(callSuper = false)
+public class AccountCategoryUpdateCmd extends CommandValidator<AccountCategoryUpdateCmd> {
     @TargetAggregateIdentifier
     private String id;
     private String description;
-    
-    public static AccountCategoryUpdatedEvent.AccountCategoryUpdatedEventBuilder eventFrom (AccountCategoryUpdateCmd cmd){
-        return AccountCategoryUpdatedEvent.builder()
-            .id(cmd.getId())
-            .description(cmd.getDescription());
+
+    public static AccountCategoryUpdatedEvent.AccountCategoryUpdatedEventBuilder eventFrom(AccountCategoryUpdateCmd cmd) {
+        return AccountCategoryUpdatedEvent.builder().id(cmd.getId()).description(cmd.getDescription());
     }
-    
-    public static AccountCategoryUpdateCmdBuilder cmdFrom (AccountCategoryUpdateCmd cmd){
-        return AccountCategoryUpdateCmd.builder()
-            .id(cmd.getId())
-            .description(cmd.getDescription());
+
+    public static AccountCategoryUpdateCmdBuilder cmdFrom(AccountCategoryUpdateCmd cmd) {
+        return AccountCategoryUpdateCmd.builder().id(cmd.getId()).description(cmd.getDescription());
     }
-    
+
     @Override
     public ValidationResult<AccountCategoryUpdateCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Category identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(id, AccountCategoryAggregate.class).isPresent()) {
                 errors.add("The category with id " + id + " doesnt exist");
             }
