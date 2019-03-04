@@ -19,16 +19,16 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class AccountCategoryDeletionCmd extends CommandValidator<AccountCategoryDeletionCmd> {
     @TargetAggregateIdentifier
-    private String categoryId;
+    protected String id;
 
     @Override
     public ValidationResult<AccountCategoryDeletionCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(categoryId)) {
+        if (StringUtils.isEmpty(id)) {
             errors.add("Category identifier shouldn't be null or empty");
         } else {
-            if (!util.aggregateGet(categoryId, AccountCategoryAggregate.class).isPresent()) {
-                errors.add("The category with id " + categoryId + " doesnt exist");
+            if (!util.aggregateGet(id, AccountCategoryAggregate.class).isPresent()) {
+                errors.add("The category with id " + id + " doesnt exist");
             }
         }
         return buildResult(errors);

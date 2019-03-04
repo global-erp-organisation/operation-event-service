@@ -18,17 +18,17 @@ public class AccountQueryHandler implements Handler {
     private final QueryGateway gateway;
 
     public Mono<ServerResponse> accountGetAll(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestComplete(() -> USER_ID);
+            return badRequestComplete(() -> USER_ID_KEY);
         }
         return queryComplete(() -> AccountGetAllQuery.builder().userId(userId).build(), Account.class, gateway);
     }
 
     public Mono<ServerResponse> accountGet(ServerRequest request) {
-        final String accountId = request.pathVariable(ACCOUNT_ID);
+        final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         if (accountId == null) {
-            return badRequestComplete(() -> ACCOUNT_ID);
+            return badRequestComplete(() -> ACCOUNT_ID_KEY);
         }
         return queryComplete(() -> AccountGetByIdQuery.builder().accountId(accountId).build(), Account.class, gateway);
     }

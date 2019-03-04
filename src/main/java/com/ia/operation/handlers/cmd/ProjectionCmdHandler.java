@@ -31,8 +31,8 @@ public class ProjectionCmdHandler implements Handler {
     private final AggregateUtil util;
 
     public Mono<ServerResponse> projectionAdd(ServerRequest request) {
-        final String accountId = request.pathVariable(ACCOUNT_ID);
-        final String periodId = request.pathVariable(PERIOD_ID);
+        final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
+        final String periodId = request.pathVariable(PERIOD_ID_KEY);
         final Mono<ProjectionCreationCmd> bodyMono = request.bodyToMono(ProjectionCreationCmd.class);
         return commandComplete(
                 bodyMono.map(
@@ -42,13 +42,13 @@ public class ProjectionCmdHandler implements Handler {
 
     public Mono<ServerResponse> projectionUpdate(ServerRequest request) {
         final Mono<ProjectionUpdateCmd> bodyMono = request.bodyToMono(ProjectionUpdateCmd.class);
-        final String projectionId = request.pathVariable(PROJECTION_ID);
+        final String projectionId = request.pathVariable(PROJECTION_ID_KEY);
         return commandComplete(bodyMono.map(body -> ProjectionUpdateCmd.cmdFrom(body).id(projectionId).build().validate(util)), gateway);
 
     }
 
     public Mono<ServerResponse> projectionDelete(ServerRequest request) {
-        final String projectionId = request.pathVariable(PROJECTION_ID);
+        final String projectionId = request.pathVariable(PROJECTION_ID_KEY);
         return response(ProjectionDeletionCmd.builder().id(projectionId).build().validate(util), gateway);
     }
 

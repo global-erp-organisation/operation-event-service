@@ -7,5 +7,4 @@ import lombok.Value;
 @Builder
 public class OperationDeletedEvent {
     private String id;
-
 }

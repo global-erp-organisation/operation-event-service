@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
 import com.ia.operation.aggregates.CompanyAggregate;
@@ -23,8 +22,9 @@ import lombok.Value;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 public class CompanyCreationCmd extends CommandValidator<CompanyCreationCmd>{
-    @TargetAggregateIdentifier
-    private String id;
+    
+    protected String id;
+
     private String description;
     private Map<String, Object> details;
     
@@ -64,5 +64,4 @@ public class CompanyCreationCmd extends CommandValidator<CompanyCreationCmd>{
         }
         return buildResult(errors);
     }
-
 }

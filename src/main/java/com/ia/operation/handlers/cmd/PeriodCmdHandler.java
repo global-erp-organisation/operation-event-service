@@ -28,7 +28,7 @@ public class PeriodCmdHandler implements Handler {
                 return gateway.sendAndWait(PeriodCreationCmd.cmdFrom(e).build());
             }).map(o -> o.toString()).collect(Collectors.toList());
         }).flatMap(ids -> ServerResponse.accepted().body(Flux.fromIterable(ids), String.class))
-                .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY + " or the year property is missing"), String.class));
+                .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY_KEY + " or the year property is missing"), String.class));
 
     }
 }

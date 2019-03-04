@@ -50,7 +50,7 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public void handleOperationCategoryDeleteCmd(AccountCategoryDeletionCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryDeletionCmd.builder().categoryId(cmd.getCategoryId()).build());
+        AggregateLifecycle.apply(AccountCategoryDeletionCmd.builder().id(cmd.getId()).build());
         AggregateLifecycle.markDeleted();
     }
 

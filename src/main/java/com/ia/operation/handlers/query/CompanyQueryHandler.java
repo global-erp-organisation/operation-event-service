@@ -19,9 +19,9 @@ public class CompanyQueryHandler implements Handler {
     private final QueryGateway gateway;
 
     public Mono<ServerResponse> companyGet(ServerRequest request) {
-        final String companyId = request.pathVariable(COMPANY_ID);
+        final String companyId = request.pathVariable(COMPANY_ID_KEY);
         if (companyId == null) {
-            return badRequestComplete(() -> COMPANY_ID);
+            return badRequestComplete(() -> COMPANY_ID_KEY);
         }
         return queryComplete(() -> CompanyGetQuery.builder().companyId(companyId).build(), Company.class, gateway);
     }

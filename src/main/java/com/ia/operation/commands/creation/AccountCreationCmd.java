@@ -18,27 +18,30 @@ import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 
-@Value
+@Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
 public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
+    
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String description;
     @JsonProperty("user_id")
     private String userId;
+    @JsonProperty("default_amount")
+    private BigDecimal defaultAmount;
+    private String categoryId;
     @JsonProperty("operation_type")
     @Builder.Default
     private AccountType accountType = AccountType.UNDEFINED;
     @JsonProperty("recurring_mode")
     @Builder.Default
     private RecurringMode recurringMode = RecurringMode.NONE;
-    @JsonProperty("default_amount")
-    private BigDecimal defaultAmount;
-    private String categoryId;
+
     
     public static AccountCreationCmdBuilder cmdFrom(AccountCreationCmd cmd) {
         return AccountCreationCmd.builder()

@@ -15,15 +15,16 @@ import com.ia.operation.util.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
 public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String year;
     private String description;
     private LocalDate start;
@@ -80,5 +81,4 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
         }
         return buildResult(errors);
     }
-
 }

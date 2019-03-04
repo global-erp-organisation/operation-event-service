@@ -22,8 +22,8 @@ public class AccountCmdHandler implements Handler {
     private final AggregateUtil util;
 
     public Mono<ServerResponse> accountAdd(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
-        final String categoryId = request.pathVariable(CATEGORY_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
+        final String categoryId = request.pathVariable(CATEGORY_ID_KEY);
         final Mono<AccountCreationCmd> bodyMono = request.bodyToMono(AccountCreationCmd.class);
         return commandComplete(
                 bodyMono.map(body -> AccountCreationCmd.cmdFrom(body)
@@ -35,12 +35,12 @@ public class AccountCmdHandler implements Handler {
 
     public Mono<ServerResponse> accountUpdate(ServerRequest request) {
         final Mono<AccountUpdateCmd> bodyMono = request.bodyToMono(AccountUpdateCmd.class);
-        final String operationId = request.pathVariable(OPERATION_ID);
+        final String operationId = request.pathVariable(OPERATION_ID_KEY);
         return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(operationId).build().validate(util)), gateway);
     }
 
     public Mono<ServerResponse> accountDelete(ServerRequest request) {
-        final String operationId = request.pathVariable(OPERATION_ID);
+        final String operationId = request.pathVariable(OPERATION_ID_KEY);
         return response(AccountDeletionCmd.builder().id(operationId).build().validate(util), gateway);
     }
 

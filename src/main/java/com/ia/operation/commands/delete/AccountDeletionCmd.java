@@ -19,7 +19,7 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class AccountDeletionCmd extends CommandValidator<AccountDeletionCmd> {
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
 
     @Override
     public ValidationResult<AccountDeletionCmd> validate(AggregateUtil util) {

@@ -7,5 +7,4 @@ import lombok.Value;
 @Builder
 public class PeriodDeletedEvent {
     private String id;
-
 }

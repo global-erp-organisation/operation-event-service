@@ -25,7 +25,7 @@ public class OperationCmdHandler implements Handler {
     private final AggregateUtil util;
 
     public Mono<ServerResponse> operationAdd(ServerRequest request) {
-        final String accountId = request.pathVariable(ACCOUNT_ID);
+        final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         return commandComplete(request.bodyToMono(OperationCreationCmd.class).map(body -> {
             final LocalDate date = body.getOperationDate() == null ? LocalDate.now() : body.getOperationDate();
             return OperationCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).operationDate(date).accountId(accountId).build().validate(util);
@@ -33,14 +33,14 @@ public class OperationCmdHandler implements Handler {
     }
 
     public Mono<ServerResponse> operationUpdate(ServerRequest request) {
-        final String operationId = request.pathVariable(OPERATION_ID);
+        final String operationId = request.pathVariable(OPERATION_ID_KEY);
         return commandComplete(request.bodyToMono(OperationUpdateCmd.class).map(body -> {
             return OperationUpdateCmd.cmdFrom(body).id(operationId).build().validate(util);
         }), gateway);
     }
 
     public Mono<ServerResponse> operationDelete(ServerRequest request) {
-        final String operationId = request.pathVariable(OPERATION_ID);
+        final String operationId = request.pathVariable(OPERATION_ID_KEY);
         return response(OperationDeletionCmd.builder().id(operationId).build().validate(util), gateway);
     }
 }

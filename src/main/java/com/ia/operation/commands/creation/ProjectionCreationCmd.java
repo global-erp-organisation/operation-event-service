@@ -9,8 +9,8 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.AccountAggregate;
+import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.util.AggregateUtil;
@@ -26,7 +26,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     @JsonProperty("account_id")
     private String accountId;
     private BigDecimal amount;
@@ -34,7 +35,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     private String periodId;
     @JsonIgnore
     private ProjectionCreatedEvent event;
-    
+
     public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreationCmd cmd) {
         return ProjectionCreationCmd.builder()
                 .id(cmd.getId())

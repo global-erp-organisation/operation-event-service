@@ -24,7 +24,7 @@ public class UserCmdHandler implements Handler {
     private final AggregateUtil util;
     
     public Mono<ServerResponse> userAdd(ServerRequest request) {
-        final String companyId = request.pathVariable(COMPANY_ID);
+        final String companyId = request.pathVariable(COMPANY_ID_KEY);
         final Mono<UserCreationCmd> bodyMono = request.bodyToMono(UserCreationCmd.class);
         return bodyMono.map(body->UserCreationCmd.cmdFrom(body)
                 .id(ObjectIdUtil.id())
@@ -33,11 +33,11 @@ public class UserCmdHandler implements Handler {
                 .validate(util))
                 .flatMap(r -> response(r, gateway))
                 .switchIfEmpty(ServerResponse.badRequest()
-                        .body(Mono.just(MISSING_REQUEST_BODY), String.class));
+                        .body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
     }
 
     public Mono<ServerResponse> userUpdate(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
         final Mono<UserUpdateCmd> bodyMono = request.bodyToMono(UserUpdateCmd.class);
         return bodyMono.map(body->UserUpdateCmd.cmdFrom(body)
                 .id(userId)
@@ -45,12 +45,12 @@ public class UserCmdHandler implements Handler {
                 .validate(util))
                 .flatMap(r -> response(r, gateway))
                 .switchIfEmpty(ServerResponse.badRequest()
-                        .body(Mono.just(MISSING_REQUEST_BODY), String.class));
+                        .body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
     }
 
     @DeleteMapping(value = "/users/{userId}")
     public Mono<ServerResponse> userDelete(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
         return response( UserDeletionCmd.builder().id(userId).build().validate(util), gateway);
     }
 }

@@ -26,7 +26,7 @@ public class DashboardQueryHandler implements Handler {
             }
             return queryComplete(() -> DashboardQuery.builder().start(body.getStart()).end(body.getEnd()).build(), DashboardView.class, gateway);
         }).flatMap(response -> response)
-                .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY), String.class));
+                .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
 
     }
 

@@ -29,12 +29,12 @@ public class AccountCategoryCmdHandler implements Handler {
 
     public Mono<ServerResponse> categoryUpdate(ServerRequest request) {
         final Mono<AccountCategoryUpdateCmd> bodyMono = request.bodyToMono(AccountCategoryUpdateCmd.class);
-        final String categoryId = request.pathVariable(CATEGORY_ID);
+        final String categoryId = request.pathVariable(CATEGORY_ID_KEY);
         return commandComplete(bodyMono.map(body -> AccountCategoryUpdateCmd.cmdFrom(body).id(categoryId).build().validate(util)), gateway);
     }
 
     public Mono<ServerResponse> categoryDelete(ServerRequest request) {
-        final String categoryId = request.pathVariable(CATEGORY_ID);
-        return response(AccountCategoryDeletionCmd.builder().categoryId(categoryId).build().validate(util), gateway);
+        final String categoryId = request.pathVariable(CATEGORY_ID_KEY);
+        return response(AccountCategoryDeletionCmd.builder().id(categoryId).build().validate(util), gateway);
     }
 }

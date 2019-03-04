@@ -8,8 +8,8 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.AccountAggregate;
+import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
@@ -24,7 +24,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     @JsonProperty("account_id")
     private String accountId;
     private BigDecimal amount;

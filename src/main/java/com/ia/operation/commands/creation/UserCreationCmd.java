@@ -24,14 +24,14 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String email;
     private String description;
     private Map<String, Object> details;
     @JsonProperty("company_id")
     private String companyId;
     private String password;
-    
     
     public static UserCreatedEvent.UserCreatedEventBuilder eventFrom(UserCreationCmd cmd){
         return UserCreatedEvent.builder()

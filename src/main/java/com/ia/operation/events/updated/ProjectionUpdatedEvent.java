@@ -13,5 +13,4 @@ public class ProjectionUpdatedEvent {
     private BigDecimal amount;
     private String periodId;
     private String year;
-
 }

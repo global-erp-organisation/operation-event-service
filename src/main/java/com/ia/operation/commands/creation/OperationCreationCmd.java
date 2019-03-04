@@ -24,7 +24,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String description;
     @JsonProperty("account_id")
     private String accountId;

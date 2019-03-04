@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ia.operation.commands.ICommand;
 import com.ia.operation.util.AggregateUtil;
 
 import lombok.Builder;
@@ -15,7 +16,8 @@ import lombok.Data;
  * @author martinblaise
  * @param <V> Type of the object that need to be validated.
  */
-public abstract class CommandValidator<V> {
+
+public  abstract class CommandValidator<V> implements ICommand {
 
     public ValidationResult<V> validate() {
         return buildResult(new ArrayList<>());

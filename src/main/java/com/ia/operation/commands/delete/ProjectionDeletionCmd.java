@@ -19,7 +19,7 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ProjectionDeletionCmd extends CommandValidator<ProjectionDeletionCmd> {
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
 
     @Override
     public ValidationResult<ProjectionDeletionCmd> validate(AggregateUtil util) {
@@ -32,6 +32,5 @@ public class ProjectionDeletionCmd extends CommandValidator<ProjectionDeletionCm
             }
         }
         return buildResult(errors);
-
     }
 }

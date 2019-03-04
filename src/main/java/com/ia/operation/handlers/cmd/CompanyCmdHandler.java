@@ -30,7 +30,7 @@ public class CompanyCmdHandler implements Handler {
     }
 
     public Mono<ServerResponse> companyUpdate(ServerRequest request) {
-        final String companyId = request.pathVariable(COMPANY_ID);
+        final String companyId = request.pathVariable(COMPANY_ID_KEY);
         final Mono<CompanyUpdateCmd> bodyMono = request.bodyToMono(CompanyUpdateCmd.class);
         return commandComplete(bodyMono.map(body->CompanyUpdateCmd.cmdFrom(body)
                     .id(companyId)
@@ -39,7 +39,7 @@ public class CompanyCmdHandler implements Handler {
     }
 
     public Mono<ServerResponse>  companyRemove(ServerRequest request) {
-        final String companyId = request.pathVariable(COMPANY_ID);
+        final String companyId = request.pathVariable(COMPANY_ID_KEY);
         return response(CompanyDeletionCmd.builder()
                 .id(companyId)
                 .build()

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,7 +23,9 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = false)
 public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
-    private String id;
+    @TargetAggregateIdentifier
+    protected String id;
+
     private String description;
     @JsonProperty("account_id")
     private String accountId;
@@ -76,5 +79,4 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
         }
         return buildResult(errors);
     }
-
 }

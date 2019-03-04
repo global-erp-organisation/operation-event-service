@@ -24,7 +24,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class UserUpdateCmd extends CommandValidator<UserUpdateCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String email;
     private String description;
     private Map<String, Object> details;

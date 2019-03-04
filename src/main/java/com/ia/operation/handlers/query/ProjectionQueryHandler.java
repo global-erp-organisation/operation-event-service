@@ -20,29 +20,29 @@ public class ProjectionQueryHandler implements Handler {
     private final QueryGateway gateway;
 
     public Mono<ServerResponse> projectionByAccount(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestComplete(() -> USER_ID);
+            return badRequestComplete(() -> USER_ID_KEY);
         }
-        final String accountId = request.pathVariable(ACCOUNT_ID);
+        final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         if (accountId == null) {
-            return badRequestComplete(() -> ACCOUNT_ID);
+            return badRequestComplete(() -> ACCOUNT_ID_KEY);
         }
-        final String year = request.pathVariable(YEAR);
+        final String year = request.pathVariable(YEAR_KEY);
         if (year == null || !StringUtils.isNumeric(year)) {
-            return badRequestComplete(() -> YEAR);
+            return badRequestComplete(() -> YEAR_KEY);
         }
         return queryComplete(() -> ProjectionByAccountQuery.builder().accountId(accountId).userId(userId).year(year).build(), Projection.class, gateway);
     }
 
     public Mono<ServerResponse> projectionByYear(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID);
+        final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestComplete(() -> USER_ID);
+            return badRequestComplete(() -> USER_ID_KEY);
         }
-        final String year = request.pathVariable(YEAR);
+        final String year = request.pathVariable(YEAR_KEY);
         if (year == null || !StringUtils.isNumeric(year)) {
-            return badRequestComplete(() -> YEAR);
+            return badRequestComplete(() -> YEAR_KEY);
         }
         return queryComplete(() -> ProjectionByYearQuery.builder().year(year).userId(userId).build(), Projection.class, gateway);
 

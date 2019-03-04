@@ -26,7 +26,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String description;
     @JsonProperty("user_id")
     private String userId;

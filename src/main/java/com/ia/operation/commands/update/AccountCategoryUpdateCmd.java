@@ -21,7 +21,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class AccountCategoryUpdateCmd extends CommandValidator<AccountCategoryUpdateCmd> {
     @TargetAggregateIdentifier
-    private String id;
+    protected String id;
+
     private String description;
 
     public static AccountCategoryUpdatedEvent.AccountCategoryUpdatedEventBuilder eventFrom(AccountCategoryUpdateCmd cmd) {
