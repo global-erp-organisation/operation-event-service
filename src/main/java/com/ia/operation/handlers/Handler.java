@@ -42,9 +42,8 @@ public interface Handler {
             if (r.isPresent()) {
                 final CommandValidator<V> command = r.get();
                 final String id = gateway.sendAndWait(command);
-                final Supplier<Publisher<String>> response =
-                        () -> id == null ? Mono.just(command.getId()) : Mono.just(id);
-                return acceptedRequestComplete(response, String.class);
+                final CmdResponse cr = CmdResponse.builder().id(id == null ? command.getId() : id).build();
+                return acceptedRequestComplete(() -> Mono.just(cr), CmdResponse.class);
             } else {
                 return badRequestComplete(() -> "No error message found. It sound like a default validator operation have been used.");
             }

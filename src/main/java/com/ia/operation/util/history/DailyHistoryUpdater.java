@@ -30,7 +30,6 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         final Flux<DailyHistoryView> histories = convert(
                 operationRepository.findByOperationDateAndAccount_accountType(event.getOperationDate(), event.getAccount().getAccountType()),
                 (r) -> DailyHistoryView.from(r).build());
-        // historyByDateRepository.findBydateAndType(event.getOperationDate(), event.getOperation().getOperationType());
         refs.collectList().subscribe(reference -> {
             final Optional<DailyHistoryView> ref = reference.stream().filter(r -> isMatch(r, event)).findFirst();
             histories.collectList().subscribe(history -> {
