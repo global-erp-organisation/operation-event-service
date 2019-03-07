@@ -55,12 +55,10 @@ public class CompanyAggregate {
 
     @CommandHandler
     public void handleCompanyDeletionCmd(CompanyDeletionCmd cmd) {
-        AggregateLifecycle.apply(CompanyDeletedEvent.builder().companyId(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
     }
 
     @EventSourcingHandler
     public void onCompanyDeleted(CompanyDeletedEvent event) {
-        this.id = event.getCompanyId();
+        AggregateLifecycle.markDeleted();
     }
 }

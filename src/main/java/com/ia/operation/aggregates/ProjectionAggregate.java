@@ -44,11 +44,10 @@ public class ProjectionAggregate {
     @CommandHandler
     public void handleProjectionDeletionCmd(ProjectionDeletionCmd cmd) {
         AggregateLifecycle.apply(ProjectionDeletedEvent.builder().id(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
     }
 
     @EventSourcingHandler
     public void onProjectionDeleted(ProjectionDeletedEvent event) {
-        this.id = event.getId();
+        AggregateLifecycle.markDeleted();
     }
 }

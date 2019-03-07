@@ -65,11 +65,10 @@ public class UserAggregate {
     @CommandHandler
     public void handleUserDeletionCmd(UserDeletionCmd cmd) {
         AggregateLifecycle.apply(UserDeletedEvent.builder().userId(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
     }
 
     @EventSourcingHandler
     public void onUserDeleted(UserDeletedEvent event) {
-        this.id = event.getUserId();
+        AggregateLifecycle.markDeleted();
     }
 }

@@ -18,7 +18,6 @@ import reactor.core.publisher.Flux;
 @AllArgsConstructor
 @Data
 @Component
-
 public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
     private final HistoryByDateRepository historyByDateRepository;
@@ -54,15 +53,15 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void onUpdate(Operation event, Operation old) {
-        final Flux<DailyHistoryView> olds = retrieve(old);
+        final Flux<DailyHistoryView> olds = retrieve(old.getOperationDate(), old.getAccount().getId());
         olds.subscribe(o -> {
             o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
             complete(event, o);
         });
     }
-    
+
     private void onRemove(Operation event) {
-        final Flux<DailyHistoryView> olds = retrieve(event);
+        final Flux<DailyHistoryView> olds = retrieve(event.getOperationDate(), event.getAccount().getId());
         olds.subscribe(o -> {
             o.setCurAmount(o.getCurAmount().subtract(event.getAmount()));
             complete(event, o);
@@ -70,10 +69,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void complete(Operation event, DailyHistoryView view) {
-        final Flux<DailyHistoryView> next =
-                historyByDateRepository.findBydateAndAccount_id(event.getOperationDate().plusDays(1), event.getAccount().getId());
-        final Flux<DailyHistoryView> previous =
-                historyByDateRepository.findBydateAndAccount_id(event.getOperationDate().minusDays(1), event.getAccount().getId());
+        final Flux<DailyHistoryView> next = retrieve(event.getOperationDate().plusDays(1), event.getAccount().getId());
+        final Flux<DailyHistoryView> previous = retrieve(event.getOperationDate().minusDays(1), event.getAccount().getId());
         previous.switchIfEmpty(a -> {
             updateViews(view, view, next);
         }).subscribe(p -> {
@@ -92,10 +89,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
             historyByDateRepository.save(view).subscribe();
         });
     }
-    
-    private Flux<DailyHistoryView> retrieve(Operation event) {
-        final LocalDate date = event.getOperationDate();
-        final String accountId = event.getAccount().getId();
+
+    private Flux<DailyHistoryView> retrieve(LocalDate date, String accountId) {
         return historyByDateRepository.findBydateAndAccount_id(date, accountId);
     }
 }
