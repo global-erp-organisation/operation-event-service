@@ -31,8 +31,6 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
     private String accountId;
     @JsonProperty("operation_date")
     private LocalDate operationDate;
-    @JsonProperty("period_id")
-    private String periodId;
     private BigDecimal amount;
 
     public static OperationUpdateCmdBuilder cmdFrom(OperationUpdateCmd cmd) {
@@ -67,12 +65,9 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
         if(StringUtils.isEmpty(id)) {
             errors.add("The operation identifier shouldnt be null nor empty.");
         }else {
-            if (util.aggregateGet(id, OperationAggregate.class).isPresent()) {
+            if (!util.aggregateGet(id, OperationAggregate.class).isPresent()) {
                 errors.add("The operation with id " + id + " doesnt exists");
             }
-        }
-        if(StringUtils.isEmpty(description)) {
-            errors.add("The operation description shouldnt be null or empty");
         }
         if(amount.doubleValue()<=0.0) {
             errors.add("The operation amount should be greater than zero.");

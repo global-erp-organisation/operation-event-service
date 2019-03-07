@@ -37,7 +37,7 @@ public class AccountAggregate {
 
     @CommandHandler
     public AccountAggregate(AccountCreationCmd cmd) {
-        AggregateLifecycle.apply(AccountCreationCmd.enventFrom(cmd));
+        AggregateLifecycle.apply(AccountCreationCmd.enventFrom(cmd).build());
     }
 
     @EventSourcingHandler

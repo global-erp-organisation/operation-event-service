@@ -55,7 +55,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     }
     
     
-    public static AccountCreatedEvent enventFrom(AccountCreationCmd cmd) {
+    public static AccountCreatedEvent.AccountCreatedEventBuilder enventFrom(AccountCreationCmd cmd) {
         return AccountCreatedEvent.builder()
                 .id(cmd.getId())
                 .userId(cmd.getUserId())
@@ -63,8 +63,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
                 .recurringMode(cmd.getRecurringMode())
                 .accountType(cmd.getAccountType())
                 .defaultAmount(cmd.getDefaultAmount())
-                .categoryId(cmd.getCategoryId())
-                .build();
+                .categoryId(cmd.getCategoryId());
     }
     
     @Override

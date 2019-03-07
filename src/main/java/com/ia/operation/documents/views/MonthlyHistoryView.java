@@ -5,8 +5,8 @@ import java.time.Month;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
-import com.ia.operation.enums.AccountType;
 import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class MonthlyHistoryView {
     private String id;
     private BigDecimal refAmount;
     private BigDecimal curAmount;
-    private AccountType type;
+    private Account account;
     private String month;
     private Month key;
     
@@ -27,7 +27,7 @@ public class MonthlyHistoryView {
         return MonthlyHistoryView.builder()
                 .id(ObjectIdUtil.id())
                 .curAmount(r.getAmount())
-                .type(r.getAccount().getAccountType())
+                .account(r.getAccount())
                 .refAmount(BigDecimal.ZERO)
                 .month(r.getPeriod().getDescription().toUpperCase())
                 .key(r.getOperationDate().getMonth());
