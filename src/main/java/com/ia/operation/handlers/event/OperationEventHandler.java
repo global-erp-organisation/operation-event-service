@@ -25,7 +25,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-@ProcessingGroup("relaisation-handler")
+@ProcessingGroup("operation-handler")
 @AllArgsConstructor
 @Slf4j
 public class OperationEventHandler {
@@ -75,8 +75,9 @@ public class OperationEventHandler {
         operationRepository.findById(event.getId()).subscribe(old -> {
             operationRepository.deleteById(event.getId()).subscribe(e -> {
                 log.info("Operation succesfully removed. [{}]", event.getId());
-                dailyUpdater.update(old, old, UpdateType.R);
+                
              });
+            dailyUpdater.update(old, old, UpdateType.R);
         });
     }
 

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
@@ -16,13 +17,13 @@ import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 
 @Builder
-@Value
+@Data
 @EqualsAndHashCode(callSuper = false)
-public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
+public class OperationUpdateCmd extends CommandValidator<OperationUpdateCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -34,42 +35,41 @@ public class OperationUpdateCmd  extends CommandValidator<OperationUpdateCmd>{
     private BigDecimal amount;
 
     public static OperationUpdateCmdBuilder cmdFrom(OperationUpdateCmd cmd) {
-        return OperationUpdateCmd.builder()
-                .id(cmd.getId())
-                .description(cmd.getDescription())
-                .operationDate(cmd.getOperationDate())
-                .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount());
+        return OperationUpdateCmd.builder().id(cmd.getId()).description(cmd.getDescription()).operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId()).amount(cmd.getAmount());
     }
 
-    
     public static OperationUpdatedEvent.OperationUpdatedEventBuilder eventFrom(OperationUpdateCmd cmd) {
-        return OperationUpdatedEvent.builder()
-                .id(cmd.getId())
-                .description(cmd.getDescription())
-                .operationDate(cmd.getOperationDate())
-                .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount());
+        return OperationUpdatedEvent.builder().id(cmd.getId()).description(cmd.getDescription()).operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId()).amount(cmd.getAmount());
     }
 
     @Override
     public ValidationResult<OperationUpdateCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(accountId)) {
-            errors.add("Account identifier shouldn't be null or empty");
+
+        if (StringUtils.isEmpty(id)) {
+            errors.add("The operation identifier shouldnt be null nor empty.");
         } else {
+            final Optional<OperationAggregate> op = util.aggregateGet(id, OperationAggregate.class);
+            if (op.isPresent()) {
+                setAccountId(accountId == null ? op.get().getAccountId() : accountId);
+            }
+        }
+
+        if (!StringUtils.isEmpty(accountId)) {
             if (!util.aggregateGet(accountId, AccountAggregate.class).isPresent()) {
                 errors.add("The account with id " + accountId + " doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(id)) {
+        if (StringUtils.isEmpty(id)) {
             errors.add("The operation identifier shouldnt be null nor empty.");
-        }else {
+        } else {
             if (!util.aggregateGet(id, OperationAggregate.class).isPresent()) {
                 errors.add("The operation with id " + id + " doesnt exists");
             }
         }
-        if(amount.doubleValue()<=0.0) {
+        if (amount.doubleValue() <= 0.0) {
             errors.add("The operation amount should be greater than zero.");
         }
         return buildResult(errors);

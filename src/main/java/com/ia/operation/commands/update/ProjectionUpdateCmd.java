@@ -3,26 +3,27 @@ package com.ia.operation.commands.update;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
-import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
+import com.ia.operation.aggregates.ProjectionAggregate;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 
-@Value
+@Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd>{
+public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -31,35 +32,35 @@ public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd>{
     private BigDecimal amount;
     @JsonProperty("period_id")
     private String periodId;
-    
-    public static ProjectionUpdateCmdBuilder cmdFrom (ProjectionUpdateCmd cmd) {
-        return ProjectionUpdateCmd.builder()
-                .amount(cmd.getAmount())
-                .id(cmd.getId())
-                .accountId(cmd.getAccountId())
-                .periodId(cmd.getPeriodId());
+
+    public static ProjectionUpdateCmdBuilder cmdFrom(ProjectionUpdateCmd cmd) {
+        return ProjectionUpdateCmd.builder().amount(cmd.getAmount()).id(cmd.getId()).accountId(cmd.getAccountId()).periodId(cmd.getPeriodId());
     }
-    
+
     @Override
     public ValidationResult<ProjectionUpdateCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Projection identifier shouldn't be null or empty");
-        }else {
-            if (!util.aggregateGet(id, CompanyAggregate.class).isPresent()) {
+        } else {
+            final Optional<ProjectionAggregate> p = util.aggregateGet(id, ProjectionAggregate.class);
+            if (p.isPresent()) {
+                setPeriodId(periodId == null ? p.get().getPeriodId() : periodId);
+                setAccountId(accountId == null ? p.get().getAccountId() : accountId);
+            } else {
                 errors.add("The projection with id " + id + " doesnt exist");
             }
         }
         if (StringUtil.isNullOrEmpty(accountId)) {
             errors.add("account identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(accountId, AccountAggregate.class).isPresent()) {
                 errors.add("The account with id " + id + " doesnt exist");
             }
-        }       
+        }
         if (StringUtil.isNullOrEmpty(periodId)) {
             errors.add("period identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(periodId, PeriodAggregate.class).isPresent()) {
                 errors.add("The period with id " + id + " doesnt exist");
             }

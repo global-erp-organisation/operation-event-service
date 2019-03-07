@@ -31,7 +31,7 @@ public class ObjectIdUtil {
 
     public static Collection<String> id(Collection<String> ids) {
         Assert.isTrue(!CollectionUtils.isEmpty(ids), () -> "Ids should not be null or empty.");
-        return ids.stream().filter(i -> !StringUtils.isEmpty(i)).map(i -> new ObjectId(i).toHexString()).collect(Collectors.toList());
+        return ids.stream().filter(i -> !StringUtils.isEmpty(i)).map(ObjectIdUtil::id).collect(Collectors.toList());
     }
 
     public static Collection<String> ids2String(Collection<ObjectId> ids) {
