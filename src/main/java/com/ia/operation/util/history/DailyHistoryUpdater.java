@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.DailyHistoryView;
-import com.ia.operation.repositories.HistoryByDateRepository;
+import com.ia.operation.repositories.DailyHistoryRepository;
 import com.ia.operation.repositories.OperationRepository;
 import com.ia.operation.util.ObjectIdUtil;
 
@@ -20,7 +20,7 @@ import reactor.core.publisher.Flux;
 @Component
 public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
-    private final HistoryByDateRepository historyByDateRepository;
+    private final DailyHistoryRepository dailyHistoryRepository;
     private final OperationRepository operationRepository;
 
     @Override
@@ -41,7 +41,7 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void onAdd(Operation event) {
-        final Flux<DailyHistoryView> current = historyByDateRepository.findBydateAndAccount_id(event.getOperationDate(), event.getAccount().getId());
+        final Flux<DailyHistoryView> current = dailyHistoryRepository.findBystartAndAccount_id(event.getOperationDate(), event.getAccount().getId());
         current.switchIfEmpty(a -> {
             final DailyHistoryView view = DailyHistoryView.from(event).curAmount(BigDecimal.ZERO).id(ObjectIdUtil.id()).build();
             view.setCurAmount(view.getCurAmount().add(event.getAmount()));
@@ -81,16 +81,16 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
     private void updateViews(DailyHistoryView view, DailyHistoryView previous, Flux<DailyHistoryView> next) {
         next.switchIfEmpty(a -> {
-            historyByDateRepository.save(view).subscribe();
+            dailyHistoryRepository.save(view).subscribe();
         }).subscribe(n -> {
             n.setRefAmount(view.getCurAmount());
-            historyByDateRepository.save(previous).subscribe();
-            historyByDateRepository.save(n).subscribe();
-            historyByDateRepository.save(view).subscribe();
+            dailyHistoryRepository.save(previous).subscribe();
+            dailyHistoryRepository.save(n).subscribe();
+            dailyHistoryRepository.save(view).subscribe();
         });
     }
 
     private Flux<DailyHistoryView> retrieve(LocalDate date, String accountId) {
-        return historyByDateRepository.findBydateAndAccount_id(date, accountId);
+        return dailyHistoryRepository.findBystartAndAccount_id(date, accountId);
     }
 }

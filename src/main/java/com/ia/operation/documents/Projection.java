@@ -3,12 +3,11 @@ package com.ia.operation.documents;
 import java.math.BigDecimal;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 
-import io.github.kaiso.relmongo.annotation.JoinProperty;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,10 +17,10 @@ import lombok.Data;
 public class Projection {
     @Id
     private String id;
-    @ManyToOne
-    @JoinProperty
+    @DBRef
     private Account account;
     private BigDecimal amount;
+    @DBRef
     private Period period;
     
     public static Projection of(ProjectionCreatedEvent event, Account account, Period period) {
