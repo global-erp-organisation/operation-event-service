@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ProcessingGroup("operation-handler")
+@ProcessingGroup("account-handler")
 public class AccountEventHandler {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;

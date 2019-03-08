@@ -38,7 +38,7 @@ public class OperationAggregate {
     }
 
     @EventSourcingHandler
-    public void onRealisationUpdated(OperationUpdatedEvent event) {
+    public void onOperationUpdated(OperationUpdatedEvent event) {
         this.id = event.getId();
         this.description = event.getDescription();
         this.accountId = event.getAccountId();
@@ -47,12 +47,12 @@ public class OperationAggregate {
     }
 
     @CommandHandler
-    public void handleRealisationUpdateCmd(OperationUpdateCmd cmd) {
+    public void handleOperationUpdateCmd(OperationUpdateCmd cmd) {
         AggregateLifecycle.apply(OperationUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
-    public void onRealisationCreated(OperationCreatedEvent event) {
+    public void onOperationCreated(OperationCreatedEvent event) {
         this.id = event.getId();
         this.description = event.getDescription();
         this.accountId = event.getAccountId();
@@ -61,13 +61,13 @@ public class OperationAggregate {
     }
 
     @CommandHandler
-    public void handleRealisationDeletionCmd(OperationDeletionCmd cmd) {
+    public void handleOperationDeletionCmd(OperationDeletionCmd cmd) {
         AggregateLifecycle.apply(OperationDeletedEvent.builder().id(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
+        
     }
 
     @EventSourcingHandler
-    public void onRealisationDeleted(OperationDeletedEvent event) {
-        this.id = event.getId();
+    public void onOperationDeleted(OperationDeletedEvent event) {
+        AggregateLifecycle.markDeleted();
     }
 }

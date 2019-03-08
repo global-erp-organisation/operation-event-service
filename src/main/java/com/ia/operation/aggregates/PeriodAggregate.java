@@ -49,11 +49,10 @@ public class PeriodAggregate {
             throw new IllegalStateException("Deleting closed periods is prohibited");
         }
         AggregateLifecycle.apply(PeriodDeletedEvent.builder().id(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
     }
 
     @EventSourcingHandler
     public void onPeriodDeleted(PeriodDeletedEvent event) {
-        this.id = event.getId();
+        AggregateLifecycle.markDeleted();
     }
 }

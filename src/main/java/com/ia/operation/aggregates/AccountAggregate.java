@@ -37,7 +37,7 @@ public class AccountAggregate {
 
     @CommandHandler
     public AccountAggregate(AccountCreationCmd cmd) {
-        AggregateLifecycle.apply(AccountCreationCmd.enventFrom(cmd));
+        AggregateLifecycle.apply(AccountCreationCmd.enventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -70,11 +70,10 @@ public class AccountAggregate {
     @CommandHandler
     public void handleOperationDeletionCmd(AccountDeletionCmd cmd) {
         AggregateLifecycle.apply(AccountDeletedEvent.builder().id(cmd.getId()).build());
-        AggregateLifecycle.markDeleted();
     }
 
     @EventSourcingHandler
     public void onOperationDeleted(AccountDeletedEvent event) {
-        this.id = event.getId();
+        AggregateLifecycle.markDeleted();
     }
 }

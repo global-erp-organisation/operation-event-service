@@ -1,6 +1,7 @@
 package com.ia.operation.util.history;
 
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
@@ -8,71 +9,88 @@ import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.DailyHistoryView;
 import com.ia.operation.repositories.HistoryByDateRepository;
 import com.ia.operation.repositories.OperationRepository;
+import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 @AllArgsConstructor
 @Data
 @Component
-@Slf4j
 public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
     private final HistoryByDateRepository historyByDateRepository;
     private final OperationRepository operationRepository;
 
     @Override
-    public void update(Operation event) {
-        final Flux<DailyHistoryView> refs =
-                historyByDateRepository.findBydateAndType(event.getOperationDate().minusMonths(1), event.getAccount().getAccountType());
-        final Flux<DailyHistoryView> histories = convert(
-                operationRepository.findByOperationDateAndAccount_accountType(event.getOperationDate(), event.getAccount().getAccountType()),
-                (r) -> DailyHistoryView.from(r).build());
-        refs.collectList().subscribe(reference -> {
-            final Optional<DailyHistoryView> ref = reference.stream().filter(r -> isMatch(r, event)).findFirst();
-            histories.collectList().subscribe(history -> {
-                if (ref.isPresent()) {
-                    if (history.isEmpty()) {
-                        historyByDateRepository.save(DailyHistoryView.from(event).refAmount(ref.get().getCurAmount()).build()).subscribe(h -> {
-                            log.info("History successfully saved: ", h);
-                        });
-                    } else {
-                        history.stream().filter(r -> isMatch(r, event)).forEach(h -> {
-                            h.setRefAmount(ref.get().getCurAmount());
-                            h.setCurAmount(h.getCurAmount().add(event.getAmount()));
-                            historyByDateRepository.save(h).subscribe(o -> {
-                                log.info("History successfully saved: ", o);
-                            });
-                        });
-                    }
-                } else {
-                    if (history.isEmpty()) {
-                        historyByDateRepository.save(DailyHistoryView.from(event).build()).subscribe(h -> {
-                            log.info("History successfully saved: ", h);
-                        });
-                    } else {
-                        final DailyHistoryView v =
-                                history.stream().filter(r -> r.getType().equals(event.getAccount().getAccountType())).findFirst().orElse(null);
-                        if (v != null) {
+    public void update(Operation event, Operation old, UpdateType type) {
+        switch (type) {
+            case A:
+                onAdd(event);
+                break;
+            case U:
+                onUpdate(event, old);
+                break;
+            case R:
+                onRemove(event);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown update type.");
+        }
+    }
 
-                            v.setCurAmount(v.getCurAmount().add(event.getAmount()));
-                            historyByDateRepository.save(v).subscribe(o -> {
-                                log.info("History successfully saved: ", o);
-                            });
-                        } else {
-                            historyByDateRepository.save(DailyHistoryView.from(event).build()).subscribe(h -> {
-                                log.info("History successfully saved: ", h);
-                            });
-                        }
-                    }
-                }
-            });
+    private void onAdd(Operation event) {
+        final Flux<DailyHistoryView> current = historyByDateRepository.findBydateAndAccount_id(event.getOperationDate(), event.getAccount().getId());
+        current.switchIfEmpty(a -> {
+            final DailyHistoryView view = DailyHistoryView.from(event).curAmount(BigDecimal.ZERO).id(ObjectIdUtil.id()).build();
+            view.setCurAmount(view.getCurAmount().add(event.getAmount()));
+            complete(event, view);
+        }).subscribe(c -> {
+            c.setCurAmount(c.getCurAmount().add(event.getAmount()));
+            complete(event, c);
         });
     }
 
-    private Boolean isMatch(DailyHistoryView r, Operation event) {
-        return (r.getDate().getDayOfMonth() == event.getOperationDate().getDayOfMonth());
+    private void onUpdate(Operation event, Operation old) {
+        final Flux<DailyHistoryView> olds = retrieve(old.getOperationDate(), old.getAccount().getId());
+        olds.subscribe(o -> {
+            o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
+            complete(event, o);
+        });
+    }
+
+    private void onRemove(Operation event) {
+        final Flux<DailyHistoryView> olds = retrieve(event.getOperationDate(), event.getAccount().getId());
+        olds.subscribe(o -> {
+            o.setCurAmount(o.getCurAmount().subtract(event.getAmount()));
+            complete(event, o);
+        });
+    }
+
+    private void complete(Operation event, DailyHistoryView view) {
+        final Flux<DailyHistoryView> next = retrieve(event.getOperationDate().plusDays(1), event.getAccount().getId());
+        final Flux<DailyHistoryView> previous = retrieve(event.getOperationDate().minusDays(1), event.getAccount().getId());
+        previous.switchIfEmpty(a -> {
+            updateViews(view, view, next);
+        }).subscribe(p -> {
+            view.setRefAmount(p.getCurAmount());
+            updateViews(view, p, next);
+        });
+    }
+
+    private void updateViews(DailyHistoryView view, DailyHistoryView previous, Flux<DailyHistoryView> next) {
+        next.switchIfEmpty(a -> {
+            historyByDateRepository.save(view).subscribe();
+        }).subscribe(n -> {
+            n.setRefAmount(view.getCurAmount());
+            historyByDateRepository.save(previous).subscribe();
+            historyByDateRepository.save(n).subscribe();
+            historyByDateRepository.save(view).subscribe();
+        });
+    }
+
+    private Flux<DailyHistoryView> retrieve(LocalDate date, String accountId) {
+        return historyByDateRepository.findBydateAndAccount_id(date, accountId);
     }
 }

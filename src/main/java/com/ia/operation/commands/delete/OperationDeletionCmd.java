@@ -6,7 +6,7 @@ import java.util.List;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
-import com.ia.operation.aggregates.CompanyAggregate;
+import com.ia.operation.aggregates.OperationAggregate;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
@@ -27,7 +27,7 @@ public class OperationDeletionCmd extends CommandValidator<OperationDeletionCmd>
         if (StringUtils.isEmpty(id)) {
             errors.add("Operation identifier shouldn't be null or empty");
         } else {
-            if (!util.aggregateGet(id, CompanyAggregate.class).isPresent()) {
+            if (!util.aggregateGet(id, OperationAggregate.class).isPresent()) {
                 errors.add("The Operation with id " + id + " doesnt exist");
             }
         }

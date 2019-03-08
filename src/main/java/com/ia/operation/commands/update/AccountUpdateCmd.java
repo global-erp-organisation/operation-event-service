@@ -3,6 +3,7 @@ package com.ia.operation.commands.update;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
@@ -18,13 +19,13 @@ import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 
-@Value
+@Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
+public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -38,32 +39,33 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
     @JsonProperty("default_amount")
     private BigDecimal defaultAmount;
     private String categoryId;
-    
+
     public static AccountUpdateCmdBuilder cmdFrom(AccountUpdateCmd cmd) {
-        return AccountUpdateCmd.builder()
-                .defaultAmount(cmd.getDefaultAmount())
-                .description(cmd.getDescription())
-                .id(cmd.getId())
-                .userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode())
-                .accountType(cmd.getAccountType())
-                .categoryId(cmd.getCategoryId());
+        return AccountUpdateCmd.builder().defaultAmount(cmd.getDefaultAmount()).description(cmd.getDescription()).id(cmd.getId()).userId(cmd.getUserId())
+                .recurringMode(cmd.getRecurringMode()).accountType(cmd.getAccountType()).categoryId(cmd.getCategoryId());
     }
-    
+
     public static AccountUpdatedEvent.AccountUpdatedEventBuilder eventFrom(AccountUpdateCmd cmd) {
-        return AccountUpdatedEvent.builder()
-                .defaultAmount(cmd.getDefaultAmount())
-                .description(cmd.getDescription())
-                .id(cmd.getId())
-                .userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode())
-                .accountType(cmd.getAccountType())
-                .categoryId(cmd.getCategoryId());
+        return AccountUpdatedEvent.builder().defaultAmount(cmd.getDefaultAmount()).description(cmd.getDescription()).id(cmd.getId())
+                .userId(cmd.getUserId()).recurringMode(cmd.getRecurringMode()).accountType(cmd.getAccountType()).categoryId(cmd.getCategoryId());
     }
 
     @Override
     public ValidationResult<AccountUpdateCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
+
+        if (StringUtils.isEmpty(id)) {
+            errors.add("The operation identifier shouldnt be null nor empty.");
+        } else {
+            final Optional<AccountAggregate> ac = util.aggregateGet(id, AccountAggregate.class);
+            if (!ac.isPresent()) {
+                errors.add("The operation with id " + id + " doesnt exists");
+            } else {
+                setCategoryId(categoryId == null ? ac.get().getCategoryId() : categoryId);
+                setUserId(userId == null ? ac.get().getUserId() : userId);
+            }
+        }
+
         if (StringUtils.isEmpty(categoryId)) {
             errors.add("Category identifier shouldn't be null or empty");
         } else {
@@ -71,27 +73,20 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd>{
                 errors.add("The category with id " + categoryId + " doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(id)) {
-            errors.add("The operation identifier shouldnt be null nor empty.");
-        }else {
-            if (!util.aggregateGet(id, AccountAggregate.class).isPresent()) {
-                errors.add("The operation with id " + id + " doesnt exists");
-            }
-        }
-        if(StringUtils.isEmpty(userId)) {
+        if (StringUtils.isEmpty(userId)) {
             errors.add("The user identifier shouldnt be null or empty");
-        }else {
-            if(!util.aggregateGet(userId, UserAggregate.class).isPresent()) {
-                errors.add("The user with id "+ userId + "doesnt exist");
+        } else {
+            if (!util.aggregateGet(userId, UserAggregate.class).isPresent()) {
+                errors.add("The user with id " + userId + "doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(description)) {
+        if (StringUtils.isEmpty(description)) {
             errors.add("The operation description shouldnt be null or empty");
         }
-        if(!AccountType.check(accountType)) {
+        if (!AccountType.check(accountType)) {
             errors.add("The input operation type doesnt match with the available domain. Here is the domain value: " + AccountType.values());
         }
-        if(!RecurringMode.check(recurringMode)) {
+        if (!RecurringMode.check(recurringMode)) {
             errors.add("The input recurring mode doesnt match with the available domain. Here is the domain value: " + RecurringMode.values());
         }
         return buildResult(errors);

@@ -61,9 +61,9 @@ public interface Handler {
         }
     }
 
-    default Mono<ServerResponse> badRequestComplete(Supplier<String> variable) {
-        beanValidate(variable);
-        return ServerResponse.badRequest().body(Mono.just("The " + variable.get() + " variable is missing."), String.class);
+    default Mono<ServerResponse> badRequestComplete(Supplier<String> message) {
+        beanValidate(message);
+        return ServerResponse.badRequest().body(Mono.just(message.get()), String.class);
     }
 
     @SuppressWarnings("unchecked")

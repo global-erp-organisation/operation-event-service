@@ -16,25 +16,31 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @ConditionalOnProperty("axon.events.database")
 @Component
 @AllArgsConstructor
+@Slf4j
 public class AggregateUtil {
     private final EventStore store;
 
     public <T> Optional<T> aggregateGet(String aggregateId, Class<T> clazz) {
         final UnitOfWork<GenericMessage<String>> uow = DefaultUnitOfWork.startAndGet(new GenericMessage<>(aggregateId));
         try {
-
             final Aggregate<T> aggreagte = getRepository(clazz).load(aggregateId);
             return Optional.of(aggreagte.invoke(a -> {
                 uow.commit();
                 return a;
             }));
         } catch (AggregateNotFoundException e) {
+            log.error("Aggregate with id {} doesnt exist.", aggregateId);
             uow.rollback();
             return Optional.empty();
+        } catch (Exception e) {
+            uow.rollback();
+            log.error("Error query the aggregate store. message=[{}]", e.getMessage());
+            throw e;
         }
     }
 
@@ -45,6 +51,4 @@ public class AggregateUtil {
     public <T> Repository<T> getRepository(Class<T> clazz) {
         return EventSourcingRepository.builder(clazz).eventStore(store).build();
     }
-    
-    
 }
