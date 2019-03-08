@@ -10,5 +10,9 @@ spring:
   data:
     mongodb:
       database: operation-view-store
+
 server:
   port: 8093
+logging:
+  level:
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG

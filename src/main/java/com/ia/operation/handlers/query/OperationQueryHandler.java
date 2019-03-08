@@ -22,7 +22,7 @@ public class OperationQueryHandler implements Handler {
     public Mono<ServerResponse> operationGet(ServerRequest request) {
         final String operationId = request.pathVariable(OPERATION_ID_KEY);
         if (operationId == null) {
-            return badRequestComplete(() -> OPERATION_ID_KEY);
+            return badRequestError(OPERATION_ID_KEY);
         }
         return queryComplete(() -> OperationGetByIdQuery.builder().operationId(operationId).build(), Operation.class, gateway);
     }
@@ -30,11 +30,11 @@ public class OperationQueryHandler implements Handler {
     public Mono<ServerResponse> operationGetByear(ServerRequest request) {
         final String year = request.pathVariable(YEAR_KEY);
         if (year == null) {
-            return badRequestComplete(() -> YEAR_KEY);
+            return badRequestError(YEAR_KEY);
         }
         final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestComplete(() -> USER_ID_KEY);
+            return badRequestError(USER_ID_KEY);
         }
         return queryComplete(() -> OperationGetByYearQuery.builder().year(year).userId(userId).build(), Operation.class, gateway);
     }
@@ -42,7 +42,7 @@ public class OperationQueryHandler implements Handler {
     public Mono<ServerResponse> operationGetAll(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestComplete(() -> USER_ID_KEY);
+            return badRequestError(USER_ID_KEY);
         }
         return queryComplete(() -> OperationGetAllQuery.builder().userId(userId).build(), Operation.class, gateway);
     }

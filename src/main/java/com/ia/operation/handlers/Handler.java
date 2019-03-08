@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.ia.operation.handlers.CmdResponse.Error;
 import com.ia.operation.util.validator.CommandValidator;
 
 import reactor.core.publisher.Mono;
@@ -42,13 +43,13 @@ public interface Handler {
             if (r.isPresent()) {
                 final CommandValidator<V> command = r.get();
                 final String id = gateway.sendAndWait(command);
-                final CmdResponse cr = CmdResponse.builder().id(id == null ? command.getId() : id).build();
+                final CmdResponse<String, String> cr = CmdResponse.<String, String>builder().body(id == null ? command.getId() : id).build();
                 return acceptedRequestComplete(() -> Mono.just(cr), CmdResponse.class);
             } else {
-                return badRequestComplete(() -> "No error message found. It sound like a default validator operation have been used.");
+                return badRequestError("No error message found. It sound like a default validator operation have been used.");
             }
         } else {
-            return badRequestComplete(() -> String.join(",", cmd.getErrors()));
+            return badRequestError(cmd.getErrors());
         }
     }
 
@@ -61,9 +62,18 @@ public interface Handler {
         }
     }
 
-    default Mono<ServerResponse> badRequestComplete(Supplier<String> message) {
+    default <T> Mono<ServerResponse> badRequestComplete(Supplier<T> message, Class<T> type) {
         beanValidate(message);
-        return ServerResponse.badRequest().body(Mono.just(message.get()), String.class);
+        return ServerResponse.badRequest().body(Mono.just(message.get()), type);
+    }
+
+    default <T, E> Mono<ServerResponse> errorWithSatus(E errorDescription, HttpStatus status) {
+        final Error<E> error = Error.<E>builder().status(status).body(errorDescription).build();
+        return badRequestComplete(() -> CmdResponse.<T, E>builder().error(error).build(), CmdResponse.class);
+    }
+
+    default <E> Mono<ServerResponse> badRequestError(E errorDescription) {
+        return errorWithSatus(errorDescription, HttpStatus.BAD_REQUEST);
     }
 
     @SuppressWarnings("unchecked")

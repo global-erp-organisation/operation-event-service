@@ -1,7 +1,9 @@
 package com.ia.operation.documents.views;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.ia.operation.documents.Account;
@@ -18,8 +20,12 @@ public class YearlyHistoryView {
     private String id;
     private BigDecimal refAmount;
     private BigDecimal curAmount;
+    @DBRef
     private Account account;
     private int year;
+    private LocalDate start;
+    private LocalDate end;
+
 
     public static YearlyHistoryViewBuilder from(Operation r) {
         return YearlyHistoryView.builder()

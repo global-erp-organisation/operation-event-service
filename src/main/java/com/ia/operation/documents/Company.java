@@ -5,6 +5,8 @@ import java.util.Map;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ia.operation.events.created.CompanyCreatedEvent;
 import com.ia.operation.events.updated.CompanyUpdatedEvent;
 
@@ -14,6 +16,7 @@ import lombok.Data;
 @Document
 @Builder
 @Data
+@JsonInclude(value=Include.NON_EMPTY)
 public class Company {
     @Id
     private String id;

@@ -1,14 +1,27 @@
 package com.ia.operation.documents.views;
 
-import java.util.List;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 @Builder
-@Data
+@Value
+@JsonInclude(value = Include.NON_NULL)
 public class DashboardView {
-    private List<DailyHistoryView> dailyHistory;
-    private List<MonthlyHistoryView> monthlyHistory;
-    private List<YearlyHistoryView> yearlyHistory;
+
+    private HistoryView<DailyHistoryView> dailyHistory;
+    private HistoryView<MonthlyHistoryView> monthlyHistory;
+    private HistoryView<YearlyHistoryView> yearlyHistory;
+
+    @Value
+    @Builder
+    public static class DashboardParams {
+        private LocalDate start;
+        private LocalDate end;
+        private String userId;
+    }
 }

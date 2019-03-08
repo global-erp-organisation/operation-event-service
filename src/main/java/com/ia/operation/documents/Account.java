@@ -1,27 +1,25 @@
 package com.ia.operation.documents;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
 
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.JoinProperty;
-import io.github.kaiso.relmongo.annotation.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 
 @Document
 @Builder
 @Data
+@JsonInclude(value=Include.NON_EMPTY)
 public class Account {
     @Id
     private String id;
@@ -31,16 +29,7 @@ public class Account {
     private BigDecimal defaultAmount;
     @DBRef
     private AccountCategory category;
-   
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinProperty(name = "operations")
-    private Collection<Operation> operations = new ArrayList<Operation>();
-    
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinProperty(name = "projections")
-    private Collection<Projection> projections = new ArrayList<Projection>();
+    @DBRef
     private User user;
 
     public static Account of(AccountCreatedEvent event, User user, AccountCategory category) {
