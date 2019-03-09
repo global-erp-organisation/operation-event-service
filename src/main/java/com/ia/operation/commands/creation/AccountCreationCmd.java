@@ -2,7 +2,10 @@ package com.ia.operation.commands.creation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
@@ -25,7 +28,7 @@ import lombok.EqualsAndHashCode;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
-    
+
     @TargetAggregateIdentifier
     protected String id;
 
@@ -42,30 +45,17 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     @Builder.Default
     private RecurringMode recurringMode = RecurringMode.NONE;
 
-    
     public static AccountCreationCmdBuilder cmdFrom(AccountCreationCmd cmd) {
-        return AccountCreationCmd.builder()
-                .id(cmd.getId())
-                .description(cmd.getDescription())
-                .userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode())
-                .defaultAmount(cmd.getDefaultAmount())
-                .accountType(cmd.getAccountType())
-                .categoryId(cmd.getCategoryId());
+        return AccountCreationCmd.builder().id(cmd.getId()).description(cmd.getDescription()).userId(cmd.getUserId()).recurringMode(cmd.getRecurringMode())
+                .defaultAmount(cmd.getDefaultAmount()).accountType(cmd.getAccountType()).categoryId(cmd.getCategoryId());
     }
-    
-    
+
     public static AccountCreatedEvent.AccountCreatedEventBuilder enventFrom(AccountCreationCmd cmd) {
-        return AccountCreatedEvent.builder()
-                .id(cmd.getId())
-                .userId(cmd.getUserId())
-                .description(cmd.getDescription())
-                .recurringMode(cmd.getRecurringMode())
-                .accountType(cmd.getAccountType())
-                .defaultAmount(cmd.getDefaultAmount())
+        return AccountCreatedEvent.builder().id(cmd.getId()).userId(cmd.getUserId()).description(cmd.getDescription())
+                .recurringMode(cmd.getRecurringMode()).accountType(cmd.getAccountType()).defaultAmount(cmd.getDefaultAmount())
                 .categoryId(cmd.getCategoryId());
     }
-    
+
     @Override
     public ValidationResult<AccountCreationCmd> validate(AggregateUtil util) {
         final List<String> errors = new ArrayList<>();
@@ -76,28 +66,30 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
                 errors.add("The category with id " + categoryId + " doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(id)) {
-            errors.add("The operation identifier shouldnt be null nor empty.");
-        }else {
+        if (StringUtils.isEmpty(id)) {
+            errors.add("The account identifier shouldnt be null nor empty.");
+        } else {
             if (util.aggregateGet(id, AccountAggregate.class).isPresent()) {
-                errors.add("The operation with id " + id + " already exists");
+                errors.add("The account with id " + id + " already exists");
             }
         }
-        if(StringUtils.isEmpty(userId)) {
+        if (StringUtils.isEmpty(userId)) {
             errors.add("The user identifier shouldnt be null or empty");
-        }else {
-            if(!util.aggregateGet(userId, UserAggregate.class).isPresent()) {
-                errors.add("The user with id "+ userId + "doesnt exist");
+        } else {
+            if (!util.aggregateGet(userId, UserAggregate.class).isPresent()) {
+                errors.add("The user with id " + userId + "doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(description)) {
-            errors.add("The operation description shouldnt be null or empty");
+        if (StringUtils.isEmpty(description)) {
+            errors.add("The account description shouldnt be null or empty");
         }
-        if(!AccountType.check(accountType)) {
-            errors.add("The input operation type doesnt match with the available domain. Here is the domain value: " + AccountType.values());
+        if (!AccountType.check(accountType)) {
+            final List<String> values = Stream.of(AccountType.values()).map(a -> a.name()).collect(Collectors.toList());
+            errors.add("The input account type doesnt match with the available domain. Here is the domain value: " + String.join(",", values));
         }
-        if(!RecurringMode.check(recurringMode)) {
-            errors.add("The input recurring mode doesnt match with the available domain. Here is the domain value: " + RecurringMode.values());
+        if (!RecurringMode.check(recurringMode)) {
+            final List<String> values = Stream.of(RecurringMode.values()).map(a -> a.name()).collect(Collectors.toList());
+            errors.add("The input recurring mode doesnt match with the available domain. Here is the domain value: " + String.join(",", values));
         }
         return buildResult(errors);
     }
