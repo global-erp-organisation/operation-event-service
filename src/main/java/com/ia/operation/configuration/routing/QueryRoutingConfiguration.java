@@ -62,7 +62,7 @@ public class QueryRoutingConfiguration {
     
     @Bean
     public RouterFunction<ServerResponse> dashboardQueryRoutes(DashboardQueryHandler handler) {
-        return RouterFunctions.route(GET("/dashboards/{userId}"), handler::dashboardGet);
+        return RouterFunctions.route(GET("/users/{userId}/dashboard"), handler::dashboardGet);
     }
 
     

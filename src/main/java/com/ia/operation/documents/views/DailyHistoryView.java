@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,16 +25,12 @@ public class DailyHistoryView {
     private String id;
     private BigDecimal refAmount;
     private BigDecimal curAmount;
-    @DBRef
     private Account account;
-    private LocalDate start;
-    private LocalDate end;
     private LocalDate date;
     
     public static DailyHistoryViewBuilder from (Operation r) {
         return DailyHistoryView.builder()
-                .start(r.getOperationDate())
-                .end(r.getOperationDate())
+                .date(r.getOperationDate())
                 .refAmount(BigDecimal.ZERO)
                 .account(r.getAccount())
                 .curAmount(r.getAmount());
@@ -44,8 +39,7 @@ public class DailyHistoryView {
     public static DailyHistoryViewBuilder from (DailyHistoryView r) {
         return DailyHistoryView.builder()
                 .id(r.getId())
-                .start(r.getStart())
-                .end(r.getEnd())
+                .date(r.getDate())
                 .account(r.getAccount())
                 .refAmount(r.getRefAmount())
                 .curAmount(r.getCurAmount());

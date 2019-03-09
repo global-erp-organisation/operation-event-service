@@ -1,6 +1,7 @@
 package com.ia.operation.handlers.query;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.queryhandling.QueryHandler;
@@ -24,13 +25,21 @@ public class DashboardQueryHandler implements Handler {
 
     public Mono<ServerResponse> dashboardGet(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
-        return request.bodyToMono(DashboardQuery.class).map(body -> {
-            if (!periodCheck(body.getStart(), body.getEnd())) {
-                return ServerResponse.badRequest().body(Mono.just("Something when wrong with the entered period."), String.class);
-            }
-            return queryComplete(() -> DashboardQuery.builder().userId(userId).start(body.getStart()).end(body.getEnd()).build(), DashboardView.class,
-                    gateway);
-        }).flatMap(response -> response).switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
+        final Optional<LocalDate> start = request.queryParam(START_DATE_KEY).map(s -> LocalDate.parse(s));
+        final Optional<LocalDate> end = request.queryParam(END_DATE_KEY).map(s -> LocalDate.parse(s));
+        if (userId == null) {
+            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + USER_ID_KEY);
+        }
+        if (!start.isPresent()) {
+            return badRequestError(MISSING_QUERY_PARAM_PREFIX + START_DATE_KEY);
+        }
+        if (!end.isPresent()) {
+            return badRequestError(MISSING_QUERY_PARAM_PREFIX + END_DATE_KEY);
+        }
+        if (!periodCheck(start.get(), end.get())) {
+            return ServerResponse.badRequest().body(Mono.just("Something when wrong with the entered period."), String.class);
+        }
+        return queryComplete(() -> DashboardQuery.builder().userId(userId).start(start.get()).end(end.get()).build(), DashboardView.class, gateway);
 
     }
 
