@@ -26,14 +26,19 @@ public interface Handler {
     String PROJECTION_ID_KEY = "projectionId";
     String USER_ID_KEY = "userId";
     String YEAR_KEY = "year";
+    String END_DATE_KEY = "end-date";
+    String START_DATE_KEY = "start-date";
+    String MISSING_QUERY_PARAM_PREFIX = "missing query param: ";
+    String MISSING_PATH_VARIABLE_PREFIX = "missing path variable: ";
+
 
     default <V> Mono<ServerResponse> commandComplete(Mono<CommandValidator.ValidationResult<V>> cmd, CommandGateway gateway) {
         try {
             beanValidate(cmd, gateway);
             return cmd.flatMap(r -> response(r, gateway))
-                    .switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
+                    .switchIfEmpty(badRequestError(MISSING_REQUEST_BODY_KEY));
         } catch (Exception e) {
-            return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just(e.getMessage()), String.class);
+            return errorWithSatus(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -58,7 +63,7 @@ public interface Handler {
             beanValidate(response, responseType);
             return ServerResponse.accepted().body(response.get(), responseType);
         } catch (Exception e) {
-            return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just(e.getMessage()), String.class);
+            return errorWithSatus(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -82,7 +87,7 @@ public interface Handler {
             beanValidate(supplier, responseType, gateway);
             return ServerResponse.ok().body((Publisher<T>) gateway.query(supplier.get(), Object.class).get(), responseType);
         } catch (Exception e) {
-            return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just(e.getLocalizedMessage()), String.class);
+            return errorWithSatus(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -41,7 +41,7 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void onAdd(Operation event) {
-        final Flux<DailyHistoryView> current = dailyHistoryRepository.findBystartAndAccount_id(event.getOperationDate(), event.getAccount().getId());
+        final Flux<DailyHistoryView> current = dailyHistoryRepository.findBydateAndAccount_id(event.getOperationDate(), event.getAccount().getId());
         current.switchIfEmpty(a -> {
             final DailyHistoryView view = DailyHistoryView.from(event).curAmount(BigDecimal.ZERO).id(ObjectIdUtil.id()).build();
             view.setCurAmount(view.getCurAmount().add(event.getAmount()));
@@ -91,6 +91,6 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private Flux<DailyHistoryView> retrieve(LocalDate date, String accountId) {
-        return dailyHistoryRepository.findBystartAndAccount_id(date, accountId);
+        return dailyHistoryRepository.findBydateAndAccount_id(date, accountId);
     }
 }
