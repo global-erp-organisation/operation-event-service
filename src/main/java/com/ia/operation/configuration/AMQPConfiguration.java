@@ -15,37 +15,48 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AMQPConfiguration {
 
+    private final AxonProperties properties;
+    
     @Bean
     public Exchange exchange() {
-        return ExchangeBuilder.topicExchange("operation-exchange").durable(true).build();
+        return ExchangeBuilder.topicExchange(properties.getDefaultExchange())
+                .durable(true)
+                .build();
     }
 
     @Bean
     public Queue projectionEventQueue() {
-        return QueueBuilder.durable("projection-event-queue").build();
+        return QueueBuilder.durable(properties.getProjectionEventQueue())
+                .build();
     }
 
     @Bean
     public Binding projectionEventBinding() {
-        return BindingBuilder.bind(projectionEventQueue()).to(exchange()).with("event").noargs();
+        return BindingBuilder.bind(projectionEventQueue())
+                .to(exchange())
+                .with(properties.getDefaultEventRoutingKey())
+                .noargs();
     }
     
     @Bean
     public Queue projectionCmdQueue() {
-        return QueueBuilder.durable("projection-cmd-queue").build();
+        return QueueBuilder.durable(properties.getProjectionCmdQueue())
+                .build();
     }
 
     @Bean
     public Binding projectionCmdBinding() {
-        return BindingBuilder.bind(projectionCmdQueue()).to(exchange()).with("cmd").noargs();
+        return BindingBuilder.bind(projectionCmdQueue())
+                .to(exchange())
+                .with(properties.getDefaultCmdRoutingKey())
+                .noargs();
     }
-
 
     @Autowired
     public void configure(AmqpAdmin admin) {
@@ -59,7 +70,7 @@ public class AMQPConfiguration {
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         final RabbitTemplate template = new RabbitTemplate();
-        template.setExchange("operation-exchange");
+        template.setExchange(properties.getDefaultExchange());
         template.setConnectionFactory(factory);
         template.setMessageConverter(messageConverter);
         return template;
@@ -68,6 +79,5 @@ public class AMQPConfiguration {
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
-    }
-    
+    }    
 }

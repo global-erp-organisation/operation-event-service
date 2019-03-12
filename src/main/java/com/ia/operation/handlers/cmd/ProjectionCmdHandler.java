@@ -53,7 +53,7 @@ public class ProjectionCmdHandler implements Handler {
     }
 
     public Mono<ServerResponse> projectionGenerate(ServerRequest request) {
-        final String year = request.pathVariable("year");
+        final String year = request.pathVariable(YEAR_KEY);
         if (StringUtil.isNullOrEmpty(year) || !StringUtils.isNumeric(year)) {
             return ServerResponse.badRequest().body(Mono.just("The year parametter is missing or the provided variable is not a number."), String.class);
         }

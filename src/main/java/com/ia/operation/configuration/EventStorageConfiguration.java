@@ -43,24 +43,35 @@ public class EventStorageConfiguration {
 
     @Bean
     EventStore eventStore(EventStorageEngine eventStorageEngine) {
-        return EmbeddedEventStore.builder().storageEngine(eventStorageEngine).build();
+        return EmbeddedEventStore.builder()
+                .storageEngine(eventStorageEngine)
+                .build();
     }
 
     @Bean
     public MongoTemplate template(MongoClient client) {
-        return DefaultMongoTemplate.builder().mongoDatabase(client, properties.getDatabase()).build();
+        return DefaultMongoTemplate.builder()
+                .mongoDatabase(client, properties.getDatabase())
+                .build();
     }
 
      @Bean
     public TokenStore tokenStore(Serializer serializer, MongoTemplate template) {
-        return MongoTokenStore.builder().serializer(serializer).mongoTemplate(template).build();
+        return MongoTokenStore.builder()
+                .serializer(serializer)
+                .mongoTemplate(template)
+                .build();
     }
 
      @Bean
     public Snapshotter snapshotter(ParameterResolverFactory parameterResolverFactory, EventStore eventStore, TransactionManager transactionManager) {
         final Executor executor = Executors.newSingleThreadExecutor();
-        return SpringAggregateSnapshotter.builder().parameterResolverFactory(parameterResolverFactory).eventStore(eventStore).executor(executor)
-                .transactionManager(transactionManager).build();
+        return SpringAggregateSnapshotter.builder()
+                .parameterResolverFactory(parameterResolverFactory)
+                .eventStore(eventStore)
+                .executor(executor)
+                .transactionManager(transactionManager)
+                .build();
     }
 
     @Bean

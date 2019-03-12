@@ -1,7 +1,13 @@
 axon:
   events:
     database: operation-events-store
-    snapshot-limit: 3
+    snapshot-limit: 1000
+    default-exchange: operation-exchange
+    projection-event-queue: projection-event-queue
+    projection-cmd-queue: projection-cmd-queue
+    default-event-routing-key: event
+    default-cmd-routing-key: cmd
+    class-path-package: com.ia
 spring:
   main:
     allow-bean-definition-overriding: true

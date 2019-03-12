@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Component;
 
+import com.ia.operation.documents.Account;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.repositories.AccountRepository;
@@ -21,15 +22,19 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
 
     @Override
     public Flux<ProjectionCreatedEvent> generate(String year) {
-        return periodRepository.findByYear(year).flatMap(period -> {
-            return accountRepository.findAll().map(account -> {
-                return ProjectionCreatedEvent.builder()
-                        .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
-                        .id(ObjectIdUtil.id())
-                        .accountId(account.getId())
-                        .periodId(period.getId())
-                        .build();
-            });
+        return accountRepository.findAll().flatMap(account -> {
+            return generate(year,account);
+        });
+    }
+
+    public  Flux<ProjectionCreatedEvent> generate(String year, Account account) {
+        return periodRepository.findByYear(year).map(period -> {
+            return ProjectionCreatedEvent.builder()
+                    .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
+                    .id(ObjectIdUtil.id())
+                    .accountId(account.getId())
+                    .periodId(period.getId())
+                    .build();
         });
     }
 

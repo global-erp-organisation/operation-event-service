@@ -62,8 +62,7 @@ public class OperationAggregate {
 
     @CommandHandler
     public void handleOperationDeletionCmd(OperationDeletionCmd cmd) {
-        AggregateLifecycle.apply(OperationDeletedEvent.builder().id(cmd.getId()).build());
-        
+        AggregateLifecycle.apply(OperationDeletedEvent.builder().id(cmd.getId()).build());       
     }
 
     @EventSourcingHandler

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
@@ -23,7 +24,9 @@ import lombok.EqualsAndHashCode;
 public class DailyHistoryView {
     @Id
     private String id;
+    @JsonProperty("ref_amount")
     private BigDecimal refAmount;
+    @JsonProperty("cur_amount")
     private BigDecimal curAmount;
     private Account account;
     private LocalDate date;

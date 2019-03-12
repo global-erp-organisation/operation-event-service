@@ -39,6 +39,18 @@ public class Operation {
                 .build();
     }
     
+    public static Operation of(Operation event, Period period, Account account) {
+        return Operation.builder()
+                .id(event.getId())
+                .description(event.getDescription())
+                .account(account)
+                .operationDate(event.getOperationDate())
+                .period(period)
+                .amount(event.getAmount())
+                .build();
+    }
+
+    
     public static Operation of(OperationUpdatedEvent event, Period period, Account account) {
         return Operation.builder()
                 .id(event.getId())
