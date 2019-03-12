@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.RecurringMode;
@@ -24,8 +25,11 @@ public class Account {
     @Id
     private String id;
     private String description;
+    @JsonProperty("account_type")
     private AccountType accountType;
+    @JsonProperty("recurring_mode")
     private RecurringMode recurringMode;
+    @JsonProperty("default_amount")
     private BigDecimal defaultAmount;
     @DBRef
     private AccountCategory category;

@@ -2,6 +2,7 @@ package com.ia.operation;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 
 import javax.annotation.PostConstruct;
 
@@ -20,5 +21,6 @@ public class OperationEventServiceApplication {
         final LocalDate date = LocalDate.now();
         System.out.println(date.withDayOfMonth(1).withMonth(Month.JANUARY.getValue()));
         System.out.println(date.withDayOfMonth(31).withMonth(Month.DECEMBER.getValue()));
+        System.out.println(Year.of(date.getYear()).length());
     }
 }

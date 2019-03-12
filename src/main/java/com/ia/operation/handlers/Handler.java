@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.handlers.CmdResponse.Error;
 import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.util.validator.CommandValidator.ValidationResult;
 
 import reactor.core.publisher.Mono;
 
@@ -30,19 +31,20 @@ public interface Handler {
     String START_DATE_KEY = "start-date";
     String MISSING_QUERY_PARAM_PREFIX = "missing query param: ";
     String MISSING_PATH_VARIABLE_PREFIX = "missing path variable: ";
+    String YEARLY_KEY = "yearly";
+    String MONTHLY_KEY = "monthly";
+    String DAILY_KEY = "daily";
 
-
-    default <V> Mono<ServerResponse> commandComplete(Mono<CommandValidator.ValidationResult<V>> cmd, CommandGateway gateway) {
+    default <V> Mono<ServerResponse> commandComplete(Mono<ValidationResult<V>> cmd, CommandGateway gateway) {
         try {
             beanValidate(cmd, gateway);
-            return cmd.flatMap(r -> response(r, gateway))
-                    .switchIfEmpty(badRequestError(MISSING_REQUEST_BODY_KEY));
+            return cmd.flatMap(r -> response(r, gateway)).switchIfEmpty(badRequestError(MISSING_REQUEST_BODY_KEY));
         } catch (Exception e) {
-            return errorWithSatus(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return internalErrorResponse(() -> e.getLocalizedMessage());
         }
     }
 
-    default <V> Mono<ServerResponse> response(CommandValidator.ValidationResult<V> cmd, CommandGateway gateway) {
+    default <V> Mono<ServerResponse> response(ValidationResult<V> cmd, CommandGateway gateway) {
         if (cmd.getIsValid()) {
             final Optional<CommandValidator<V>> r = cmd.getValidated();
             if (r.isPresent()) {
@@ -63,7 +65,7 @@ public interface Handler {
             beanValidate(response, responseType);
             return ServerResponse.accepted().body(response.get(), responseType);
         } catch (Exception e) {
-            return errorWithSatus(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return internalErrorResponse(() -> e.getLocalizedMessage());
         }
     }
 
@@ -87,8 +89,12 @@ public interface Handler {
             beanValidate(supplier, responseType, gateway);
             return ServerResponse.ok().body((Publisher<T>) gateway.query(supplier.get(), Object.class).get(), responseType);
         } catch (Exception e) {
-            return errorWithSatus(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return internalErrorResponse(() -> e.getLocalizedMessage());
         }
+    }
+
+    default <E> Mono<ServerResponse> internalErrorResponse(Supplier<E> message) {
+        return errorWithSatus(message.get(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler

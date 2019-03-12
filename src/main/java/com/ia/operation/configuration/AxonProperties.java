@@ -9,7 +9,12 @@ import lombok.Data;
 @Data
 @Component
 public class AxonProperties {
-    private String database;
+    private String database = "event-database";
     private int snapshotLimit = 3;
     private String classPathPackage = "com.ia";
+    private String projectionEventQueue = "projection-event-queue";
+    private String projectionCmdQueue = "projection-cmd-queue";
+    private String defaultExchange = "default-exchange";
+    private String defaultEventRoutingKey = "event";
+    private String defaultCmdRoutingKey = "cmd";
 }

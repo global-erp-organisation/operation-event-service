@@ -1,7 +1,7 @@
 package com.ia.operation.util.history;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -13,6 +13,7 @@ import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 @AllArgsConstructor
@@ -40,23 +41,31 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         }
     }
 
-    private void onAdd(Operation event) {
-        final Flux<DailyHistoryView> current = dailyHistoryRepository.findBydateAndAccount_id(event.getOperationDate(), event.getAccount().getId());
-        current.switchIfEmpty(a -> {
-            final DailyHistoryView view = DailyHistoryView.from(event).curAmount(BigDecimal.ZERO).id(ObjectIdUtil.id()).build();
-            view.setCurAmount(view.getCurAmount().add(event.getAmount()));
-            complete(event, view);
-        }).subscribe(c -> {
-            c.setCurAmount(c.getCurAmount().add(event.getAmount()));
-            complete(event, c);
+    private Disposable onAdd(Operation event) {
+        final Flux<DailyHistoryView> currents = retrieve(event.getOperationDate(), event.getAccount().getId());
+        return currents.switchIfEmpty(a -> {
+            final DailyHistoryView current = DailyHistoryView.from(event).id(ObjectIdUtil.id()).build();
+            complete(event, current);
+        }).subscribe(current -> {
+            current.setCurAmount(current.getCurAmount().add(event.getAmount()));
+            complete(event, current);
         });
     }
 
     private void onUpdate(Operation event, Operation old) {
+
         final Flux<DailyHistoryView> olds = retrieve(old.getOperationDate(), old.getAccount().getId());
+        final Flux<DailyHistoryView> currents = retrieve(event.getOperationDate(), event.getAccount().getId());
         olds.subscribe(o -> {
-            o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
-            complete(event, o);
+            currents.switchIfEmpty(a -> {
+                o.setCurAmount(o.getCurAmount().subtract(old.getAmount()));
+                complete(old, o);
+                final DailyHistoryView view = DailyHistoryView.from(event).id(ObjectIdUtil.id()).build();
+                complete(event, view);
+            }).subscribe(c -> {
+                o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
+                complete(event, o);
+            });
         });
     }
 
@@ -68,29 +77,36 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         });
     }
 
-    private void complete(Operation event, DailyHistoryView view) {
+    private void complete(Operation event, DailyHistoryView current) {
         final Flux<DailyHistoryView> next = retrieve(event.getOperationDate().plusDays(1), event.getAccount().getId());
         final Flux<DailyHistoryView> previous = retrieve(event.getOperationDate().minusDays(1), event.getAccount().getId());
         previous.switchIfEmpty(a -> {
-            updateViews(view, view, next);
+            updateViews(current, current, next);
         }).subscribe(p -> {
-            view.setRefAmount(p.getCurAmount());
-            updateViews(view, p, next);
+            current.setRefAmount(p.getCurAmount());
+            updateViews(current, p, next);
         });
     }
 
-    private void updateViews(DailyHistoryView view, DailyHistoryView previous, Flux<DailyHistoryView> next) {
-        next.switchIfEmpty(a -> {
-            dailyHistoryRepository.save(view).subscribe();
-        }).subscribe(n -> {
-            n.setRefAmount(view.getCurAmount());
-            dailyHistoryRepository.save(previous).subscribe();
-            dailyHistoryRepository.save(n).subscribe();
-            dailyHistoryRepository.save(view).subscribe();
+    private void updateViews(DailyHistoryView current, DailyHistoryView previous, Flux<DailyHistoryView> nexts) {
+        nexts.switchIfEmpty(a -> {
+            register(current);
+        }).subscribe(next -> {
+            next.setRefAmount(current.getCurAmount());
+            register(previous, next, current);
         });
     }
 
     private Flux<DailyHistoryView> retrieve(LocalDate date, String accountId) {
         return dailyHistoryRepository.findBydateAndAccount_id(date, accountId);
     }
+
+    private void register(DailyHistoryView... views) {
+        Stream.of(views).forEach(v -> dailyHistoryRepository.save(v).subscribe());
+    }
+
+/*    private boolean isEqual(Operation current, Operation old) {
+        return current.getAccount().getId().equals(old.getAccount().getId()) && current.getOperationDate().equals(old.getOperationDate())
+                && current.getAmount().equals(old.getAmount());
+    }*/
 }

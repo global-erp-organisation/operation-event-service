@@ -64,6 +64,4 @@ public class QueryRoutingConfiguration {
     public RouterFunction<ServerResponse> dashboardQueryRoutes(DashboardQueryHandler handler) {
         return RouterFunctions.route(GET("/users/{userId}/dashboard"), handler::dashboardGet);
     }
-
-    
 }

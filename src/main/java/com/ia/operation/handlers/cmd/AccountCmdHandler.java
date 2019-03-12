@@ -35,8 +35,8 @@ public class AccountCmdHandler implements Handler {
 
     public Mono<ServerResponse> accountUpdate(ServerRequest request) {
         final Mono<AccountUpdateCmd> bodyMono = request.bodyToMono(AccountUpdateCmd.class);
-        final String operationId = request.pathVariable(OPERATION_ID_KEY);
-        return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(operationId).build().validate(util)), gateway);
+        final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
+        return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(accountId).build().validate(util)), gateway);
     }
 
     public Mono<ServerResponse> accountDelete(ServerRequest request) {
