@@ -16,6 +16,7 @@ import com.ia.operation.queries.account.AccountGetByIdQuery;
 import com.ia.operation.repositories.AccountCategoryRepository;
 import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.UserRepository;
+import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,16 +30,18 @@ public class AccountEventHandler {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AccountCategoryRepository accountCategoryRepository;
+    private final ProjectionGenerator generator;
     
     @EventHandler
     public void on(AccountCreatedEvent event) {
         log.info("event recieved: value=[{}]", event);
         final Mono<User> user = userRepository.findById(event.getUserId());
         final Mono<AccountCategory> category = accountCategoryRepository.findById(event.getCategoryId());
-        
+
         user.subscribe(u -> {
             category.subscribe(c -> {
                 accountRepository.save(Account.of(event, u, c)).subscribe(account -> {
+                    generator.generate(account);
                     log.info("Account successfully saved. value=[{}]", account);
                 });
             });

@@ -1,7 +1,5 @@
 package com.ia.operation.handlers.cmd;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -62,7 +60,7 @@ public class ProjectionCmdHandler implements Handler {
     }
 
     @RabbitListener(queues = {"projection-event-queue"})
-    public void handleProjectionGenerationEvents(List<ProjectionCreatedEvent> events) {
-        events.forEach(event -> gateway.send(ProjectionCreationCmd.cmdFrom(event).build()));
+    public void handleProjectionGenerationEvents(ProjectionCreatedEvent event) {
+        gateway.send(ProjectionCreationCmd.cmdFrom(event).build());
     }
 }

@@ -1,9 +1,16 @@
 package com.ia.operation.util;
 
-import com.ia.operation.events.created.ProjectionCreatedEvent;
+import java.util.Optional;
 
-import reactor.core.publisher.Flux;
+import com.ia.operation.documents.Account;
+import com.ia.operation.documents.Period;
 
 public interface ProjectionGenerator {
-    Flux<ProjectionCreatedEvent> generate(String year);
+    void generate(String year);
+    void generate(Period period);
+    void generate(Optional<String> year, Account account);
+
+    default void generate(Account account) {
+        generate(Optional.empty(), account);
+    }
 }
