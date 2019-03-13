@@ -10,6 +10,7 @@ import com.ia.operation.events.created.PeriodCreatedEvent;
 import com.ia.operation.queries.period.PeriodGetByIdQuery;
 import com.ia.operation.queries.period.PeriodGetByYearQuery;
 import com.ia.operation.repositories.PeriodRepository;
+import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @ProcessingGroup("period-handler")
 public class PeriodEventHandler {
     private final PeriodRepository periodRepository;
+    private final ProjectionGenerator generator;
 
     @EventHandler
     public void on(PeriodCreatedEvent event) {
@@ -27,6 +29,7 @@ public class PeriodEventHandler {
         log.info("Event recieved: value=[{}]", period);
         periodRepository.save(period).subscribe(p -> {
             log.info("Period succesfully saved. value=[{}]", p);
+            generator.generate(p);
         });
     }
     

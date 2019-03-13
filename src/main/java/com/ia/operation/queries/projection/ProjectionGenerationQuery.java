@@ -6,5 +6,6 @@ import lombok.Value;
 @Value
 @Builder
 public class ProjectionGenerationQuery {
+    private String userId;
     private String year;
 }

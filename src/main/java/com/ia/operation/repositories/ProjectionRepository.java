@@ -10,4 +10,6 @@ public interface ProjectionRepository extends ReactiveMongoRepository<Projection
     Flux<Projection> findByAccount_IdAndAccount_UserIdAndPeriod_year(String accountId, String userId, String year);
 
     Flux<Projection> findByAccount_User_IdAndPeriod_year(String userId, String year);
+    
+    Flux<Projection> findByAccount_IdAndPeriod_Id(String accountId, String periodId);
 }
