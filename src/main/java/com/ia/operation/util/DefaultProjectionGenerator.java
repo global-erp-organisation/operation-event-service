@@ -28,55 +28,36 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
     private final RabbitTemplate rabbitTemplate;
     private final AxonProperties properties;
 
-
     @Override
     public void generate(String year) {
-         accountRepository.findAll().subscribe(account -> {
-            generate(Optional.ofNullable(year),account);
+        accountRepository.findAll().subscribe(account -> {
+            generate(Optional.ofNullable(year), account);
         });
     }
 
     @Override
     public void generate(Period period) {
         accountRepository.findAll().subscribe(account -> {
-            sendProjection(period,account);
+            createAndSendProjection(period, account);
         });
     }
 
     @Override
-    public  void generate(Optional<String> year, Account account) {
-        Flux<Period> periods = Flux.empty();
-        if(year.isPresent()) {
-            periods = periodRepository.findByYear(year.get());
-        }else {
-            periods = periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> {
-                return periodRepository.findByYear(p.getYear());
-            });
-        }
-        
-        periods.subscribe(period -> {
-            projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
-            .switchIfEmpty(a->{
-                sendProjection(period,account);
-            })
-            .collectList()
-            .subscribe();
-        });
+    public void generate(Optional<String> year, Account account) {
+        final Flux<Period> periods =
+                year.isPresent() ? periodRepository.findByYear(year.get())
+                                 : periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> periodRepository.findByYear(p.getYear()));
+
+        periods.subscribe(period -> projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
+                .switchIfEmpty(a -> createAndSendProjection(period, account)).collectList().subscribe());
     }
-    
-    private void sendProjection(Period period, Account account) {
-        rabbitTemplate.convertAndSend(properties.getDefaultEventRoutingKey(), createProjection(period, account));
+
+    private void createAndSendProjection(Period period, Account account) {
+        final ProjectionCreatedEvent projection = ProjectionCreatedEvent.builder().amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
+                .id(ObjectIdUtil.id()).accountId(account.getId()).periodId(period.getId()).build();
+        rabbitTemplate.convertAndSend(properties.getDefaultEventRoutingKey(), projection);
     }
-    
-    private ProjectionCreatedEvent createProjection(Period period, Account account) {
-        return ProjectionCreatedEvent.builder()
-                .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
-                .id(ObjectIdUtil.id())
-                .accountId(account.getId())
-                .periodId(period.getId())
-                .build();
-    }
-    
+
     private BigDecimal compute(BigDecimal amount, RecurringMode mode) {
         switch (mode) {
             case NONE:
