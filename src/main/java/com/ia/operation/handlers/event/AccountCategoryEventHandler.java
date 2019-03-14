@@ -57,5 +57,4 @@ public class AccountCategoryEventHandler {
     public Object cagetoryGet(CategoryGetQuery query) {
         return accountCategoryRepository.findById(query.getCategoryId());
     }
-
 }

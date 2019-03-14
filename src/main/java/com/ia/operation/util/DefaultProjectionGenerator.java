@@ -22,6 +22,12 @@ import reactor.core.publisher.Flux;
 @Component
 public class DefaultProjectionGenerator implements ProjectionGenerator {
 
+    private static final int TWELVE_FACTOR = 12;
+    private static final int THREE_FACTOR = 3;
+    private static final int TWO_FACTOR = 2;
+    private static final int FOUR_FACTOR = 4;
+    private static final int THIRTY_FACTOR = 30;
+    
     private final PeriodRepository periodRepository;
     private final AccountRepository accountRepository;
     private final ProjectionRepository projectionRepository;
@@ -49,7 +55,7 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
                                  : periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> periodRepository.findByYear(p.getYear()));
 
         periods.subscribe(period -> projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
-                .switchIfEmpty(a -> createAndSendProjection(period, account)).collectList().subscribe());
+                .switchIfEmpty(a -> createAndSendProjection(period, account)).subscribe());
     }
 
     private void createAndSendProjection(Period period, Account account) {
@@ -63,15 +69,15 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
             case NONE:
                 return amount;
             case DAILY:
-                return amount.multiply(new BigDecimal(30));
+                return amount.multiply(new BigDecimal(THIRTY_FACTOR));
             case WEEKLY:
-                return amount.multiply(new BigDecimal(4));
+                return amount.multiply(new BigDecimal(FOUR_FACTOR));
             case BIWEEKLY:
-                return amount.multiply(new BigDecimal(2));
+                return amount.multiply(new BigDecimal(TWO_FACTOR));
             case QUATERLY:
-                return amount.divide(new BigDecimal(3));
+                return amount.divide(new BigDecimal(THREE_FACTOR));
             case YEARLY:
-                return amount.divide(new BigDecimal(12));
+                return amount.divide(new BigDecimal(TWELVE_FACTOR));
             default:
                 return amount;
         }
