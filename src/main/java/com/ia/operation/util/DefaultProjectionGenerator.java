@@ -22,75 +22,62 @@ import reactor.core.publisher.Flux;
 @Component
 public class DefaultProjectionGenerator implements ProjectionGenerator {
 
+    private static final int TWELVE_FACTOR = 12;
+    private static final int THREE_FACTOR = 3;
+    private static final int TWO_FACTOR = 2;
+    private static final int FOUR_FACTOR = 4;
+    private static final int THIRTY_FACTOR = 30;
+    
     private final PeriodRepository periodRepository;
     private final AccountRepository accountRepository;
     private final ProjectionRepository projectionRepository;
     private final RabbitTemplate rabbitTemplate;
     private final AxonProperties properties;
 
-
     @Override
     public void generate(String year) {
-         accountRepository.findAll().subscribe(account -> {
-            generate(Optional.ofNullable(year),account);
+        accountRepository.findAll().subscribe(account -> {
+            generate(Optional.ofNullable(year), account);
         });
     }
 
     @Override
     public void generate(Period period) {
         accountRepository.findAll().subscribe(account -> {
-            sendProjection(period,account);
+            createAndSendProjection(period, account);
         });
     }
 
     @Override
-    public  void generate(Optional<String> year, Account account) {
-        Flux<Period> periods = Flux.empty();
-        if(year.isPresent()) {
-            periods = periodRepository.findByYear(year.get());
-        }else {
-            periods = periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> {
-                return periodRepository.findByYear(p.getYear());
-            });
-        }
-        
-        periods.subscribe(period -> {
-            projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
-            .switchIfEmpty(a->{
-                sendProjection(period,account);
-            })
-            .collectList()
-            .subscribe();
-        });
+    public void generate(Optional<String> year, Account account) {
+        final Flux<Period> periods =
+                year.isPresent() ? periodRepository.findByYear(year.get())
+                                 : periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> periodRepository.findByYear(p.getYear()));
+
+        periods.subscribe(period -> projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
+                .switchIfEmpty(a -> createAndSendProjection(period, account)).subscribe());
     }
-    
-    private void sendProjection(Period period, Account account) {
-        rabbitTemplate.convertAndSend(properties.getDefaultEventRoutingKey(), createProjection(period, account));
+
+    private void createAndSendProjection(Period period, Account account) {
+        final ProjectionCreatedEvent projection = ProjectionCreatedEvent.builder().amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
+                .id(ObjectIdUtil.id()).accountId(account.getId()).periodId(period.getId()).build();
+        rabbitTemplate.convertAndSend(properties.getDefaultEventRoutingKey(), projection);
     }
-    
-    private ProjectionCreatedEvent createProjection(Period period, Account account) {
-        return ProjectionCreatedEvent.builder()
-                .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
-                .id(ObjectIdUtil.id())
-                .accountId(account.getId())
-                .periodId(period.getId())
-                .build();
-    }
-    
+
     private BigDecimal compute(BigDecimal amount, RecurringMode mode) {
         switch (mode) {
             case NONE:
                 return amount;
             case DAILY:
-                return amount.multiply(new BigDecimal(30));
+                return amount.multiply(new BigDecimal(THIRTY_FACTOR));
             case WEEKLY:
-                return amount.multiply(new BigDecimal(4));
+                return amount.multiply(new BigDecimal(FOUR_FACTOR));
             case BIWEEKLY:
-                return amount.multiply(new BigDecimal(2));
+                return amount.multiply(new BigDecimal(TWO_FACTOR));
             case QUATERLY:
-                return amount.divide(new BigDecimal(3));
+                return amount.divide(new BigDecimal(THREE_FACTOR));
             case YEARLY:
-                return amount.divide(new BigDecimal(12));
+                return amount.divide(new BigDecimal(TWELVE_FACTOR));
             default:
                 return amount;
         }

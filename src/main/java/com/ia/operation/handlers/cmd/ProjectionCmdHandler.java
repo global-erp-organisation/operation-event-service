@@ -11,8 +11,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import com.ia.operation.commands.creation.ProjectionCreationCmd;
 import com.ia.operation.commands.delete.ProjectionDeletionCmd;
 import com.ia.operation.commands.update.ProjectionUpdateCmd;
+import com.ia.operation.configuration.AxonProperties;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
+import com.ia.operation.handlers.CmdResponse;
 import com.ia.operation.handlers.Handler;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.ObjectIdUtil;
@@ -27,6 +29,7 @@ public class ProjectionCmdHandler implements Handler {
     private final CommandGateway gateway;
     private final RabbitTemplate rabbitTemplate;
     private final AggregateUtil util;
+    private final AxonProperties properties;
 
     public Mono<ServerResponse> projectionAdd(ServerRequest request) {
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
@@ -53,14 +56,14 @@ public class ProjectionCmdHandler implements Handler {
     public Mono<ServerResponse> projectionGenerate(ServerRequest request) {
         final String year = request.pathVariable(YEAR_KEY);
         if (StringUtil.isNullOrEmpty(year) || !StringUtils.isNumeric(year)) {
-            return ServerResponse.badRequest().body(Mono.just("The year parametter is missing or the provided variable is not a number."), String.class);
+            return badRequestComplete(()->"The year parametter is missing or the provided variable is not a number.", String.class);
         }
-        rabbitTemplate.convertAndSend("cmd", ProjectionGeneratedEvent.builder().year(year).build());
-        return ServerResponse.accepted().body(Mono.just("Projection generation command succesfully recieved."), String.class);
+        rabbitTemplate.convertAndSend(properties.getDefaultCmdRoutingKey(), ProjectionGeneratedEvent.builder().year(year).build());
+        return acceptedRequestComplete(() ->Mono.just(CmdResponse.<String, String>builder().body("Projection generation command succesfully recieved.").build()), CmdResponse.class);
     }
 
     @RabbitListener(queues = {"projection-event-queue"})
-    public void handleProjectionGenerationEvents(ProjectionCreatedEvent event) {
+    public void handleProjectionGeneratedEvents(ProjectionCreatedEvent event) {
         gateway.send(ProjectionCreationCmd.cmdFrom(event).build());
     }
 }

@@ -1,0 +1,16 @@
+---
+applications:
+- name: operation-event-service
+  memory: 1G
+  instances: 1
+  timeout: 180
+  path: target/operation-event-service-1.0.0.jar
+  routes:
+  - route: operation-events.cfapps.io
+  services:
+  - amqp-lab
+  - event-store
+  - mongo-lab
+  env:
+    JBP_CONFIG_DEBUG: '{enabled: true}'
+    JAVA_OPTS: -Djava.security.egd=file:///dev/urandom

@@ -13,7 +13,7 @@
     <artifactId>operation-event-service</artifactId>
     <version>1.0.0</version>
     <name>operation-event-service</name>
-    <description>document managment replay service</description>
+    <description>thin financial health service</description>
 
     <properties>
         <java.version>1.8</java.version>
