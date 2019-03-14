@@ -17,7 +17,7 @@ import lombok.Data;
  * @param <V> Type of the object that need to be validated.
  */
 
-public  abstract class CommandValidator<V> implements ICommand {
+public  abstract class CommandValidator<V extends ICommand> implements ICommand {
 
     public ValidationResult<V> validate() {
         return buildResult(new ArrayList<>());
@@ -33,7 +33,7 @@ public  abstract class CommandValidator<V> implements ICommand {
 
     @Data
     @Builder
-    public static class ValidationResult<V> {
+    public static class ValidationResult<V extends ICommand> {
         private Boolean isValid;
         private List<String> errors;
         private Optional<CommandValidator<V>> validated;

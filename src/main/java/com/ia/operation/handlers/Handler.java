@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.ia.operation.commands.ICommand;
 import com.ia.operation.handlers.CmdResponse.Error;
 import com.ia.operation.util.validator.CommandValidator;
 import com.ia.operation.util.validator.CommandValidator.ValidationResult;
@@ -35,7 +36,7 @@ public interface Handler {
     String MONTHLY_KEY = "monthly";
     String DAILY_KEY = "daily";
 
-    default <V> Mono<ServerResponse> commandComplete(Mono<ValidationResult<V>> cmd, CommandGateway gateway) {
+    default <V extends ICommand> Mono<ServerResponse> commandComplete(Mono<ValidationResult<V>> cmd, CommandGateway gateway) {
         try {
             beanValidate(cmd, gateway);
             return cmd.flatMap(r -> response(r, gateway)).switchIfEmpty(badRequestError(MISSING_REQUEST_BODY_KEY));
@@ -44,7 +45,7 @@ public interface Handler {
         }
     }
 
-    default <V> Mono<ServerResponse> response(ValidationResult<V> cmd, CommandGateway gateway) {
+    default <V extends ICommand> Mono<ServerResponse> response(ValidationResult<V> cmd, CommandGateway gateway) {
         if (cmd.getIsValid()) {
             final Optional<CommandValidator<V>> r = cmd.getValidated();
             if (r.isPresent()) {
