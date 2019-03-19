@@ -1,6 +1,7 @@
 package com.ia.operation.util;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Optional;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,7 +28,7 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
     private static final int TWO_FACTOR = 2;
     private static final int FOUR_FACTOR = 4;
     private static final int THIRTY_FACTOR = 30;
-    
+
     private final PeriodRepository periodRepository;
     private final AccountRepository accountRepository;
     private final ProjectionRepository projectionRepository;
@@ -54,8 +55,11 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
                 year.isPresent() ? periodRepository.findByYear(year.get())
                                  : periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> periodRepository.findByYear(p.getYear()));
 
-        periods.subscribe(period -> projectionRepository.findByAccount_IdAndPeriod_Id(account.getId(), period.getId())
-                .switchIfEmpty(a -> createAndSendProjection(period, account)).subscribe());
+        periods.subscribe(period -> {
+            projectionRepository.findByAccount_IdAndPeriod_IdOrderByAccount_description(account.getId(), period.getId()).switchIfEmpty(a -> {
+                createAndSendProjection(period, account);
+            }).subscribe();
+        });
     }
 
     private void createAndSendProjection(Period period, Account account) {
@@ -75,9 +79,9 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
             case BIWEEKLY:
                 return amount.multiply(new BigDecimal(TWO_FACTOR));
             case QUATERLY:
-                return amount.divide(new BigDecimal(THREE_FACTOR));
+                return new BigDecimal(amount.doubleValue() / THREE_FACTOR, MathContext.DECIMAL32);
             case YEARLY:
-                return amount.divide(new BigDecimal(TWELVE_FACTOR));
+                return new BigDecimal(amount.doubleValue() / TWELVE_FACTOR, MathContext.DECIMAL32);
             default:
                 return amount;
         }

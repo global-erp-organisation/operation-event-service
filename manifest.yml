@@ -8,9 +8,9 @@ applications:
   routes:
   - route: operation-events.cfapps.io
   services:
-  - amqp-lab
-  - event-store
-  - mongo-lab
+  - operation-mongo
+  - operation-rabbit
   env:
     JBP_CONFIG_DEBUG: '{enabled: true}'
     JAVA_OPTS: -Djava.security.egd=file:///dev/urandom
+    SPRING_PROFILES_ACTIVE: dev,cloud

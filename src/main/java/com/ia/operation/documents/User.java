@@ -2,7 +2,6 @@ package com.ia.operation.documents;
 
 import java.util.Map;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ia.operation.events.created.UserCreatedEvent;
 import com.ia.operation.events.updated.UserUpdatedEvent;
 
+import io.github.kaiso.relmongo.annotation.FetchType;
+import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +23,7 @@ public class User {
     private String email;
     private String description;
     private Map<String, Object> details;
-    @DBRef
+    @ManyToOne(fetch = FetchType.EAGER)
     private Company company;
     private String password;
     

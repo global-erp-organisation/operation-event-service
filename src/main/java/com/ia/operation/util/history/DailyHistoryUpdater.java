@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 @Component
 public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
+    private static final int ONE_FACTOR = 1;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final OperationRepository operationRepository;
 
@@ -53,19 +54,32 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void onUpdate(Operation event, Operation old) {
-
         final Flux<DailyHistoryView> olds = retrieve(old.getOperationDate(), old.getAccount().getId());
-        final Flux<DailyHistoryView> currents = retrieve(event.getOperationDate(), event.getAccount().getId());
-        olds.subscribe(o -> {
-            currents.switchIfEmpty(a -> {
-                o.setCurAmount(o.getCurAmount().subtract(old.getAmount()));
-                complete(old, o);
-                final DailyHistoryView view = DailyHistoryView.from(event).id(ObjectIdUtil.id()).build();
-                complete(event, view);
-            }).subscribe(c -> {
+        olds.switchIfEmpty(a -> {
+            onAdd(event);
+        }).subscribe(o -> {
+            if (isEqual(event, old)) {
                 o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
-                complete(event, o);
-            });
+                updateHistoryReference(event.getOperationDate().plusDays(ONE_FACTOR), event.getAccount().getId(), o);
+            } else {
+                o.setCurAmount(o.getCurAmount().subtract(old.getAmount()));
+                updateHistoryReference(event.getOperationDate().plusDays(ONE_FACTOR), old.getAccount().getId(), o);
+                final Flux<DailyHistoryView> hs = retrieve(old.getOperationDate(), event.getAccount().getId());
+                hs.switchIfEmpty(a -> {
+                    onAdd(event);
+                }).subscribe(h -> {
+                    h.setCurAmount(h.getCurAmount().add(event.getAmount()));
+                    updateHistoryReference(event.getOperationDate().plusDays(ONE_FACTOR), event.getAccount().getId(), h);
+                });
+            }
+        });
+    }
+
+    private void updateHistoryReference(LocalDate date, String accountId, DailyHistoryView ref) {
+        final Flux<DailyHistoryView> olds = retrieve(date, accountId);
+        olds.subscribe(o -> {
+            o.setRefAmount(ref.getCurAmount());
+            register(o, ref);
         });
     }
 
@@ -78,8 +92,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     }
 
     private void complete(Operation event, DailyHistoryView current) {
-        final Flux<DailyHistoryView> next = retrieve(event.getOperationDate().plusDays(1), event.getAccount().getId());
-        final Flux<DailyHistoryView> previous = retrieve(event.getOperationDate().minusDays(1), event.getAccount().getId());
+        final Flux<DailyHistoryView> next = retrieve(event.getOperationDate().plusDays(ONE_FACTOR), event.getAccount().getId());
+        final Flux<DailyHistoryView> previous = retrieve(event.getOperationDate().minusDays(ONE_FACTOR), event.getAccount().getId());
         previous.switchIfEmpty(a -> {
             updateViews(current, current, next);
         }).subscribe(p -> {
@@ -105,8 +119,7 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         Stream.of(views).forEach(v -> dailyHistoryRepository.save(v).subscribe());
     }
 
-/*    private boolean isEqual(Operation current, Operation old) {
-        return current.getAccount().getId().equals(old.getAccount().getId()) && current.getOperationDate().equals(old.getOperationDate())
-                && current.getAmount().equals(old.getAmount());
-    }*/
+    private boolean isEqual(Operation current, Operation old) {
+        return current.getAccount().getId().equals(old.getAccount().getId()) && current.getOperationDate().equals(old.getOperationDate());
+    }
 }

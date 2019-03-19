@@ -29,7 +29,8 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
     private String description;
     private LocalDate start;
     private LocalDate end;
-    private Boolean close;
+    @Builder.Default
+    private Boolean close = false;
     
     @JsonIgnore
     private PeriodCreatedEvent event;

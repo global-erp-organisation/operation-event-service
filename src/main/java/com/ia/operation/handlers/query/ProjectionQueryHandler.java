@@ -20,10 +20,6 @@ public class ProjectionQueryHandler implements Handler {
     private final QueryGateway gateway;
 
     public Mono<ServerResponse> projectionByAccount(ServerRequest request) {
-        final String userId = request.pathVariable(USER_ID_KEY);
-        if (userId == null) {
-            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + USER_ID_KEY);
-        }
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         if (accountId == null) {
             return badRequestError(MISSING_PATH_VARIABLE_PREFIX + ACCOUNT_ID_KEY);
@@ -32,7 +28,7 @@ public class ProjectionQueryHandler implements Handler {
         if (year == null || !StringUtils.isNumeric(year)) {
             return badRequestError(MISSING_PATH_VARIABLE_PREFIX + YEAR_KEY);
         }
-        return queryComplete(() -> ProjectionByAccountQuery.builder().accountId(accountId).userId(userId).year(year).build(), Projection.class, gateway);
+        return queryComplete(() -> ProjectionByAccountQuery.builder().accountId(accountId).year(year).build(), Projection.class, gateway);
     }
 
     public Mono<ServerResponse> projectionByYear(ServerRequest request) {

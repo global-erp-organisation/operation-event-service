@@ -8,5 +8,4 @@ import lombok.Value;
 public class ProjectionByAccountQuery {
     private String accountId;
     private String year;
-    private String userId;
 }
