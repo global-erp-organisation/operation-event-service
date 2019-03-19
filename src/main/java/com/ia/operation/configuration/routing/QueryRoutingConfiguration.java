@@ -40,7 +40,7 @@ public class QueryRoutingConfiguration {
     @Bean
     public RouterFunction<ServerResponse> projectionQueryRoute(ProjectionQueryHandler handler) {
         return RouterFunctions.route(GET("/periods/{year}/users/{userId}/projections"), handler::projectionByYear)
-                .andRoute(GET("/periods/{year}/operations/{operationId}/projections"), handler::projectionByAccount);
+                .andRoute(GET("/periods/{year}/accounts/{accountId}/projections"), handler::projectionByAccount);
     }
 
     @Bean

@@ -48,7 +48,7 @@ public class ProjectionEventHandler {
         });
     }
 
-    @RabbitListener(queues = {"projection-cmd-queue"})
+    @RabbitListener(queues = {"${axon.events.projection-cmd-queue}"})
     public void on(ProjectionGeneratedEvent event) {
         generator.generate(event.getYear());
     }
@@ -56,18 +56,18 @@ public class ProjectionEventHandler {
     @QueryHandler
     public Object projectionByAccount(ProjectionByAccountQuery query) {
         log.info("ProjectionByAccount query recieved: value=[{}]", query);
-        return projectionRepository.findByAccount_IdAndAccount_UserIdAndPeriod_year(query.getAccountId(), query.getUserId(), query.getYear());
+        return projectionRepository.findByAccount_IdAndPeriod_yearOrderByPeriod_start(query.getAccountId(), query.getYear());
     }
 
     @QueryHandler
     public Object projectionByyear(ProjectionByYearQuery query) {
         log.info("ProjectionByYear query recieved: value=[{}]", query);
-        return projectionRepository.findByAccount_User_IdAndPeriod_year(query.getUserId(), query.getYear());
+        return projectionRepository.findByAccount_User_IdAndPeriod_yearOrderByPeriod_start(query.getUserId(), query.getYear());
     }
 
     @QueryHandler
     public Object projectionGenerate(ProjectionGenerationQuery query) {
         log.info("ProjectionGeneration query recieved: value=[{}]", query);
-        return projectionRepository.findByAccount_User_IdAndPeriod_year(query.getUserId(), query.getYear());
+        return projectionRepository.findByAccount_User_IdAndPeriod_yearOrderByPeriod_start(query.getUserId(), query.getYear());
     }
 }

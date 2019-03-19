@@ -62,7 +62,7 @@ public class ProjectionCmdHandler implements Handler {
         return acceptedRequestComplete(() ->Mono.just(CmdResponse.<String, String>builder().body("Projection generation command succesfully recieved.").build()), CmdResponse.class);
     }
 
-    @RabbitListener(queues = {"projection-event-queue"})
+    @RabbitListener(queues = {"${axon.events.projection-event-queue}"})
     public void handleProjectionGeneratedEvents(ProjectionCreatedEvent event) {
         gateway.send(ProjectionCreationCmd.cmdFrom(event).build());
     }

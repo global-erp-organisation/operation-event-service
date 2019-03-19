@@ -41,7 +41,7 @@ public class DashboardQueryHandler implements Handler {
             return badRequestError(MISSING_QUERY_PARAM_PREFIX + END_DATE_KEY);
         }
         if (!periodCheck(start.get(), end.get())) {
-            return ServerResponse.badRequest().body(Mono.just("Something when wrong with the entered period."), String.class);
+            return badRequestError("Something when wrong with the entered period. The start date should be before the end date.");
         }
         return queryComplete(() -> DashboardQuery.builder()
                 .userId(userId)

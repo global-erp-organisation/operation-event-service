@@ -1,7 +1,6 @@
 package com.ia.operation.documents;
 
 import java.time.LocalDate;
-import java.util.Collection;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -25,8 +24,6 @@ public class Period {
     private LocalDate start;
     private LocalDate end;
     private String description;
-    private Collection<Operation> operations;
-    private Collection<Projection> projections;
     @Builder.Default
     private Boolean close = false;
 

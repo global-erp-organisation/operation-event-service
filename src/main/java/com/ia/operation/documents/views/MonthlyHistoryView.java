@@ -12,6 +12,8 @@ import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
 import com.ia.operation.util.ObjectIdUtil;
 
+import io.github.kaiso.relmongo.annotation.FetchType;
+import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 
@@ -25,6 +27,7 @@ public class MonthlyHistoryView {
     private BigDecimal refAmount;
     @JsonProperty("cur_amount")
     private BigDecimal curAmount;
+    @ManyToOne(fetch = FetchType.EAGER)
     private Account account;
     private String month;
     private LocalDate date;

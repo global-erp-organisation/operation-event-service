@@ -5,11 +5,15 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @SuppressWarnings("serial")
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Builder
 public class PeriodCreatedEvent implements Serializable {
     private String id;

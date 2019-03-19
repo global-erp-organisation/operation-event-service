@@ -7,9 +7,9 @@ import com.ia.operation.documents.Projection;
 import reactor.core.publisher.Flux;
 
 public interface ProjectionRepository extends ReactiveMongoRepository<Projection, String> {
-    Flux<Projection> findByAccount_IdAndAccount_UserIdAndPeriod_year(String accountId, String userId, String year);
+    Flux<Projection> findByAccount_IdAndPeriod_yearOrderByPeriod_start(String accountId, String year);
 
-    Flux<Projection> findByAccount_User_IdAndPeriod_year(String userId, String year);
+    Flux<Projection> findByAccount_User_IdAndPeriod_yearOrderByPeriod_start(String userId, String year);
     
-    Flux<Projection> findByAccount_IdAndPeriod_Id(String accountId, String periodId);
+    Flux<Projection> findByAccount_IdAndPeriod_IdOrderByAccount_description(String accountId, String periodId);
 }

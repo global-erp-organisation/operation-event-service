@@ -1,6 +1,6 @@
 axon:
   events:
-    database: operation-events-store
+    database: operation-event-store
     snapshot-limit: 1000
     default-exchange: operation-exchange
     projection-event-queue: projection-event-queue
