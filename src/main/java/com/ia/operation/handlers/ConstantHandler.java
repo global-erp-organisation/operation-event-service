@@ -17,4 +17,5 @@ public interface ConstantHandler {
     String YEARLY_KEY = "yearly";
     String MONTHLY_KEY = "monthly";
     String DAILY_KEY = "daily";
+    String EMAIL_KEY = "email";
 }

@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.documents.User;
 import com.ia.operation.handlers.Handler;
+import com.ia.operation.queries.user.UserGetByEmailQuery;
 import com.ia.operation.queries.user.UserGetByIdQuery;
 
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,11 @@ public class UserQueryHandler implements Handler {
             return badRequestError(MISSING_PATH_VARIABLE_PREFIX + USER_ID_KEY);
         }
         return queryComplete(() -> UserGetByIdQuery.builder().userId(userId).build(), User.class, gateway);
+    }
+
+    public Mono<ServerResponse> userGetByEmail(ServerRequest request) {
+        return request.queryParam(EMAIL_KEY)
+                .map(e -> queryComplete(() -> UserGetByEmailQuery.builder().email(e).build(), User.class, gateway))
+                .orElseGet(() -> badRequestError(MISSING_QUERY_PARAM_PREFIX + EMAIL_KEY));
     }
 }
