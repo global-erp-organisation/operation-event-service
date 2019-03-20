@@ -13,4 +13,4 @@ applications:
   env:
     JBP_CONFIG_DEBUG: '{enabled: true}'
     JAVA_OPTS: -Djava.security.egd=file:///dev/urandom
-    SPRING_PROFILES_ACTIVE: dev,cloud
+    SPRING_PROFILES_ACTIVE: cloud
