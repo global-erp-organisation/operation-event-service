@@ -36,6 +36,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     private String userId;
     @JsonProperty("default_amount")
     private BigDecimal defaultAmount;
+    @JsonProperty("category_id")
     private String categoryId;
     @JsonProperty("operation_type")
     @Builder.Default
