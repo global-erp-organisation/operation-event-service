@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 
 import io.github.kaiso.relmongo.annotation.FetchType;
@@ -23,6 +24,7 @@ public class Projection {
     private BigDecimal amount;
     @ManyToOne(fetch = FetchType.EAGER)
     private Period period;
+    private OperationType operationType;
     
     public static Projection of(ProjectionCreatedEvent event, Account account, Period period) {
         return Projection.builder()
@@ -30,6 +32,7 @@ public class Projection {
                 .account(account)
                 .amount(event.getAmount())
                 .period(period)
+                .operationType(event.getOperationType())
                 .build();
     }
 }

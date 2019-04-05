@@ -63,8 +63,13 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
     }
 
     private void createAndSendProjection(Period period, Account account) {
-        final ProjectionCreatedEvent projection = ProjectionCreatedEvent.builder().amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
-                .id(ObjectIdUtil.id()).accountId(account.getId()).periodId(period.getId()).build();
+        final ProjectionCreatedEvent projection = ProjectionCreatedEvent.builder()
+                .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
+                .id(ObjectIdUtil.id())
+                .accountId(account.getId())
+                .periodId(period.getId())
+                .operationType(account.getDefaultOperationType())
+                .build();
         rabbitTemplate.convertAndSend(properties.getDefaultEventRoutingKey(), projection);
     }
 

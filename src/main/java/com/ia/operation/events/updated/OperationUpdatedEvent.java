@@ -3,6 +3,8 @@ package com.ia.operation.events.updated;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.ia.operation.enums.OperationType;
+
 import lombok.Builder;
 import lombok.Value;
 
@@ -15,4 +17,5 @@ public class OperationUpdatedEvent {
     private LocalDate operationDate;
     private String periodId;
     private BigDecimal amount;
+    private OperationType operationType;
 }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
 import com.ia.operation.aggregates.ProjectionAggregate;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
 
@@ -32,9 +33,15 @@ public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd> {
     private BigDecimal amount;
     @JsonProperty("period_id")
     private String periodId;
+    private OperationType operationType;
 
     public static ProjectionUpdateCmdBuilder cmdFrom(ProjectionUpdateCmd cmd) {
-        return ProjectionUpdateCmd.builder().amount(cmd.getAmount()).id(cmd.getId()).accountId(cmd.getAccountId()).periodId(cmd.getPeriodId());
+        return ProjectionUpdateCmd.builder()
+                .amount(cmd.getAmount())
+                .id(cmd.getId())
+                .accountId(cmd.getAccountId())
+                .periodId(cmd.getPeriodId())
+                .operationType(cmd.getOperationType());
     }
 
     @Override

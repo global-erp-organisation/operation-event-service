@@ -1,5 +1,8 @@
 package com.ia.operation.handlers.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -29,12 +32,16 @@ public class OperationQueryHandler implements Handler {
 
     public Mono<ServerResponse> operationGetByear(ServerRequest request) {
         final String year = request.pathVariable(YEAR_KEY);
+        final List<String> errors = new ArrayList<>();
         if (year == null) {
-            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + YEAR_KEY);
+            errorItemAdd(errors, MISSING_PATH_VARIABLE_PREFIX + YEAR_KEY);
         }
         final String userId = request.pathVariable(USER_ID_KEY);
         if (userId == null) {
-            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + USER_ID_KEY);
+            errorItemAdd(errors, MISSING_PATH_VARIABLE_PREFIX + USER_ID_KEY);
+        }
+        if (!errors.isEmpty()) {
+            return badRequestError(errors);
         }
         return queryComplete(() -> OperationGetByYearQuery.builder().year(year).userId(userId).build(), Operation.class, gateway);
     }

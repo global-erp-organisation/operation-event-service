@@ -26,6 +26,7 @@ public  abstract class CommandValidator<V extends ICommand> implements ICommand 
     public ValidationResult<V> validate(AggregateUtil util) {
         return validate();
     }
+    
 
     protected ValidationResult<V> buildResult(List<String> errors) {
         return ValidationResult.<V>builder().errors(errors).validated(Optional.of(this)).isValid(errors.isEmpty()).build();

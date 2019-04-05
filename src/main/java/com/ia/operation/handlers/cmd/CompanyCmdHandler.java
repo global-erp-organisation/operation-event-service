@@ -2,6 +2,7 @@ package com.ia.operation.handlers.cmd;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Component
+@RestController
 @RequiredArgsConstructor
 public class CompanyCmdHandler implements Handler {
     private final CommandGateway gateway;

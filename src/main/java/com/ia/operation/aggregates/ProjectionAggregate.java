@@ -10,6 +10,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.ProjectionCreationCmd;
 import com.ia.operation.commands.delete.ProjectionDeletionCmd;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.deleted.ProjectionDeletedEvent;
 
@@ -27,6 +28,7 @@ public class ProjectionAggregate {
     private String accountId;
     private BigDecimal amount;
     private String periodId;
+    private OperationType operationType;
 
     @CommandHandler
     public ProjectionAggregate(ProjectionCreationCmd cmd) {
@@ -39,6 +41,7 @@ public class ProjectionAggregate {
         this.accountId = event.getAccountId();
         this.amount = event.getAmount();
         this.periodId = event.getPeriodId();
+        this.operationType = event.getOperationType();
     }
 
     @CommandHandler

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
@@ -13,6 +15,7 @@ import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.AccountCategoryAggregate;
 import com.ia.operation.aggregates.UserAggregate;
 import com.ia.operation.enums.AccountType;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
 import com.ia.operation.util.AggregateUtil;
@@ -32,22 +35,54 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
     private String description;
     @JsonProperty("user_id")
     private String userId;
-    @JsonProperty("operation_type")
-    private AccountType accountType;
     @JsonProperty("recurring_mode")
     private RecurringMode recurringMode;
     @JsonProperty("default_amount")
     private BigDecimal defaultAmount;
     private String categoryId;
+    private BigDecimal balance;
+    @JsonProperty("account_type")
+    private AccountType accountType;
+    @JsonProperty("default_operation_type")
+    private OperationType defaultOperationType;
 
     public static AccountUpdateCmdBuilder cmdFrom(AccountUpdateCmd cmd) {
-        return AccountUpdateCmd.builder().defaultAmount(cmd.getDefaultAmount()).description(cmd.getDescription()).id(cmd.getId()).userId(cmd.getUserId())
-                .recurringMode(cmd.getRecurringMode()).accountType(cmd.getAccountType()).categoryId(cmd.getCategoryId());
+        return AccountUpdateCmd.builder()
+                .defaultAmount(cmd.getDefaultAmount())
+                .description(cmd.getDescription())
+                .id(cmd.getId())
+                .userId(cmd.getUserId())
+                .recurringMode(cmd.getRecurringMode())
+                .categoryId(cmd.getCategoryId())
+                .balance(cmd.getBalance())
+                .accountType(cmd.getAccountType())
+                .defaultOperationType(cmd.getDefaultOperationType());
+    }
+
+    public static AccountUpdateCmdBuilder cmdFrom(AccountAggregate cmd) {
+        return AccountUpdateCmd.builder()
+                .defaultAmount(cmd.getDefaultAmount())
+                .description(cmd.getDescription())
+                .id(cmd.getId())
+                .userId(cmd.getUserId())
+                .recurringMode(cmd.getRecurringMode())
+                .categoryId(cmd.getCategoryId())
+                .balance(cmd.getBalance())
+                .accountType(cmd.getAccountType())
+                .defaultOperationType(cmd.getDefaultOperationType());
     }
 
     public static AccountUpdatedEvent.AccountUpdatedEventBuilder eventFrom(AccountUpdateCmd cmd) {
-        return AccountUpdatedEvent.builder().defaultAmount(cmd.getDefaultAmount()).description(cmd.getDescription()).id(cmd.getId())
-                .userId(cmd.getUserId()).recurringMode(cmd.getRecurringMode()).accountType(cmd.getAccountType()).categoryId(cmd.getCategoryId());
+        return AccountUpdatedEvent.builder()
+                .defaultAmount(cmd.getDefaultAmount())
+                .description(cmd.getDescription())
+                .id(cmd.getId())
+                .userId(cmd.getUserId())
+                .recurringMode(cmd.getRecurringMode())
+                .categoryId(cmd.getCategoryId())
+                .balance(cmd.getBalance())
+                .accountType(cmd.getAccountType())
+                .defaultOperationType(cmd.getDefaultOperationType());
     }
 
     @Override
@@ -83,11 +118,15 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
         if (StringUtils.isEmpty(description)) {
             errors.add("The operation description shouldnt be null or empty");
         }
-        if (!AccountType.check(accountType)) {
-            errors.add("The input operation type doesnt match with the available domain. Here is the domain value: " + AccountType.values());
-        }
         if (!RecurringMode.check(recurringMode)) {
             errors.add("The input recurring mode doesnt match with the available domain. Here is the domain value: " + RecurringMode.values());
+        }
+        if (!AccountType.check(accountType)) {
+            final List<String> values = Stream.of(AccountType.values()).map(a -> a.name()).collect(Collectors.toList());
+            errors.add("The input account type doesnt match with the available domain. Here is the domain value: " + String.join(",", values));
+        }
+        if (balance.doubleValue() < 0.0) {
+            errors.add("The input balance shouldnt be less than zero.");
         }
         return buildResult(errors);
     }
