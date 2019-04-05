@@ -2,12 +2,15 @@ package com.ia.operation.handlers.event;
 
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.User;
 import com.ia.operation.events.created.UserCreatedEvent;
 import com.ia.operation.events.deleted.UserDeletedEvent;
 import com.ia.operation.events.updated.UserUpdatedEvent;
+import com.ia.operation.queries.user.UserGetByEmailQuery;
+import com.ia.operation.queries.user.UserGetByIdQuery;
 import com.ia.operation.repositories.CompanyRepository;
 import com.ia.operation.repositories.UserRepository;
 
@@ -50,4 +53,13 @@ public class UserEventHandler {
         });
     }
 
+    @QueryHandler
+    public Object userGetById(UserGetByIdQuery query) {
+        return userRepository.findById(query.getUserId());
+    }
+
+    @QueryHandler
+    public Object userGetByEmail(UserGetByEmailQuery query) {
+        return userRepository.findByEmail(query.getEmail());
+    }
 }

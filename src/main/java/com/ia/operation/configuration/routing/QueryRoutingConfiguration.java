@@ -57,7 +57,8 @@ public class QueryRoutingConfiguration {
 
     @Bean
     public RouterFunction<ServerResponse> userQueryRoutes(UserQueryHandler handler) {
-        return RouterFunctions.route(GET("/users/{userId}"), handler::userGet);
+        return RouterFunctions.route(GET("/users/{userId}"), handler::userGet)
+                .andRoute(GET("/users"), handler::userGetByEmail);
     }
     
     @Bean

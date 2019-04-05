@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
@@ -33,6 +34,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     private BigDecimal amount;
     @JsonProperty("period_id")
     private String periodId;
+    private OperationType operationType;
     @JsonIgnore
     private ProjectionCreatedEvent event;
 
@@ -41,7 +43,8 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
                 .periodId(cmd.getPeriodId())
-                .amount(cmd.getAmount());
+                .amount(cmd.getAmount())
+                .operationType(cmd.getOperationType());
     }
     
     public static ProjectionCreatedEvent eventFrom(ProjectionCreationCmd cmd) {
@@ -50,6 +53,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .accountId(cmd.getAccountId())
                 .periodId(cmd.getPeriodId())
                 .amount(cmd.getAmount())
+                .operationType(cmd.getOperationType())
                 .build();
     }
     
@@ -59,6 +63,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .accountId(event.getAccountId())
                 .periodId(event.getPeriodId())
                 .amount(event.getAmount())
+                .operationType(event.getOperationType())
                 .event(event);
     }
     

@@ -1,5 +1,8 @@
 package com.ia.operation.handlers.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.stereotype.Component;
@@ -21,12 +24,16 @@ public class ProjectionQueryHandler implements Handler {
 
     public Mono<ServerResponse> projectionByAccount(ServerRequest request) {
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
+        final List<String> errors = new ArrayList<>();
         if (accountId == null) {
-            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + ACCOUNT_ID_KEY);
+            errorItemAdd(errors, MISSING_PATH_VARIABLE_PREFIX + ACCOUNT_ID_KEY);
         }
         final String year = request.pathVariable(YEAR_KEY);
         if (year == null || !StringUtils.isNumeric(year)) {
-            return badRequestError(MISSING_PATH_VARIABLE_PREFIX + YEAR_KEY);
+            errorItemAdd(errors, MISSING_PATH_VARIABLE_PREFIX + YEAR_KEY);
+        }
+        if (!errors.isEmpty()) {
+            return badRequestError(errors);
         }
         return queryComplete(() -> ProjectionByAccountQuery.builder().accountId(accountId).year(year).build(), Projection.class, gateway);
     }

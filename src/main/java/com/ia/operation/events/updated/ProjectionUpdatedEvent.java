@@ -2,6 +2,8 @@ package com.ia.operation.events.updated;
 
 import java.math.BigDecimal;
 
+import com.ia.operation.enums.OperationType;
+
 import lombok.Builder;
 import lombok.Value;
 
@@ -13,4 +15,5 @@ public class ProjectionUpdatedEvent {
     private BigDecimal amount;
     private String periodId;
     private String year;
+    private OperationType operationType;
 }

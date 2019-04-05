@@ -8,7 +8,6 @@ import org.axonframework.common.Assert;
 import org.axonframework.queryhandling.QueryGateway;
 import org.reactivestreams.Publisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.ICommand;
@@ -82,7 +81,6 @@ public interface Handler extends ConstantHandler {
         return errorWithSatus(message.get(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler
     default void beanValidate(Object... beans) {
         for (Object o : beans) {
             Assert.notNull(o, () -> "null is not accepted for " + o.getClass().getSimpleName() + " object");

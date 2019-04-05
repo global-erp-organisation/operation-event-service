@@ -1,5 +1,7 @@
 package com.ia.operation.handlers;
 
+import java.util.List;
+
 public interface ConstantHandler {
     String ACCOUNT_ID_KEY = "accountId";
     String CATEGORY_ID_KEY = "categoryId";
@@ -17,4 +19,9 @@ public interface ConstantHandler {
     String YEARLY_KEY = "yearly";
     String MONTHLY_KEY = "monthly";
     String DAILY_KEY = "daily";
+    String EMAIL_KEY = "email";
+    
+    default void errorItemAdd(List<String> errors, String item) {
+        errors.add(item);
+    }
 }

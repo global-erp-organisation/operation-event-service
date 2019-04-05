@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
@@ -11,6 +13,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.OperationAggregate;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.util.AggregateUtil;
 import com.ia.operation.util.validator.CommandValidator;
@@ -32,6 +35,9 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
     @JsonProperty("operation_date")
     private LocalDate operationDate;
     private BigDecimal amount;
+    @Builder.Default
+    @JsonProperty("operation_type")
+    private OperationType operationType = OperationType.UNDEFINED;
     
     public static OperationCreationCmdBuilder cmdFrom(OperationCreationCmd cmd) {
         return OperationCreationCmd.builder()
@@ -39,7 +45,8 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 .description(cmd.getDescription())
                 .operationDate(cmd.getOperationDate())
                 .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount());
+                .amount(cmd.getAmount())
+                .operationType(cmd.getOperationType());
     }
     
     public static OperationCreatedEvent.OperationCreatedEventBuilder eventFrom(OperationCreationCmd cmd) {
@@ -48,7 +55,8 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 .description(cmd.getDescription())
                 .operationDate(cmd.getOperationDate())
                 .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount());
+                .amount(cmd.getAmount())
+                .operationType(cmd.getOperationType());
     }
 
     @Override
@@ -74,6 +82,11 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
         if(amount.doubleValue()<=0.0) {
             errors.add("The operation amount should be greater than zero.");
         }
+        if (!OperationType.check(operationType)) {
+            final List<String> values = Stream.of(OperationType.values()).map(a -> a.name()).collect(Collectors.toList());
+            errors.add("The input account type doesnt match with the available domain. Here is the domain value: " + String.join(",", values));
+        }
+
         return buildResult(errors);
     }
 }

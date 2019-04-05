@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
 
@@ -27,6 +29,9 @@ public class Operation {
     @ManyToOne(fetch = FetchType.EAGER)
     private Period period;
     private BigDecimal amount;
+    @JsonProperty("operation_type")
+    private OperationType operationType;
+
 
     
     public static Operation of(OperationCreatedEvent event, Period period, Account account) {
@@ -37,6 +42,7 @@ public class Operation {
                 .operationDate(event.getOperationDate())
                 .period(period)
                 .amount(event.getAmount())
+                .operationType(event.getOperationType())
                 .build();
     }
     
@@ -48,6 +54,7 @@ public class Operation {
                 .operationDate(event.getOperationDate())
                 .period(period)
                 .amount(event.getAmount())
+                .operationType(event.getOperationType())
                 .build();
     }
 
@@ -60,6 +67,7 @@ public class Operation {
                 .operationDate(event.getOperationDate())
                 .period(period)
                 .amount(event.getAmount())
+                .operationType(event.getOperationType())
                 .build();
     }
 
@@ -71,7 +79,8 @@ public class Operation {
                 .account(event.getAccount())
                 .operationDate(event.getOperationDate())
                 .period(event.getPeriod())
-                .amount(event.getAmount());
+                .amount(event.getAmount())
+                .operationType(event.getOperationType());
     }
 
 }
