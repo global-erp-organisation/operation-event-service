@@ -1,4 +1,4 @@
-package com.ia.operation.util.history;
+package com.ia.operation.helper.history;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.MonthlyHistoryView;
+import com.ia.operation.helper.ObjectIdHelper;
 import com.ia.operation.repositories.MonthlyHistoryRepository;
-import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -39,7 +39,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
     private void onAdd(Operation event) {
         final Flux<MonthlyHistoryView> currents = retrieve(getMonth(event.getOperationDate()), event.getAccount().getId());
         currents.switchIfEmpty(a -> {
-            final MonthlyHistoryView current = MonthlyHistoryView.from(event).id(ObjectIdUtil.id()).build();
+            final MonthlyHistoryView current = MonthlyHistoryView.from(event).id(ObjectIdHelper.id()).build();
             complete(event, current);
         }).subscribe(current -> {
             current.setCurAmount(current.getCurAmount().add(event.getAmount()));

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.Period;
 import com.ia.operation.events.created.PeriodCreatedEvent;
+import com.ia.operation.helper.ProjectionGenerator;
 import com.ia.operation.queries.period.PeriodGetByIdQuery;
 import com.ia.operation.queries.period.PeriodGetByYearQuery;
 import com.ia.operation.repositories.PeriodRepository;
-import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

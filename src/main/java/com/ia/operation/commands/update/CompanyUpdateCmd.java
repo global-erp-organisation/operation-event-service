@@ -9,8 +9,8 @@ import org.springframework.util.StringUtils;
 
 import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.events.updated.CompanyUpdatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
@@ -42,7 +42,7 @@ public class CompanyUpdateCmd extends CommandValidator<CompanyUpdateCmd>{
     }
     
     @Override
-    public ValidationResult<CompanyUpdateCmd> validate(AggregateUtil util) {
+    public ValidationResult<CompanyUpdateCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Company identifier shouldn't be null or empty");

@@ -10,8 +10,8 @@ import com.ia.operation.commands.creation.UserCreationCmd;
 import com.ia.operation.commands.delete.UserDeletionCmd;
 import com.ia.operation.commands.update.UserUpdateCmd;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -21,13 +21,13 @@ import reactor.core.publisher.Mono;
 public class UserCmdHandler implements Handler {
     
     private final CommandGateway gateway;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
     
     public Mono<ServerResponse> userAdd(ServerRequest request) {
         final String companyId = request.pathVariable(COMPANY_ID_KEY);
         final Mono<UserCreationCmd> bodyMono = request.bodyToMono(UserCreationCmd.class);
         return bodyMono.map(body->UserCreationCmd.cmdFrom(body)
-                .id(ObjectIdUtil.id())
+                .id(ObjectIdHelper.id())
                 .companyId(companyId)
                 .build()
                 .validate(util))

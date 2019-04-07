@@ -1,4 +1,4 @@
-package com.ia.operation.util;
+package com.ia.operation.helper;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -15,21 +15,22 @@ import org.axonframework.modelling.command.Repository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @ConditionalOnProperty("axon.events.database")
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
-public class AggregateUtil {
+public class AggregateHelper {
+   
     private final EventStore store;
 
     public <T> Optional<T> aggregateGet(String aggregateId, Class<T> clazz) {
         final UnitOfWork<GenericMessage<String>> uow = DefaultUnitOfWork.startAndGet(new GenericMessage<>(aggregateId));
         try {
-            final Aggregate<T> aggreagte = getRepository(clazz).load(aggregateId);
-            return Optional.of(aggreagte.invoke(a -> {
+            final Aggregate<T> aggregate = getRepository(clazz).load(aggregateId);
+            return Optional.of(aggregate.invoke(a -> {
                 uow.commit();
                 return a;
             }));

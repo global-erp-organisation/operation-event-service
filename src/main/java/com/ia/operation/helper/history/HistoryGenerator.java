@@ -1,4 +1,4 @@
-package com.ia.operation.util.history;
+package com.ia.operation.helper.history;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -12,12 +12,12 @@ import com.ia.operation.documents.Period;
 import com.ia.operation.documents.views.DailyHistoryView;
 import com.ia.operation.documents.views.MonthlyHistoryView;
 import com.ia.operation.documents.views.YearlyHistoryView;
+import com.ia.operation.helper.ObjectIdHelper;
 import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.DailyHistoryRepository;
 import com.ia.operation.repositories.MonthlyHistoryRepository;
 import com.ia.operation.repositories.PeriodRepository;
 import com.ia.operation.repositories.YearlyHistoryRepository;
-import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -47,19 +47,19 @@ public class HistoryGenerator {
         periods.subscribe(p -> {
             IntStream.range(0, p.getStart().getMonth().length(p.getStart().isLeapYear())).forEach(i -> {
                 dailyHistoryRepository.findBydateAndAccount_id(p.getStart().plusDays(i), account.getId()).switchIfEmpty(a -> {
-                    final DailyHistoryView d = DailyHistoryView.builder().id(ObjectIdUtil.id()).account(account).curAmount(BigDecimal.ZERO)
+                    final DailyHistoryView d = DailyHistoryView.builder().id(ObjectIdHelper.id()).account(account).curAmount(BigDecimal.ZERO)
                             .refAmount(BigDecimal.ZERO).date(p.getStart().plusDays(i)).build();
                     dailyHistoryRepository.save(d).subscribe();
                 }).subscribe();
             });
             monthlyHistoryRepository.findByMonthAndAccount_id(p.getDescription().toUpperCase(), account.getId()).switchIfEmpty(a -> {
-                final MonthlyHistoryView m = MonthlyHistoryView.builder().id(ObjectIdUtil.id()).account(account).date(p.getStart())
+                final MonthlyHistoryView m = MonthlyHistoryView.builder().id(ObjectIdHelper.id()).account(account).date(p.getStart())
                         .refAmount(BigDecimal.ZERO).curAmount(BigDecimal.ZERO).month(p.getDescription().toUpperCase()).build();
                 monthlyHistoryRepository.save(m).subscribe();
             }).subscribe();
             final int yearInt = p.getStart().getYear();
             yearlyHistoryRepository.findByYearAndAccount_id(yearInt, account.getId()).switchIfEmpty(a -> {
-                final YearlyHistoryView y = YearlyHistoryView.builder().id(ObjectIdUtil.id()).refAmount(BigDecimal.ZERO).curAmount(BigDecimal.ZERO)
+                final YearlyHistoryView y = YearlyHistoryView.builder().id(ObjectIdHelper.id()).refAmount(BigDecimal.ZERO).curAmount(BigDecimal.ZERO)
                         .date(Year.of(yearInt).atDay(1)).year(yearInt).build();
                 yearlyHistoryRepository.save(y).subscribe();
             }).subscribe();

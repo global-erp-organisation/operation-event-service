@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import io.github.kaiso.relmongo.annotation.FetchType;
 import io.github.kaiso.relmongo.annotation.ManyToOne;
@@ -35,7 +35,7 @@ public class MonthlyHistoryView {
     
     public static MonthlyHistoryViewBuilder from (Operation r) {
         return MonthlyHistoryView.builder()
-                .id(ObjectIdUtil.id())
+                .id(ObjectIdHelper.id())
                 .curAmount(r.getAmount())
                 .account(r.getAccount())
                 .refAmount(BigDecimal.ZERO)

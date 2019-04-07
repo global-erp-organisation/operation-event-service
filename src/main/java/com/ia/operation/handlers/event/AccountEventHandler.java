@@ -11,12 +11,12 @@ import com.ia.operation.documents.User;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.deleted.AccountDeletedEvent;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
+import com.ia.operation.helper.ProjectionGenerator;
 import com.ia.operation.queries.account.AccountGetAllQuery;
 import com.ia.operation.queries.account.AccountGetByIdQuery;
 import com.ia.operation.repositories.AccountCategoryRepository;
 import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.UserRepository;
-import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

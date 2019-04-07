@@ -1,7 +1,5 @@
 package com.ia.operation.handlers.event;
 
-import java.time.LocalDate;
-
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
@@ -14,11 +12,11 @@ import com.ia.operation.documents.views.MonthlyHistoryView;
 import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.deleted.OperationDeletedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
+import com.ia.operation.helper.history.HistoryUpdater;
+import com.ia.operation.helper.history.UpdateType;
 import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.OperationRepository;
 import com.ia.operation.repositories.PeriodRepository;
-import com.ia.operation.util.history.HistoryUpdater;
-import com.ia.operation.util.history.UpdateType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,18 +34,19 @@ public class OperationEventHandler {
     private final OperationRepository operationRepository;
     private final HistoryUpdater<DailyHistoryView> dailyUpdater;
     private final HistoryUpdater<MonthlyHistoryView> monthlyUpdate;
+    
     @EventHandler
     public void on(OperationCreatedEvent event) {
         log.info("event recieved: [{}]", event);
         final Flux<Period> periods =
-                periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> isBelongs(p, event.getOperationDate()));
-        final Mono<Account> account = accountRepository.findById(event.getAccountId());
+                periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> p.contains(event.getOperationDate()));
+        final Mono<Account> acc = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> {
-            account.subscribe(operation -> {
-                operationRepository.save(Operation.of(event, period, operation)).subscribe(current -> {
-                    log.info("Operation succesfully saved. [{}]", current);
-                    dailyUpdater.update(current, current, UpdateType.A);
-                    monthlyUpdate.update(current, current, UpdateType.A);
+            acc.subscribe(account -> {
+                operationRepository.save(Operation.of(event, period, account)).subscribe(opration -> {
+                    log.info("Operation succesfully saved. [{}]", opration);
+                    dailyUpdater.update(opration, opration, UpdateType.A);
+                    monthlyUpdate.update(opration, opration, UpdateType.A);
                 });
             });
         });
@@ -57,7 +56,7 @@ public class OperationEventHandler {
     public void on(OperationUpdatedEvent event) {
         log.info("event recieved: [{}]", event);
         final Flux<Period> periods =
-                periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> isBelongs(p, event.getOperationDate()));
+                periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> p.contains(event.getOperationDate()));
         final Mono<Account> account = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> {
             account.subscribe(operation -> {
@@ -83,9 +82,4 @@ public class OperationEventHandler {
             monthlyUpdate.update(old, old, UpdateType.R);
         });
     }
-
-    private Boolean isBelongs(Period p, LocalDate date) {
-        return (p.getStart().toEpochDay() <= date.toEpochDay()) && (p.getEnd().toEpochDay() >= date.toEpochDay());
-    }
-
 }

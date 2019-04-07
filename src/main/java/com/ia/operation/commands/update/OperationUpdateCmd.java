@@ -16,8 +16,8 @@ import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.OperationAggregate;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import lombok.Builder;
 import lombok.Data;
@@ -51,7 +51,7 @@ public class OperationUpdateCmd extends CommandValidator<OperationUpdateCmd> {
     }
 
     @Override
-    public ValidationResult<OperationUpdateCmd> validate(AggregateUtil util) {
+    public ValidationResult<OperationUpdateCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
 
         if (StringUtils.isEmpty(id)) {

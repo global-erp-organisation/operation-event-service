@@ -1,4 +1,4 @@
-package com.ia.operation.util;
+package com.ia.operation.helper;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -53,10 +53,12 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
     public void generate(Optional<String> year, Account account) {
         final Flux<Period> periods =
                 year.isPresent() ? periodRepository.findByYear(year.get())
-                                 : periodRepository.findTop1ByOrderByStartDesc().flatMap(p -> periodRepository.findByYear(p.getYear()));
+                                 : periodRepository.findTop1ByOrderByStartDesc()
+                                 .flatMap(p -> periodRepository.findByYear(p.getYear()));
 
         periods.subscribe(period -> {
-            projectionRepository.findByAccount_IdAndPeriod_IdOrderByAccount_description(account.getId(), period.getId()).switchIfEmpty(a -> {
+            projectionRepository.findByAccount_IdAndPeriod_IdOrderByAccount_description(account.getId(), period.getId())
+            .switchIfEmpty(a -> {
                 createAndSendProjection(period, account);
             }).subscribe();
         });
@@ -65,7 +67,7 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
     private void createAndSendProjection(Period period, Account account) {
         final ProjectionCreatedEvent projection = ProjectionCreatedEvent.builder()
                 .amount(compute(account.getDefaultAmount(), account.getRecurringMode()))
-                .id(ObjectIdUtil.id())
+                .id(ObjectIdHelper.id())
                 .accountId(account.getId())
                 .periodId(period.getId())
                 .operationType(account.getDefaultOperationType())

@@ -1,4 +1,4 @@
-package com.ia.operation.util;
+package com.ia.operation.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,9 +17,9 @@ import org.springframework.util.StringUtils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-@UtilityClass
 @Slf4j
-public class ObjectIdUtil {
+@UtilityClass
+public class ObjectIdHelper {
 
     public static String id(String id) {
         return id == null ? id() : new ObjectId(id.getBytes()).toHexString();
@@ -31,7 +31,7 @@ public class ObjectIdUtil {
 
     public static Collection<String> id(Collection<String> ids) {
         Assert.isTrue(!CollectionUtils.isEmpty(ids), () -> "Ids should not be null or empty.");
-        return ids.stream().filter(i -> !StringUtils.isEmpty(i)).map(ObjectIdUtil::id).collect(Collectors.toList());
+        return ids.stream().filter(i -> !StringUtils.isEmpty(i)).map(ObjectIdHelper::id).collect(Collectors.toList());
     }
 
     public static Collection<String> ids2String(Collection<ObjectId> ids) {

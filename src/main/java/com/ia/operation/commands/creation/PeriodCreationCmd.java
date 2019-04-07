@@ -10,8 +10,8 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.events.created.PeriodCreatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
@@ -65,7 +65,7 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
     }
     
     @Override
-    public ValidationResult<PeriodCreationCmd> validate(AggregateUtil util) {
+    public ValidationResult<PeriodCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("period identifier shouldn't be null or empty");

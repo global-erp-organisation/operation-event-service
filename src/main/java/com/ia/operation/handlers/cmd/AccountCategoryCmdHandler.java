@@ -9,8 +9,8 @@ import com.ia.operation.commands.creation.AccountCategoryCreationCmd;
 import com.ia.operation.commands.delete.AccountCategoryDeletionCmd;
 import com.ia.operation.commands.update.AccountCategoryUpdateCmd;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -20,11 +20,11 @@ import reactor.core.publisher.Mono;
 public class AccountCategoryCmdHandler implements Handler {
 
     private final CommandGateway gateway;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
 
     public Mono<ServerResponse> categoryAdd(ServerRequest request) {
         final Mono<AccountCategoryCreationCmd> bodyMono = request.bodyToMono(AccountCategoryCreationCmd.class);
-        return commandComplete(bodyMono.map(body -> AccountCategoryCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).build().validate(util)), gateway);
+        return commandComplete(bodyMono.map(body -> AccountCategoryCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).build().validate(util)), gateway);
     }
 
     public Mono<ServerResponse> categoryUpdate(ServerRequest request) {
