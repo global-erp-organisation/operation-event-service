@@ -21,38 +21,39 @@ public class AccountUpdater {
     private final CommandGateway gateway;
 
     public void update(UpdateParams params) {
-        final AccountAggregate account = util.aggregateGet(params.getAccountId(), AccountAggregate.class).get();
-        if (AccountType.BANKING.equals(account.getAccountType())) {
-            final BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
-            final AccountUpdateCmd.AccountUpdateCmdBuilder builder = AccountUpdateCmd.cmdFrom(account);
+        util.aggregateGet(params.getAccountId(), AccountAggregate.class).ifPresent(account -> {
+            if (AccountType.BANKING.equals(account.getAccountType())) {
+                final BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
+                final AccountUpdateCmd.AccountUpdateCmdBuilder builder = AccountUpdateCmd.cmdFrom(account);
 
-            switch (params.getEventType()) {
-                case A:
-                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                        builder.balance(current.subtract(params.getAmount()));
-                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                        builder.balance(current.add(params.getAmount()));
-                    }
-                    break;
-                case U:
-                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                        builder.balance(current.subtract(params.getOldAmount()).subtract(params.getAmount()));
-                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                        builder.balance(current.subtract(params.getOldAmount()).add(params.getAmount()));
-                    }
-                    break;
-                case D:
-                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                        builder.balance(current.add(params.getAmount()));
-                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                        builder.balance(current.subtract(params.getAmount()));
-                    }
-                    break;
-                default:
-                    break;
+                switch (params.getEventType()) {
+                    case A:
+                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                            builder.balance(current.subtract(params.getAmount()));
+                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                            builder.balance(current.add(params.getAmount()));
+                        }
+                        break;
+                    case U:
+                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                            builder.balance(current.subtract(params.getOldAmount()).subtract(params.getAmount()));
+                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                            builder.balance(current.subtract(params.getOldAmount()).add(params.getAmount()));
+                        }
+                        break;
+                    case D:
+                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                            builder.balance(current.add(params.getAmount()));
+                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                            builder.balance(current.subtract(params.getAmount()));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                gateway.send(builder.build());
             }
-            gateway.send(builder.build());
-        }
+        });
     }
 
     @Value
