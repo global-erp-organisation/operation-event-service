@@ -1,4 +1,4 @@
-package com.ia.operation.util.history.ratios;
+package com.ia.operation.helper.history.ratios;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

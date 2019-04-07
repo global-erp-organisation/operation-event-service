@@ -1,5 +1,6 @@
 package com.ia.operation.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface ConstantHandler {
@@ -20,8 +21,11 @@ public interface ConstantHandler {
     String MONTHLY_KEY = "monthly";
     String DAILY_KEY = "daily";
     String EMAIL_KEY = "email";
-    
-    default void errorItemAdd(List<String> errors, String item) {
+    List<String> errors = new ArrayList<String>();
+    default void addError(String item) {
         errors.add(item);
+    }
+    default void errorReset() {
+        errors.clear();
     }
 }

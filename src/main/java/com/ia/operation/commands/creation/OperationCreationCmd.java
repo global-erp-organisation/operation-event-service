@@ -15,8 +15,8 @@ import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.aggregates.OperationAggregate;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.OperationCreatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -60,7 +60,7 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
     }
 
     @Override
-    public ValidationResult<OperationCreationCmd> validate(AggregateUtil util) {
+    public ValidationResult<OperationCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(accountId)) {
             errors.add("Account identifier shouldn't be null or empty");

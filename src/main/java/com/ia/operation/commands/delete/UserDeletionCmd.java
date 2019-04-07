@@ -7,8 +7,8 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import org.springframework.util.StringUtils;
 
 import com.ia.operation.aggregates.UserAggregate;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,7 +22,7 @@ public class UserDeletionCmd extends CommandValidator<UserDeletionCmd> {
     protected String id;
 
     @Override
-    public ValidationResult<UserDeletionCmd> validate(AggregateUtil util) {
+    public ValidationResult<UserDeletionCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("User identifier shouldn't be null or empty");

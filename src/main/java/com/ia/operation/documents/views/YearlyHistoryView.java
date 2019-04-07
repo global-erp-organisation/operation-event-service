@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import io.github.kaiso.relmongo.annotation.FetchType;
 import io.github.kaiso.relmongo.annotation.ManyToOne;
@@ -32,7 +32,7 @@ public class YearlyHistoryView {
 
     public static YearlyHistoryViewBuilder from(Operation r) {
         return YearlyHistoryView.builder()
-                .id(ObjectIdUtil.id())
+                .id(ObjectIdHelper.id())
                 .curAmount(r.getAmount())
                 .refAmount(BigDecimal.ZERO)
                 .year(r.getOperationDate().getYear())

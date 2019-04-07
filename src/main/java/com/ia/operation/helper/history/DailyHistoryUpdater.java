@@ -1,4 +1,4 @@
-package com.ia.operation.util.history;
+package com.ia.operation.helper.history;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.DailyHistoryView;
+import com.ia.operation.helper.ObjectIdHelper;
 import com.ia.operation.repositories.DailyHistoryRepository;
 import com.ia.operation.repositories.OperationRepository;
-import com.ia.operation.util.ObjectIdUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +45,7 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     private Disposable onAdd(Operation event) {
         final Flux<DailyHistoryView> currents = retrieve(event.getOperationDate(), event.getAccount().getId());
         return currents.switchIfEmpty(a -> {
-            final DailyHistoryView current = DailyHistoryView.from(event).id(ObjectIdUtil.id()).build();
+            final DailyHistoryView current = DailyHistoryView.from(event).id(ObjectIdHelper.id()).build();
             complete(event, current);
         }).subscribe(current -> {
             current.setCurAmount(current.getCurAmount().add(event.getAmount()));

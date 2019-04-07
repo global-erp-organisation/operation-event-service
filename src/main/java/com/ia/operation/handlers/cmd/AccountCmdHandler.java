@@ -9,8 +9,8 @@ import com.ia.operation.commands.creation.AccountCreationCmd;
 import com.ia.operation.commands.delete.AccountDeletionCmd;
 import com.ia.operation.commands.update.AccountUpdateCmd;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AccountCmdHandler implements Handler {
     private final CommandGateway gateway;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
 
     public Mono<ServerResponse> accountAdd(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
@@ -27,7 +27,7 @@ public class AccountCmdHandler implements Handler {
         final Mono<AccountCreationCmd> bodyMono = request.bodyToMono(AccountCreationCmd.class);
         return commandComplete(
                 bodyMono.map(body -> AccountCreationCmd.cmdFrom(body)
-                        .id(ObjectIdUtil.id())
+                        .id(ObjectIdHelper.id())
                         .userId(userId)
                         .categoryId(categoryId)
                         .build().validate(util)),gateway);

@@ -11,13 +11,13 @@ import com.ia.operation.documents.Period;
 import com.ia.operation.documents.Projection;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
+import com.ia.operation.helper.ProjectionGenerator;
 import com.ia.operation.queries.projection.ProjectionByAccountQuery;
 import com.ia.operation.queries.projection.ProjectionByYearQuery;
 import com.ia.operation.queries.projection.ProjectionGenerationQuery;
 import com.ia.operation.repositories.AccountRepository;
 import com.ia.operation.repositories.PeriodRepository;
 import com.ia.operation.repositories.ProjectionRepository;
-import com.ia.operation.util.ProjectionGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

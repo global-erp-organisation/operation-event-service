@@ -8,8 +8,8 @@ import org.springframework.util.StringUtils;
 
 import com.ia.operation.aggregates.AccountCategoryAggregate;
 import com.ia.operation.events.updated.AccountCategoryUpdatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class AccountCategoryUpdateCmd extends CommandValidator<AccountCategoryUp
     }
 
     @Override
-    public ValidationResult<AccountCategoryUpdateCmd> validate(AggregateUtil util) {
+    public ValidationResult<AccountCategoryUpdateCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Category identifier shouldn't be null or empty");

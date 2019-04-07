@@ -12,8 +12,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.ia.operation.commands.ICommand;
 import com.ia.operation.handlers.CmdResponse.Error;
-import com.ia.operation.util.validator.CommandValidator;
-import com.ia.operation.util.validator.CommandValidator.ValidationResult;
+import com.ia.operation.helper.validator.CommandValidator;
+import com.ia.operation.helper.validator.CommandValidator.ValidationResult;
 
 import reactor.core.publisher.Mono;
 
@@ -68,10 +68,10 @@ public interface Handler extends ConstantHandler {
     }
 
     @SuppressWarnings("unchecked")
-    default <Q, T> Mono<ServerResponse> queryComplete(Supplier<Q> supplier, Class<T> responseType, QueryGateway gateway) {
+    default <Q, T> Mono<ServerResponse> queryComplete(Supplier<Q> querySupplier, Class<T> responseType, QueryGateway gateway) {
         try {
-            beanValidate(supplier, responseType, gateway);
-            return ServerResponse.ok().body((Publisher<T>) gateway.query(supplier.get(), Object.class).get(), responseType);
+            beanValidate(querySupplier, responseType, gateway);
+            return ServerResponse.ok().body((Publisher<T>) gateway.query(querySupplier.get(), Object.class).get(), responseType);
         } catch (Exception e) {
             return internalErrorResponse(() -> e.getLocalizedMessage());
         }

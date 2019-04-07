@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.UserAggregate;
 import com.ia.operation.events.created.UserCreatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
@@ -55,7 +55,7 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
     
     
     @Override
-    public ValidationResult<UserCreationCmd> validate(AggregateUtil util) {
+    public ValidationResult<UserCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("User identifier shouldn't be null or empty");

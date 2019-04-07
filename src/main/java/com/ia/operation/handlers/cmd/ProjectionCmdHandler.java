@@ -16,8 +16,8 @@ import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
 import com.ia.operation.handlers.CmdResponse;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 public class ProjectionCmdHandler implements Handler {
     private final CommandGateway gateway;
     private final RabbitTemplate rabbitTemplate;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
     private final AxonProperties properties;
 
     public Mono<ServerResponse> projectionAdd(ServerRequest request) {
@@ -37,7 +37,7 @@ public class ProjectionCmdHandler implements Handler {
         final Mono<ProjectionCreationCmd> bodyMono = request.bodyToMono(ProjectionCreationCmd.class);
         return commandComplete(
                 bodyMono.map(
-                        body -> ProjectionCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).accountId(accountId).periodId(periodId).build().validate(util)),
+                        body -> ProjectionCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).accountId(accountId).periodId(periodId).build().validate(util)),
                 gateway);
     }
 

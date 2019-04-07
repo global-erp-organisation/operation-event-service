@@ -10,8 +10,8 @@ import com.ia.operation.commands.creation.CompanyCreationCmd;
 import com.ia.operation.commands.delete.CompanyDeletionCmd;
 import com.ia.operation.commands.update.CompanyUpdateCmd;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -21,12 +21,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CompanyCmdHandler implements Handler {
     private final CommandGateway gateway;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
     
     public Mono<ServerResponse> companyAdd(ServerRequest request) {
         final Mono<CompanyCreationCmd> bodyMono = request.bodyToMono(CompanyCreationCmd.class);
         return commandComplete(bodyMono.map(body -> CompanyCreationCmd.cmdFrom(body)
-                .id(ObjectIdUtil.id())
+                .id(ObjectIdHelper.id())
                 .build()
                 .validate(util)), gateway);
     }

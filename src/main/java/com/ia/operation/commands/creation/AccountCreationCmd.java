@@ -17,8 +17,8 @@ import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.AccountCreatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import lombok.Builder;
 import lombok.Data;
@@ -78,7 +78,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     }
 
     @Override
-    public ValidationResult<AccountCreationCmd> validate(AggregateUtil util) {
+    public ValidationResult<AccountCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(categoryId)) {
             errors.add("Category identifier shouldn't be null or empty");

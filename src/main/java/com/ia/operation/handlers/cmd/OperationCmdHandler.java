@@ -11,8 +11,8 @@ import com.ia.operation.commands.creation.OperationCreationCmd;
 import com.ia.operation.commands.delete.OperationDeletionCmd;
 import com.ia.operation.commands.update.OperationUpdateCmd;
 import com.ia.operation.handlers.Handler;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.ObjectIdUtil;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -22,13 +22,13 @@ import reactor.core.publisher.Mono;
 public class OperationCmdHandler implements Handler {
 
     private final CommandGateway gateway;
-    private final AggregateUtil util;
+    private final AggregateHelper util;
 
     public Mono<ServerResponse> operationAdd(ServerRequest request) {
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         return commandComplete(request.bodyToMono(OperationCreationCmd.class).map(body -> {
             final LocalDate date = body.getOperationDate() == null ? LocalDate.now() : body.getOperationDate();
-            return OperationCreationCmd.cmdFrom(body).id(ObjectIdUtil.id()).operationDate(date).accountId(accountId).build().validate(util);
+            return OperationCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).operationDate(date).accountId(accountId).build().validate(util);
         }), gateway);
     }
 

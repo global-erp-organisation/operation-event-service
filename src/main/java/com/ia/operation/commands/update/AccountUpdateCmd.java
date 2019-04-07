@@ -18,8 +18,8 @@ import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import lombok.Builder;
 import lombok.Data;
@@ -86,7 +86,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
     }
 
     @Override
-    public ValidationResult<AccountUpdateCmd> validate(AggregateUtil util) {
+    public ValidationResult<AccountUpdateCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
 
         if (StringUtils.isEmpty(id)) {

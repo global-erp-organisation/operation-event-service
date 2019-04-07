@@ -1,11 +1,11 @@
-package com.ia.operation.util.validator;
+package com.ia.operation.helper.validator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.ia.operation.commands.ICommand;
-import com.ia.operation.util.AggregateUtil;
+import com.ia.operation.helper.AggregateHelper;
 
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +23,7 @@ public  abstract class CommandValidator<V extends ICommand> implements ICommand 
         return buildResult(new ArrayList<>());
     }
 
-    public ValidationResult<V> validate(AggregateUtil util) {
+    public ValidationResult<V> validate(AggregateHelper util) {
         return validate();
     }
     

@@ -21,12 +21,13 @@ import org.axonframework.spring.eventsourcing.SpringAggregateSnapshotter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import com.mongodb.MongoClient;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ConditionalOnProperty("axon.events.database")
 public class EventStorageConfiguration {
 

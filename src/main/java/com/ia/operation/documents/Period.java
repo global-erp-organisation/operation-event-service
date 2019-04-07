@@ -37,4 +37,8 @@ public class Period {
                 .close(event.getClose())
                 .build();
     }
+    
+    public Boolean contains(LocalDate date) {
+        return (getStart().toEpochDay() <= date.toEpochDay()) && (getEnd().toEpochDay() >= date.toEpochDay());
+    }
 }

@@ -14,8 +14,8 @@ import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.aggregates.PeriodAggregate;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
-import com.ia.operation.util.AggregateUtil;
-import com.ia.operation.util.validator.CommandValidator;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.validator.CommandValidator;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
@@ -68,7 +68,7 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     }
     
     @Override
-    public ValidationResult<ProjectionCreationCmd> validate(AggregateUtil util) {
+    public ValidationResult<ProjectionCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Projection identifier shouldn't be null or empty");
