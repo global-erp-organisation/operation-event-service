@@ -29,8 +29,8 @@ public class YearlyHistoryView {
     private int year;
     private LocalDate date;
 
-
     public static YearlyHistoryViewBuilder from(Operation r) {
+        /*@formatter:off*/
         return YearlyHistoryView.builder()
                 .id(ObjectIdHelper.id())
                 .curAmount(r.getAmount())
@@ -38,5 +38,6 @@ public class YearlyHistoryView {
                 .year(r.getOperationDate().getYear())
                 .date(r.getOperationDate())
                 .account(r.getAccount());
+        /*@formatter:on*/
     }
 }

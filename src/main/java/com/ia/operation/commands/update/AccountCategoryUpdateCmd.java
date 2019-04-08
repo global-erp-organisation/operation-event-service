@@ -26,15 +26,19 @@ public class AccountCategoryUpdateCmd extends CommandValidator<AccountCategoryUp
     private String description;
 
     public static AccountCategoryUpdatedEvent.AccountCategoryUpdatedEventBuilder eventFrom(AccountCategoryUpdateCmd cmd) {
+        /*@formatter:off*/
         return AccountCategoryUpdatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription());
+        /*@formatter:on*/
     }
 
     public static AccountCategoryUpdateCmdBuilder cmdFrom(AccountCategoryUpdateCmd cmd) {
+        /*@formatter:off*/
         return AccountCategoryUpdateCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription());
+        /*@formatter:on*/
     }
 
     @Override

@@ -67,8 +67,10 @@ public class AccountUpdater {
     }
 
     public enum EventType {
+        /*@formatter:off*/
         A, // A new Operation creation command have been handled.
         U, // A new Operation update command have been handled.
         D; // A new Operation deletion command have been handled.
+        /*@formatter:on*/
     }
 }

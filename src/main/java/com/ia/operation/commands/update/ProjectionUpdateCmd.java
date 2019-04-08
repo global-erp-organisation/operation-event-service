@@ -36,12 +36,14 @@ public class ProjectionUpdateCmd extends CommandValidator<ProjectionUpdateCmd> {
     private OperationType operationType;
 
     public static ProjectionUpdateCmdBuilder cmdFrom(ProjectionUpdateCmd cmd) {
+        /*@formatter:off*/
         return ProjectionUpdateCmd.builder()
                 .amount(cmd.getAmount())
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
                 .periodId(cmd.getPeriodId())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
 
     @Override

@@ -22,7 +22,7 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
+public class UserCreationCmd extends CommandValidator<UserCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -32,8 +32,9 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
     @JsonProperty("company_id")
     private String companyId;
     private String password;
-    
-    public static UserCreatedEvent.UserCreatedEventBuilder eventFrom(UserCreationCmd cmd){
+
+    public static UserCreatedEvent.UserCreatedEventBuilder eventFrom(UserCreationCmd cmd) {
+        /*@formatter:off*/
         return UserCreatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -41,9 +42,11 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
                 .companyId(cmd.getCompanyId())
                 .email(cmd.getEmail())
                 .password(cmd.getPassword());
+        /*@formatter:on*/
     }
-    
-    public static UserCreationCmdBuilder cmdFrom(UserCreationCmd cmd){
+
+    public static UserCreationCmdBuilder cmdFrom(UserCreationCmd cmd) {
+        /*@formatter:off*/
         return UserCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -51,15 +54,15 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
                 .companyId(cmd.getCompanyId())
                 .email(cmd.getEmail())
                 .password(cmd.getPassword());
+        /*@formatter:on*/
     }
-    
-    
+
     @Override
     public ValidationResult<UserCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("User identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (util.aggregateGet(id, UserAggregate.class).isPresent()) {
                 errors.add("The User with id " + id + " already exist");
             }
@@ -67,14 +70,14 @@ public class UserCreationCmd  extends CommandValidator<UserCreationCmd>{
         if (StringUtil.isNullOrEmpty(description)) {
             errors.add("User description shouldn't be null or empty");
         }
-        
+
         if (StringUtil.isNullOrEmpty(email)) {
             errors.add("User email shouldn't be null or empty");
         }
 
         if (StringUtils.isEmpty(companyId)) {
             errors.add("User identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(companyId, CompanyAggregate.class).isPresent()) {
                 errors.add("The Company with id " + id + " doesnt exist");
             }

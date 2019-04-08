@@ -28,6 +28,7 @@ public class User {
     private String password;
     
     public static User of(UserCreatedEvent event, Company company) {
+        /*@formatter:off*/
         return User.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -36,9 +37,11 @@ public class User {
                 .email(event.getEmail())
                 .password(event.getPassword())
                 .build();
+        /*@formatter:on*/
     }
     
     public static User of(UserUpdatedEvent event, Company company) {
+        /*@formatter:off*/
         return User.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -47,6 +50,7 @@ public class User {
                 .email(event.getEmail())
                 .password(event.getPassword())
                 .build();
+        /*@formatter:on*/
     }
 
 }

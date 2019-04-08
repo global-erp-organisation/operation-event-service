@@ -16,26 +16,30 @@ import lombok.Data;
 @Document
 @Builder
 @Data
-@JsonInclude(value=Include.NON_EMPTY)
+@JsonInclude(value = Include.NON_EMPTY)
 public class Company {
     @Id
     private String id;
     private String description;
     private Map<String, Object> details;
-    
+
     public static Company of(CompanyCreatedEvent event) {
+        /*@formatter:off*/
         return Company.builder()
                 .id(event.getId())
                 .description(event.getDescription())
                 .details(event.getDetails())
                 .build();
+        /*@formatter:on*/
     }
-    
+
     public static Company of(CompanyUpdatedEvent event) {
+        /*@formatter:off*/
         return Company.builder()
                 .id(event.getId())
                 .description(event.getDescription())
                 .details(event.getDetails())
                 .build();
+        /*@formatter:on*/
     }
 }

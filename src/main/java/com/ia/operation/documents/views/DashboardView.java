@@ -39,5 +39,7 @@ public class DashboardView {
         private HistoryView<MonthlyHistoryView> monthlyHistory;
         @JsonProperty("yearly_history")
         private HistoryView<YearlyHistoryView> yearlyHistory;
+        @JsonProperty("rate_view")
+        private RateView rateView;
     }
 }

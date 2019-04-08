@@ -20,33 +20,37 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class CompanyUpdateCmd extends CommandValidator<CompanyUpdateCmd>{
+public class CompanyUpdateCmd extends CommandValidator<CompanyUpdateCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
     private String description;
     private Map<String, Object> details;
-    
+
     public static CompanyUpdateCmdBuilder cmdFrom(CompanyUpdateCmd cmd) {
+        /*@formatter:off*/
         return CompanyUpdateCmd.builder()
                 .description(cmd.getDescription())
                 .details(cmd.getDetails())
                 .id(cmd.getId());
+        /*@formatter:on*/
     }
-    
+
     public static CompanyUpdatedEvent.CompanyUpdatedEventBuilder eventFrom(CompanyUpdateCmd cmd) {
+        /*@formatter:off*/
         return CompanyUpdatedEvent.builder()
                 .description(cmd.getDescription())
                 .details(cmd.getDetails())
                 .id(cmd.getId());
+        /*@formatter:on*/
     }
-    
+
     @Override
     public ValidationResult<CompanyUpdateCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Company identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(id, CompanyAggregate.class).isPresent()) {
                 errors.add("The company with id " + id + " doesnt exist");
             }

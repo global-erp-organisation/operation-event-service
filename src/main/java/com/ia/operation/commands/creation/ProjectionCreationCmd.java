@@ -25,7 +25,7 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCmd>{
+public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -39,15 +39,18 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     private ProjectionCreatedEvent event;
 
     public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreationCmd cmd) {
+        /*@formatter:off*/
         return ProjectionCreationCmd.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
                 .periodId(cmd.getPeriodId())
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
-    
+
     public static ProjectionCreatedEvent eventFrom(ProjectionCreationCmd cmd) {
+        /*@formatter:off*/
         return ProjectionCreatedEvent.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
@@ -55,9 +58,11 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType())
                 .build();
+        /*@formatter:on*/
     }
-    
+
     public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreatedEvent event) {
+        /*@formatter:off*/
         return ProjectionCreationCmd.builder()
                 .id(event.getId())
                 .accountId(event.getAccountId())
@@ -65,28 +70,29 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .event(event);
+        /*@formatter:on*/
     }
-    
+
     @Override
     public ValidationResult<ProjectionCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("Projection identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (util.aggregateGet(id, CompanyAggregate.class).isPresent()) {
                 errors.add("The projection with id " + id + " already exist");
             }
         }
         if (StringUtil.isNullOrEmpty(accountId)) {
             errors.add("account identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(accountId, AccountAggregate.class).isPresent()) {
                 errors.add("The account with id " + id + " doesnt exist");
             }
-        }       
+        }
         if (StringUtil.isNullOrEmpty(periodId)) {
             errors.add("period identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (!util.aggregateGet(periodId, PeriodAggregate.class).isPresent()) {
                 errors.add("The period with id " + id + " doesnt exist");
             }

@@ -28,6 +28,7 @@ public class Period {
     private Boolean close = false;
 
     public static Period from(PeriodCreatedEvent event) {
+        /*@formatter:off*/
         return Period.builder()
                 .id(event.getId())
                 .year(event.getYear())
@@ -36,6 +37,7 @@ public class Period {
                 .description(event.getDescription())
                 .close(event.getClose())
                 .build();
+        /*@formatter:on*/
     }
     
     public Boolean contains(LocalDate date) {

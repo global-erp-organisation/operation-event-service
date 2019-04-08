@@ -40,8 +40,9 @@ public class Account {
     private AccountType accountType;
     @JsonProperty("default_operation_type")
     private OperationType defaultOperationType;
-    
+
     public static Account of(AccountCreatedEvent event, User user, AccountCategory category) {
+        /*@formatter:off*/
         return Account.builder()
                 .id(event.getId())
                 .user(user)
@@ -53,9 +54,11 @@ public class Account {
                 .balance(event.getBalance())
                 .defaultOperationType(event.getDefaultOperationType())
                 .build();
+        /*@formatter:on*/
     }
 
     public static Account of(AccountUpdatedEvent event, User user, AccountCategory category) {
+        /*@formatter:off*/
         return Account.builder()
                 .id(event.getId())
                 .user(user)
@@ -67,5 +70,6 @@ public class Account {
                 .balance(event.getBalance())
                 .defaultOperationType(event.getDefaultOperationType())
                 .build();
+        /*@formatter:on*/
     }
 }
