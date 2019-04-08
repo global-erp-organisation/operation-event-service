@@ -32,9 +32,8 @@ public class Operation {
     @JsonProperty("operation_type")
     private OperationType operationType;
 
-
-    
     public static Operation of(OperationCreatedEvent event, Period period, Account account) {
+        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -44,22 +43,11 @@ public class Operation {
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .build();
-    }
-    
-    public static Operation of(Operation event, Period period, Account account) {
-        return Operation.builder()
-                .id(event.getId())
-                .description(event.getDescription())
-                .account(account)
-                .operationDate(event.getOperationDate())
-                .period(period)
-                .amount(event.getAmount())
-                .operationType(event.getOperationType())
-                .build();
+        /*@formatter:on*/
     }
 
-    
     public static Operation of(OperationUpdatedEvent event, Period period, Account account) {
+        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -69,10 +57,11 @@ public class Operation {
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .build();
+        /*@formatter:on*/
     }
 
-    
     public static OperationBuilder from(Operation event) {
+        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -81,6 +70,7 @@ public class Operation {
                 .period(event.getPeriod())
                 .amount(event.getAmount())
                 .operationType(event.getOperationType());
+        /*@formatter:on*/
     }
 
 }

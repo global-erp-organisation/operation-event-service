@@ -39,13 +39,7 @@ public class OperationAggregate {
 
     @CommandHandler
     public OperationAggregate(OperationCreationCmd cmd, AccountUpdater updater) {
-        final UpdateParams params = UpdateParams.builder()
-                .eventType(EventType.A)
-                .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount())
-                .oldAmount(cmd.getAmount())
-                .operationType(cmd.getOperationType())
-                .build();
+        final UpdateParams params = getParams(cmd.getAccountId(), EventType.A, cmd.getAmount(), getAmount(), cmd.getOperationType());
         AggregateLifecycle.apply(OperationCreationCmd.eventFrom(cmd).build()).andThen(() -> updater.update(params));
     }
 
@@ -60,13 +54,7 @@ public class OperationAggregate {
 
     @CommandHandler
     public void handleOperationUpdateCmd(OperationUpdateCmd cmd, AccountUpdater updater) {
-        final UpdateParams params = UpdateParams.builder()
-                .eventType(EventType.U)
-                .accountId(cmd.getAccountId())
-                .amount(cmd.getAmount())
-                .operationType(cmd.getOperationType())
-                .oldAmount(getAmount())
-                .build();
+        final UpdateParams params = getParams(cmd.getAccountId(), EventType.U, cmd.getAmount(), getAmount(), cmd.getOperationType());
         AggregateLifecycle.apply(OperationUpdateCmd.eventFrom(cmd).build()).andThen(() -> updater.update(params));
     }
 
@@ -81,19 +69,24 @@ public class OperationAggregate {
 
     @CommandHandler
     public void handleOperationDeletionCmd(OperationDeletionCmd cmd, AccountUpdater updater) {
-        final UpdateParams params =
-                UpdateParams.builder()
-                .eventType(EventType.D)
-                .accountId(getAccountId())
-                .amount(getAmount())
-                .oldAmount(getAmount())
-                .operationType(getOperationType())
-                .build();
+        final UpdateParams params = getParams(getAccountId(), EventType.D, getAmount(), getAmount(), getOperationType());
         AggregateLifecycle.apply(OperationDeletedEvent.builder().id(cmd.getId()).build()).andThen(() -> updater.update(params));
     }
 
     @EventSourcingHandler
     public void onOperationDeleted(OperationDeletedEvent event) {
         AggregateLifecycle.markDeleted();
+    }
+
+    private UpdateParams getParams(String accountId, EventType eventType, BigDecimal amount, BigDecimal oldAmount, OperationType operationType) {
+        /*@formatter:off*/
+        return UpdateParams.builder()
+                .eventType(eventType)
+                .accountId(accountId)
+                .amount(amount)
+                .oldAmount(oldAmount)
+                .operationType(operationType)
+                .build();
+        /*@formatter:on*/
     }
 }

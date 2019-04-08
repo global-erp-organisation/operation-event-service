@@ -24,7 +24,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
@@ -52,6 +51,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
     private OperationType defaultOperationType = OperationType.UNDEFINED;
 
     public static AccountCreationCmdBuilder cmdFrom(AccountCreationCmd cmd) {
+        /*@formatter:off*/
         return AccountCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -62,9 +62,11 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
                 .balance(cmd.getBalance())
                 .accountType(cmd.getAccountType())
                 .defaultOperationType(cmd.getDefaultOperationType());
+        /*@formatter:on*/
     }
 
     public static AccountCreatedEvent.AccountCreatedEventBuilder enventFrom(AccountCreationCmd cmd) {
+        /*@formatter:off*/
         return AccountCreatedEvent.builder()
                 .id(cmd.getId())
                 .userId(cmd.getUserId())
@@ -75,6 +77,7 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
                 .categoryId(cmd.getCategoryId())
                 .accountType(cmd.getAccountType())
                 .defaultOperationType(cmd.getDefaultOperationType());
+        /*@formatter:on*/
     }
 
     @Override

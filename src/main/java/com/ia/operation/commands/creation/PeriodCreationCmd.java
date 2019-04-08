@@ -21,7 +21,7 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
+public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -31,29 +31,34 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
     private LocalDate end;
     @Builder.Default
     private Boolean close = false;
-    
+
     @JsonIgnore
     private PeriodCreatedEvent event;
-    
+
     public static PeriodCreatedEvent.PeriodCreatedEventBuilder eventFrom(PeriodCreationCmd cmd) {
+        /*@formatter:off*/
         return PeriodCreatedEvent.builder()
                 .year(cmd.getYear())
                 .id(cmd.getId())
                 .start(cmd.getStart())
                 .end(cmd.getEnd())
                 .close(cmd.getClose());
+        /*@formatter:on*/
     }
-    
+
     public static PeriodCreationCmdBuilder cmdFrom(PeriodCreationCmd cmd) {
+        /*@formatter:off*/
         return PeriodCreationCmd.builder()
                 .year(cmd.getYear())
                 .id(cmd.getId())
                 .start(cmd.getStart())
                 .end(cmd.getEnd())
                  .close(cmd.getClose());
+        /*@formatter:on*/
     }
-    
+
     public static PeriodCreationCmdBuilder cmdFrom(PeriodCreatedEvent event) {
+        /*@formatter:off*/
         return PeriodCreationCmd.builder()
                 .id(event.getId())
                 .year(event.getYear())
@@ -62,14 +67,15 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
                 .end(event.getEnd())
                 .event(event)
                 .close(event.getClose());
+        /*@formatter:on*/
     }
-    
+
     @Override
     public ValidationResult<PeriodCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(id)) {
             errors.add("period identifier shouldn't be null or empty");
-        }else {
+        } else {
             if (util.aggregateGet(id, CompanyAggregate.class).isPresent()) {
                 errors.add("The period with id " + id + " already exist");
             }
@@ -77,7 +83,7 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd>{
         if (StringUtil.isNullOrEmpty(description)) {
             errors.add("Company description shouldn't be null or empty");
         }
-        if(year == null) {
+        if (year == null) {
             errors.add("The year shouldnt be null");
         }
         return buildResult(errors);

@@ -25,7 +25,7 @@ import lombok.Value;
 @Builder
 @Value
 @EqualsAndHashCode(callSuper = false)
-public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd>{
+public class OperationCreationCmd extends CommandValidator<OperationCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
 
@@ -38,8 +38,9 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
     @Builder.Default
     @JsonProperty("operation_type")
     private OperationType operationType = OperationType.UNDEFINED;
-    
+
     public static OperationCreationCmdBuilder cmdFrom(OperationCreationCmd cmd) {
+        /*@formatter:off*/
         return OperationCreationCmd.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -47,9 +48,11 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 .accountId(cmd.getAccountId())
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
-    
+
     public static OperationCreatedEvent.OperationCreatedEventBuilder eventFrom(OperationCreationCmd cmd) {
+        /*@formatter:off*/
         return OperationCreatedEvent.builder()
                 .id(cmd.getId())
                 .description(cmd.getDescription())
@@ -57,6 +60,7 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 .accountId(cmd.getAccountId())
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
 
     @Override
@@ -69,17 +73,17 @@ public class OperationCreationCmd  extends CommandValidator<OperationCreationCmd
                 errors.add("The account with id " + accountId + " doesnt exist");
             }
         }
-        if(StringUtils.isEmpty(id)) {
+        if (StringUtils.isEmpty(id)) {
             errors.add("The operation identifier shouldnt be null nor empty.");
-        }else {
+        } else {
             if (util.aggregateGet(id, OperationAggregate.class).isPresent()) {
                 errors.add("The operation with id " + id + " already exists");
             }
         }
-        if(StringUtils.isEmpty(description)) {
+        if (StringUtils.isEmpty(description)) {
             errors.add("The operation description shouldnt be null or empty");
         }
-        if(amount.doubleValue()<=0.0) {
+        if (amount.doubleValue() <= 0.0) {
             errors.add("The operation amount should be greater than zero.");
         }
         if (!OperationType.check(operationType)) {

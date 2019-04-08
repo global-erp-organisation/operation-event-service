@@ -47,6 +47,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
     private OperationType defaultOperationType;
 
     public static AccountUpdateCmdBuilder cmdFrom(AccountUpdateCmd cmd) {
+        /*@formatter:off*/
         return AccountUpdateCmd.builder()
                 .defaultAmount(cmd.getDefaultAmount())
                 .description(cmd.getDescription())
@@ -57,9 +58,11 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
                 .balance(cmd.getBalance())
                 .accountType(cmd.getAccountType())
                 .defaultOperationType(cmd.getDefaultOperationType());
+        /*@formatter:on*/
     }
 
     public static AccountUpdateCmdBuilder cmdFrom(AccountAggregate cmd) {
+        /*@formatter:off*/
         return AccountUpdateCmd.builder()
                 .defaultAmount(cmd.getDefaultAmount())
                 .description(cmd.getDescription())
@@ -70,9 +73,11 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
                 .balance(cmd.getBalance())
                 .accountType(cmd.getAccountType())
                 .defaultOperationType(cmd.getDefaultOperationType());
+        /*@formatter:on*/
     }
 
     public static AccountUpdatedEvent.AccountUpdatedEventBuilder eventFrom(AccountUpdateCmd cmd) {
+        /*@formatter:off*/
         return AccountUpdatedEvent.builder()
                 .defaultAmount(cmd.getDefaultAmount())
                 .description(cmd.getDescription())
@@ -83,6 +88,7 @@ public class AccountUpdateCmd extends CommandValidator<AccountUpdateCmd> {
                 .balance(cmd.getBalance())
                 .accountType(cmd.getAccountType())
                 .defaultOperationType(cmd.getDefaultOperationType());
+        /*@formatter:on*/
     }
 
     @Override

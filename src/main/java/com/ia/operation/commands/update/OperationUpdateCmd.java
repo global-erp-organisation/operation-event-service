@@ -39,15 +39,27 @@ public class OperationUpdateCmd extends CommandValidator<OperationUpdateCmd> {
     private OperationType operationType;
 
     public static OperationUpdateCmdBuilder cmdFrom(OperationUpdateCmd cmd) {
-        return OperationUpdateCmd.builder().id(cmd.getId()).description(cmd.getDescription()).operationDate(cmd.getOperationDate())
-                .accountId(cmd.getAccountId()).amount(cmd.getAmount())
+        /*@formatter:off*/
+        return OperationUpdateCmd.builder()
+                .id(cmd.getId())
+                .description(cmd.getDescription())
+                .operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId())
+                .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
 
     public static OperationUpdatedEvent.OperationUpdatedEventBuilder eventFrom(OperationUpdateCmd cmd) {
-        return OperationUpdatedEvent.builder().id(cmd.getId()).description(cmd.getDescription()).operationDate(cmd.getOperationDate())
-                .accountId(cmd.getAccountId()).amount(cmd.getAmount())
+        /*@formatter:off*/
+        return OperationUpdatedEvent.builder()
+                .id(cmd.getId())
+                .description(cmd.getDescription())
+                .operationDate(cmd.getOperationDate())
+                .accountId(cmd.getAccountId())
+                .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
+        /*@formatter:on*/
     }
 
     @Override

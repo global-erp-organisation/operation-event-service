@@ -20,7 +20,7 @@ import lombok.Data;
 @Document
 @Builder
 @Data
-@JsonInclude(value=Include.NON_EMPTY)
+@JsonInclude(value = Include.NON_EMPTY)
 public class MonthlyHistoryView {
     private String id;
     @JsonProperty("ref_amount")
@@ -32,8 +32,8 @@ public class MonthlyHistoryView {
     private String month;
     private LocalDate date;
 
-    
-    public static MonthlyHistoryViewBuilder from (Operation r) {
+    public static MonthlyHistoryViewBuilder from(Operation r) {
+        /*@formatter:off*/
         return MonthlyHistoryView.builder()
                 .id(ObjectIdHelper.id())
                 .curAmount(r.getAmount())
@@ -41,5 +41,6 @@ public class MonthlyHistoryView {
                 .refAmount(BigDecimal.ZERO)
                 .month(r.getPeriod().getDescription().toUpperCase())
                 .date(r.getOperationDate());
+        /*@formatter:on*/
     }
 }

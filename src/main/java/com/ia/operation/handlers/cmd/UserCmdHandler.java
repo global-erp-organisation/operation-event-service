@@ -19,13 +19,14 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Component
 public class UserCmdHandler implements Handler {
-    
+
     private final CommandGateway gateway;
     private final AggregateHelper util;
-    
+
     public Mono<ServerResponse> userAdd(ServerRequest request) {
         final String companyId = request.pathVariable(COMPANY_ID_KEY);
         final Mono<UserCreationCmd> bodyMono = request.bodyToMono(UserCreationCmd.class);
+        /*@formatter:off*/
         return bodyMono.map(body->UserCreationCmd.cmdFrom(body)
                 .id(ObjectIdHelper.id())
                 .companyId(companyId)
@@ -34,11 +35,13 @@ public class UserCmdHandler implements Handler {
                 .flatMap(r -> response(r, gateway))
                 .switchIfEmpty(ServerResponse.badRequest()
                         .body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
+        /*@formatter:on*/
     }
 
     public Mono<ServerResponse> userUpdate(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
         final Mono<UserUpdateCmd> bodyMono = request.bodyToMono(UserUpdateCmd.class);
+        /*@formatter:off*/
         return bodyMono.map(body->UserUpdateCmd.cmdFrom(body)
                 .id(userId)
                 .build()
@@ -46,11 +49,12 @@ public class UserCmdHandler implements Handler {
                 .flatMap(r -> response(r, gateway))
                 .switchIfEmpty(ServerResponse.badRequest()
                         .body(Mono.just(MISSING_REQUEST_BODY_KEY), String.class));
+        /*@formatter:on*/
     }
 
     @DeleteMapping(value = "/users/{userId}")
     public Mono<ServerResponse> userDelete(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
-        return response( UserDeletionCmd.builder().id(userId).build().validate(util), gateway);
+        return response(UserDeletionCmd.builder().id(userId).build().validate(util), gateway);
     }
 }

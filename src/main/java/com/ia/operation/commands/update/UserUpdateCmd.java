@@ -35,13 +35,27 @@ public class UserUpdateCmd extends CommandValidator<UserUpdateCmd> {
     private String password;
 
     public static UserUpdatedEvent.UserUpdatedEventBuilder eventFrom(UserUpdateCmd cmd) {
-        return UserUpdatedEvent.builder().id(cmd.getId()).description(cmd.getDescription()).details(cmd.getDetails()).companyId(cmd.getCompanyId())
-                .email(cmd.getEmail()).password(cmd.getPassword());
+        /*@formatter:off*/
+        return UserUpdatedEvent.builder()
+                .id(cmd.getId())
+                .description(cmd.getDescription())
+                .details(cmd.getDetails())
+                .companyId(cmd.getCompanyId())
+                .email(cmd.getEmail())
+                .password(cmd.getPassword());
+        /*@formatter:on*/
     }
 
     public static UserUpdateCmdBuilder cmdFrom(UserUpdateCmd cmd) {
-        return UserUpdateCmd.builder().id(cmd.getId()).description(cmd.getDescription()).details(cmd.getDetails()).companyId(cmd.getCompanyId())
-                .email(cmd.getEmail()).password(cmd.getPassword());
+        /*@formatter:off*/
+        return UserUpdateCmd.builder()
+                .id(cmd.getId())
+                .description(cmd.getDescription())
+                .details(cmd.getDetails())
+                .companyId(cmd.getCompanyId())
+                .email(cmd.getEmail())
+                .password(cmd.getPassword());
+        /*@formatter:on*/
     }
 
     @Override

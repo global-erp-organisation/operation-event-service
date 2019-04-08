@@ -27,15 +27,19 @@ public class AccountCategoryCreationCmd extends CommandValidator<AccountCategory
     
     
     public static AccountCategoryCreatedEvent.AccountCategoryCreatedEventBuilder eventFrom (AccountCategoryCreationCmd cmd){
+        /*@formatter:off*/
         return AccountCategoryCreatedEvent.builder()
             .id(cmd.getId())
             .description(cmd.getDescription());
+        /*@formatter:on*/
     }
     
     public static AccountCategoryCreationCmdBuilder cmdFrom (AccountCategoryCreationCmd cmd){
+        /*@formatter:off*/
         return AccountCategoryCreationCmd.builder()
             .id(cmd.getId())
             .description(cmd.getDescription());
+        /*@formatter:on*/
     }
     
     @Override

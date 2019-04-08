@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-@JsonInclude(value=Include.NON_EMPTY)
+@JsonInclude(value = Include.NON_EMPTY)
 public class DailyHistoryView {
     @Id
     private String id;
@@ -33,21 +33,25 @@ public class DailyHistoryView {
     @ManyToOne(fetch = FetchType.EAGER)
     private Account account;
     private LocalDate date;
-    
-    public static DailyHistoryViewBuilder from (Operation r) {
+
+    public static DailyHistoryViewBuilder from(Operation r) {
+        /*@formatter:off*/
         return DailyHistoryView.builder()
                 .date(r.getOperationDate())
                 .refAmount(BigDecimal.ZERO)
                 .account(r.getAccount())
                 .curAmount(r.getAmount());
+        /*@formatter:on*/
     }
-    
-    public static DailyHistoryViewBuilder from (DailyHistoryView r) {
+
+    public static DailyHistoryViewBuilder from(DailyHistoryView r) {
+        /*@formatter:off*/
         return DailyHistoryView.builder()
                 .id(r.getId())
                 .date(r.getDate())
                 .account(r.getAccount())
                 .refAmount(r.getRefAmount())
                 .curAmount(r.getCurAmount());
+        /*@formatter:on*/
     }
 }
