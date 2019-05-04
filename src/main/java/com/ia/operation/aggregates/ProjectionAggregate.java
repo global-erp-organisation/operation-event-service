@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.ProjectionCreationCmd;
@@ -32,7 +33,7 @@ public class ProjectionAggregate {
 
     @CommandHandler
     public ProjectionAggregate(ProjectionCreationCmd cmd) {
-        AggregateLifecycle.apply(ProjectionCreationCmd.eventFrom(cmd));
+        apply(ProjectionCreationCmd.eventFrom(cmd));
     }
 
     @EventSourcingHandler
@@ -46,11 +47,11 @@ public class ProjectionAggregate {
 
     @CommandHandler
     public void handleProjectionDeletionCmd(ProjectionDeletionCmd cmd) {
-        AggregateLifecycle.apply(ProjectionDeletedEvent.builder().id(cmd.getId()).build());
+        apply(ProjectionDeletedEvent.builder().id(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onProjectionDeleted(ProjectionDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }

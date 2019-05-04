@@ -72,6 +72,7 @@ public class CmdRoutingConfiguration {
         return RouterFunctions
                 .route(POST("/accounts/{accountId}/operations"), handler::operationAdd)
                 .andRoute(DELETE("/operations/{operationId}"), handler::operationDelete)
-               .andRoute(PUT("/operations/{operationId}"), handler::operationUpdate);
+                .andRoute(PUT("/operations/{operationId}"), handler::operationUpdate)
+                .andRoute(POST("/operations"), handler::operationTransfert);
     }
 }

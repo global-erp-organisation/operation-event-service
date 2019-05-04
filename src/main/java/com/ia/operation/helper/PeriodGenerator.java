@@ -7,11 +7,14 @@ import java.util.Optional;
 import com.ia.operation.documents.Period;
 import com.ia.operation.events.created.PeriodCreatedEvent;
 
-@FunctionalInterface
+import reactor.core.publisher.Mono;
+
 public interface PeriodGenerator {
    
     Collection<PeriodCreatedEvent> generate(String year);
-
+    
+    Mono<Optional<Period>> resolve(LocalDate date, String year);
+    
     default Optional<Period> resolve(LocalDate date, Collection<Period> periods) {
         return periods.stream()
                 .filter(p -> (p.getStart().toEpochDay() <= date.toEpochDay()) && (p.getEnd().toEpochDay() >= date.toEpochDay()))

@@ -119,7 +119,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         Stream.of(views).forEach(v -> dailyHistoryRepository.save(v).subscribe());
     }
 
-    private boolean isEqual(Operation current, Operation old) {
+    @Override
+    public boolean isEqual(Operation current, Operation old) {
         return current.getAccount().getId().equals(old.getAccount().getId()) && current.getOperationDate().equals(old.getOperationDate());
     }
 }

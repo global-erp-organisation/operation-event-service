@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.ia.operation.aggregates.AccountAggregate;
 import com.ia.operation.commands.update.AccountUpdateCmd;
-import com.ia.operation.enums.AccountType;
 import com.ia.operation.enums.OperationType;
+
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -22,37 +22,34 @@ public class AccountUpdater {
 
     public void update(UpdateParams params) {
         util.aggregateGet(params.getAccountId(), AccountAggregate.class).ifPresent(account -> {
-            if (AccountType.BANKING.equals(account.getAccountType())) {
-                final BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
-                final AccountUpdateCmd.AccountUpdateCmdBuilder builder = AccountUpdateCmd.cmdFrom(account);
-
-                switch (params.getEventType()) {
-                    case A:
-                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                            builder.balance(current.subtract(params.getAmount()));
-                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                            builder.balance(current.add(params.getAmount()));
-                        }
-                        break;
-                    case U:
-                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                            builder.balance(current.subtract(params.getOldAmount()).subtract(params.getAmount()));
-                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                            builder.balance(current.subtract(params.getOldAmount()).add(params.getAmount()));
-                        }
-                        break;
-                    case D:
-                        if (OperationType.EXPENSE.equals(params.getOperationType())) {
-                            builder.balance(current.add(params.getAmount()));
-                        } else if (OperationType.REVENUE.equals(params.getOperationType())) {
-                            builder.balance(current.subtract(params.getAmount()));
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                gateway.send(builder.build());
+            final BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
+            final AccountUpdateCmd.AccountUpdateCmdBuilder builder = AccountUpdateCmd.cmdFrom(account);
+            switch (params.getEventType()) {
+                case A:
+                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                        builder.balance(current.subtract(params.getAmount()));
+                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                        builder.balance(current.add(params.getAmount()));
+                    }
+                    break;
+                case U:
+                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                        builder.balance(current.subtract(params.getOldAmount()).subtract(params.getAmount()));
+                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                        builder.balance(current.subtract(params.getOldAmount()).add(params.getAmount()));
+                    }
+                    break;
+                case D:
+                    if (OperationType.EXPENSE.equals(params.getOperationType())) {
+                        builder.balance(current.add(params.getAmount()));
+                    } else if (OperationType.REVENUE.equals(params.getOperationType())) {
+                        builder.balance(current.subtract(params.getAmount()));
+                    }
+                    break;
+                default:
+                    break;
             }
+            gateway.send(builder.build());
         });
     }
 

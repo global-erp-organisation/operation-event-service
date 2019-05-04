@@ -3,6 +3,7 @@ package com.ia.operation.helper;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,10 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.axonframework.common.Assert;
 import org.springframework.stereotype.Component;
 
+import com.ia.operation.documents.Period;
 import com.ia.operation.events.created.PeriodCreatedEvent;
+import com.ia.operation.repositories.PeriodRepository;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -24,16 +28,14 @@ public class MonthlyPeriodGenerator implements PeriodGenerator {
 
     private static final int YEAR_LENGTH_IN_MONTH = 12;
     private final Locale locale;
+    private final PeriodRepository periodRepository;
 
     @Override
     public Collection<PeriodCreatedEvent> generate(String year) {
-        if(!StringUtils.isNumeric(year)) {
-           throw new IllegalArgumentException("The provided year should be a number."); 
+        if (!StringUtils.isNumeric(year)) {
+            throw new IllegalArgumentException("The provided year should be a number.");
         }
-        return IntStream
-                .range(1, YEAR_LENGTH_IN_MONTH + 1)
-                .mapToObj(i -> of(Integer.valueOf(year), i))
-                .map(p -> PeriodCreatedEvent.of(p, locale).build())
+        return IntStream.range(1, YEAR_LENGTH_IN_MONTH + 1).mapToObj(i -> of(Integer.valueOf(year), i)).map(p -> PeriodCreatedEvent.of(p, locale).build())
                 .collect(Collectors.toList());
     }
 
@@ -60,18 +62,15 @@ public class MonthlyPeriodGenerator implements PeriodGenerator {
     }
 
     private PeriodCreatedEvent.PeriodCreatedEventBuilder create(int year, int month, int startDay, int lastDay,
-                                PeriodCreatedEvent.PeriodCreatedEventBuilder period) {
-        return period
-                .id(ObjectIdHelper.id())
-                .end(LocalDate.of(year, month, lastDay))
-                .start(LocalDate.of(year, month, startDay))
+                                                                PeriodCreatedEvent.PeriodCreatedEventBuilder period) {
+        return period.id(ObjectIdHelper.id()).end(LocalDate.of(year, month, lastDay)).start(LocalDate.of(year, month, startDay))
                 .year(String.valueOf(year));
     }
 
     enum ClassOfMonth {
-       END_WITH_31(Arrays.asList(1, 3, 5, 7, 8, 10, 12)),
-       END_WITH_30(Arrays.asList(4, 6, 9, 11)),
-       FEBUARY(Arrays.asList(2));
+                       END_WITH_31(Arrays.asList(1, 3, 5, 7, 8, 10, 12)),
+                       END_WITH_30(Arrays.asList(4, 6, 9, 11)),
+                       FEBUARY(Arrays.asList(2));
         @Getter
         private final Collection<Integer> list;
 
@@ -80,7 +79,15 @@ public class MonthlyPeriodGenerator implements PeriodGenerator {
         }
 
         public static Optional<ClassOfMonth> of(Integer month) {
-            return Optional.ofNullable(Stream.of(values()).filter(e -> e.getList().contains(month)).findFirst().orElse(null));
+            return Stream.of(values()).filter(e -> e.getList().contains(month)).findFirst();
         }
+    }
+
+    @Override
+    public Mono<Optional<Period>> resolve(LocalDate date, String year) {
+        final Mono<List<Period>> periods = periodRepository.findByYear(year).collectList();
+        return periods.map(p -> {
+            return resolve(date, p);
+        });
     }
 }
