@@ -5,7 +5,8 @@ import java.util.Map;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.CompanyCreationCmd;
@@ -31,7 +32,7 @@ public class CompanyAggregate {
 
     @CommandHandler
     public CompanyAggregate(CompanyCreationCmd cmd) {
-        AggregateLifecycle.apply(CompanyCreationCmd.eventFrom(cmd).build());
+        apply(CompanyCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -43,7 +44,7 @@ public class CompanyAggregate {
 
     @CommandHandler
     public void handleCompanyUpdateCmd(CompanyUpdateCmd cmd) {
-        AggregateLifecycle.apply(CompanyUpdateCmd.eventFrom(cmd).build());
+        apply(CompanyUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -55,11 +56,11 @@ public class CompanyAggregate {
 
     @CommandHandler
     public void handleCompanyDeletionCmd(CompanyDeletionCmd cmd) {
-        AggregateLifecycle.apply(CompanyDeletedEvent.builder().companyId(cmd.getId()).build());
+        apply(CompanyDeletedEvent.builder().companyId(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onCompanyDeleted(CompanyDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }

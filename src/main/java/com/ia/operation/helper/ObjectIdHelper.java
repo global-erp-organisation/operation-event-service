@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,15 +39,15 @@ public class ObjectIdHelper {
         return ids.stream().map(ObjectId::toHexString).collect(Collectors.toList());
     }
 
-    public static Message toMessage(Object events) {
+    public static Optional<Message> toMessage(Object events) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             final ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(events);
-            return MessageBuilder.withBody(bos.toByteArray()).build();
+            return Optional.of(MessageBuilder.withBody(bos.toByteArray()).build());
         } catch (IOException e) {
             log.error("unable to convert events to byte.", e);
-            return null;
+            return Optional.empty();
         }
     }
 

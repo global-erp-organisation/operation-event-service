@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.AccountCreationCmd;
@@ -40,7 +41,7 @@ public class AccountAggregate {
 
     @CommandHandler
     public AccountAggregate(AccountCreationCmd cmd) {
-        AggregateLifecycle.apply(AccountCreationCmd.enventFrom(cmd).build());
+        apply(AccountCreationCmd.enventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -58,7 +59,7 @@ public class AccountAggregate {
 
     @CommandHandler
     public void handleOperationUpdateCmd(AccountUpdateCmd cmd) {
-        AggregateLifecycle.apply(AccountUpdateCmd.eventFrom(cmd).build());
+        apply(AccountUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -76,11 +77,11 @@ public class AccountAggregate {
 
     @CommandHandler
     public void handleOperationDeletionCmd(AccountDeletionCmd cmd) {
-        AggregateLifecycle.apply(AccountDeletedEvent.builder().id(cmd.getId()).build());
+        apply(AccountDeletedEvent.builder().id(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onOperationDeleted(AccountDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }

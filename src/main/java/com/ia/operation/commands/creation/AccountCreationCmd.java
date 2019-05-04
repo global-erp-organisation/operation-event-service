@@ -115,9 +115,6 @@ public class AccountCreationCmd extends CommandValidator<AccountCreationCmd> {
             final List<String> values = Stream.of(AccountType.values()).map(a -> a.name()).collect(Collectors.toList());
             errors.add("The input account type doesnt match with the available domain. Here is the domain value: " + String.join(",", values));
         }
-        if (balance.doubleValue() < 0.0) {
-            errors.add("The input balance shouldnt be less than zero.");
-        }
         return buildResult(errors);
     }
 }

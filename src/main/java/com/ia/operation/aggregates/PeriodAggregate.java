@@ -5,7 +5,8 @@ import java.time.LocalDate;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.PeriodCreationCmd;
@@ -32,7 +33,7 @@ public class PeriodAggregate {
 
     @CommandHandler
     public PeriodAggregate(PeriodCreationCmd cmd) {
-        AggregateLifecycle.apply(cmd.getEvent());
+        apply(cmd.getEvent());
     }
 
     @EventSourcingHandler
@@ -48,11 +49,11 @@ public class PeriodAggregate {
         if (getClose()) {
             throw new IllegalStateException("Deleting closed periods is prohibited");
         }
-        AggregateLifecycle.apply(PeriodDeletedEvent.builder().id(cmd.getId()).build());
+        apply(PeriodDeletedEvent.builder().id(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onPeriodDeleted(PeriodDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }

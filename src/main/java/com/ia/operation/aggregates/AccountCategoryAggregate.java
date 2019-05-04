@@ -3,7 +3,8 @@ package com.ia.operation.aggregates;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.AccountCategoryCreationCmd;
@@ -28,7 +29,7 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public AccountCategoryAggregate(AccountCategoryCreationCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryCreationCmd.eventFrom(cmd).build());
+        apply(AccountCategoryCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -39,7 +40,7 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public void handleOperationCategoryUpdateCmd(AccountCategoryUpdateCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryUpdateCmd.eventFrom(cmd).build());
+        apply(AccountCategoryUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -50,11 +51,11 @@ public class AccountCategoryAggregate {
 
     @CommandHandler
     public void handleOperationCategoryDeleteCmd(AccountCategoryDeletionCmd cmd) {
-        AggregateLifecycle.apply(AccountCategoryDeletionCmd.builder().id(cmd.getId()).build());
+        apply(AccountCategoryDeletionCmd.builder().id(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onOperationCategoryDeleted(AccountCategoryDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }

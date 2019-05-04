@@ -121,7 +121,8 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
         Stream.of(views).forEach(v -> monthlyHistoryRepository.save(v).subscribe());
     }
 
-    private boolean isEqual(Operation current, Operation old) {
+    @Override
+    public boolean isEqual(Operation current, Operation old) {
         return getMonth(current.getOperationDate()).equals(getMonth(old.getOperationDate())) && current.getAccount().getId().equals(old.getAccount().getId());
     }
 }

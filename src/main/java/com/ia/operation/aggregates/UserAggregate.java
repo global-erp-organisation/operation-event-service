@@ -5,7 +5,8 @@ import java.util.Map;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+import static org.axonframework.modelling.command.AggregateLifecycle.markDeleted;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import com.ia.operation.commands.creation.UserCreationCmd;
@@ -34,7 +35,7 @@ public class UserAggregate {
 
     @CommandHandler
     public UserAggregate(UserCreationCmd cmd) {
-        AggregateLifecycle.apply(UserCreationCmd.eventFrom(cmd).build());
+        apply(UserCreationCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -49,7 +50,7 @@ public class UserAggregate {
 
     @CommandHandler
     public void handleUserUpdateCmd(UserUpdateCmd cmd) {
-        AggregateLifecycle.apply(UserUpdateCmd.eventFrom(cmd).build());
+        apply(UserUpdateCmd.eventFrom(cmd).build());
     }
 
     @EventSourcingHandler
@@ -64,11 +65,11 @@ public class UserAggregate {
 
     @CommandHandler
     public void handleUserDeletionCmd(UserDeletionCmd cmd) {
-        AggregateLifecycle.apply(UserDeletedEvent.builder().userId(cmd.getId()).build());
+        apply(UserDeletedEvent.builder().userId(cmd.getId()).build());
     }
 
     @EventSourcingHandler
     public void onUserDeleted(UserDeletedEvent event) {
-        AggregateLifecycle.markDeleted();
+        markDeleted();
     }
 }
