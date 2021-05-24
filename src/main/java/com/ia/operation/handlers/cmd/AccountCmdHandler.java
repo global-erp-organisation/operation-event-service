@@ -1,25 +1,25 @@
 package com.ia.operation.handlers.cmd;
 
+import com.ia.operation.commands.creation.AccountCreationCmd;
+import com.ia.operation.commands.delete.AccountDeletionCmd;
+import com.ia.operation.commands.update.AccountUpdateCmd;
+import com.ia.operation.handlers.CommandHandler;
+import com.ia.operation.helper.AggregateHelper;
+import com.ia.operation.helper.ObjectIdHelper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import com.ia.operation.commands.creation.AccountCreationCmd;
-import com.ia.operation.commands.delete.AccountDeletionCmd;
-import com.ia.operation.commands.update.AccountUpdateCmd;
-import com.ia.operation.handlers.Handler;
-import com.ia.operation.helper.AggregateHelper;
-import com.ia.operation.helper.ObjectIdHelper;
-
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Component
-@RequiredArgsConstructor
-public class AccountCmdHandler implements Handler {
-    private final CommandGateway gateway;
+public class AccountCmdHandler extends CommandHandler {
     private final AggregateHelper util;
+
+    public AccountCmdHandler(CommandGateway gateway, AggregateHelper util) {
+        super(gateway);
+        this.util = util;
+    }
 
     public Mono<ServerResponse> accountAdd(ServerRequest request) {
         final String userId = request.pathVariable(USER_ID_KEY);
@@ -30,18 +30,16 @@ public class AccountCmdHandler implements Handler {
                         .id(ObjectIdHelper.id())
                         .userId(userId)
                         .categoryId(categoryId)
-                        .build().validate(util)),gateway);
+                        .build().validate(util)));
     }
-
     public Mono<ServerResponse> accountUpdate(ServerRequest request) {
         final Mono<AccountUpdateCmd> bodyMono = request.bodyToMono(AccountUpdateCmd.class);
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
-        return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(accountId).build().validate(util)), gateway);
+        return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(accountId).build().validate(util)));
     }
 
     public Mono<ServerResponse> accountDelete(ServerRequest request) {
         final String operationId = request.pathVariable(OPERATION_ID_KEY);
-        return response(AccountDeletionCmd.builder().id(operationId).build().validate(util), gateway);
+        return response(AccountDeletionCmd.builder().id(operationId).build().validate(util));
     }
-
 }

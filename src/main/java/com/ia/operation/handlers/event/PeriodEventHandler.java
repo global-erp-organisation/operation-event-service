@@ -15,6 +15,9 @@ import com.ia.operation.repositories.PeriodRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 @Component
 @AllArgsConstructor
 @Slf4j
@@ -34,14 +37,14 @@ public class PeriodEventHandler {
     }
     
     @QueryHandler
-    public Object periodGetById(PeriodGetByIdQuery query) {
+    public CompletableFuture<Period> periodGetById(PeriodGetByIdQuery query) {
         log.info("periodGetById query recieved: value=[{}]", query);
-        return periodRepository.findById(query.getPeriodId());
+        return periodRepository.findById(query.getPeriodId()).toFuture();
     }
     
     @QueryHandler
-    public Object periodGetByYearQuery(PeriodGetByYearQuery query) {
+    public CompletableFuture<List<Period>> periodGetByYearQuery(PeriodGetByYearQuery query) {
         log.info("periodGetByYear query recieved: value=[{}]", query);
-        return periodRepository.findByYear(query.getYear());
+        return periodRepository.findByYear(query.getYear()).collectList().toFuture();
     }
 }

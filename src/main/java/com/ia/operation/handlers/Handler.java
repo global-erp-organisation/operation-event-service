@@ -1,84 +1,52 @@
 package com.ia.operation.handlers;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.common.Assert;
-import org.axonframework.queryhandling.QueryGateway;
-import org.reactivestreams.Publisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import com.ia.operation.commands.ICommand;
-import com.ia.operation.handlers.CmdResponse.Error;
-import com.ia.operation.helper.validator.CommandValidator;
-import com.ia.operation.helper.validator.CommandValidator.ValidationResult;
-
 import reactor.core.publisher.Mono;
 
-public interface Handler extends ConstantHandler {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
-    default <V extends ICommand> Mono<ServerResponse> commandComplete(Mono<ValidationResult<V>> cmd, CommandGateway gateway) {
-        try {
-            beanValidate(cmd, gateway);
-            return cmd.flatMap(r -> response(r, gateway)).switchIfEmpty(badRequestError(MISSING_REQUEST_BODY_KEY));
-        } catch (Exception e) {
-            return internalErrorResponse(() -> e.getLocalizedMessage());
-        }
+public interface Handler {
+    String ACCOUNT_ID_KEY = "accountId";
+    String CATEGORY_ID_KEY = "categoryId";
+    String COMPANY_ID_KEY = "companyId";
+    String MISSING_REQUEST_BODY_KEY = "The request body is missing.";
+    String OPERATION_ID_KEY = "operationId";
+    String PERIOD_ID_KEY = "periodId";
+    String PROJECTION_ID_KEY = "projectionId";
+    String USER_ID_KEY = "userId";
+    String YEAR_KEY = "year";
+    String END_DATE_KEY = "end-date";
+    String START_DATE_KEY = "start-date";
+    String MISSING_QUERY_PARAM_PREFIX = "missing query param: ";
+    String MISSING_PATH_VARIABLE_PREFIX = "missing path variable: ";
+    String YEARLY_KEY = "yearly";
+    String MONTHLY_KEY = "monthly";
+    String DAILY_KEY = "daily";
+    String EMAIL_KEY = "email";
+
+    List<String> errors = new ArrayList<>();
+    default void addError(String item) {
+        errors.add(item);
+    }
+    default void errorReset() {
+        errors.clear();
     }
 
-    default <V extends ICommand> Mono<ServerResponse> response(ValidationResult<V> cmd, CommandGateway gateway) {
-        if (cmd.getIsValid()) {
-            final Optional<CommandValidator<V>> r = cmd.getValidated();
-            if (r.isPresent()) {
-                final CommandValidator<V> command = r.get();
-                final String id = gateway.sendAndWait(command);
-                final CmdResponse<String, String> cr = CmdResponse.<String, String>builder().body(id == null ? command.getId() : id).build();
-                return acceptedRequestComplete(() -> Mono.just(cr), CmdResponse.class);
-            } else {
-                return badRequestError("No error message found. It sound like a default validator operation have been used.");
-            }
-        } else {
-            return badRequestError(cmd.getErrors());
-        }
+    default   <T, E> Mono<ServerResponse> errorWithStatus(E errorDescription, HttpStatus status) {
+        final CmdResponse.Error<E> error = CmdResponse.Error.<E>builder().status(status).body(errorDescription).build();
+        return ServerResponse.status(status).body(Mono.just(CmdResponse.<T, E>builder().error(error).build()), CmdResponse.class);
     }
 
-    default <T> Mono<ServerResponse> acceptedRequestComplete(Supplier<Publisher<T>> response, Class<T> responseType) {
-        try {
-            beanValidate(response, responseType);
-            return ServerResponse.accepted().body(response.get(), responseType);
-        } catch (Exception e) {
-            return internalErrorResponse(() -> e.getLocalizedMessage());
-        }
+    default   <E> Mono<ServerResponse> internalErrorResponse(Supplier<E> message) {
+        return errorWithStatus(message.get(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    default <T> Mono<ServerResponse> badRequestComplete(Supplier<T> message, Class<T> type) {
-        beanValidate(message);
-        return ServerResponse.badRequest().body(Mono.just(message.get()), type);
-    }
-
-    default <T, E> Mono<ServerResponse> errorWithSatus(E errorDescription, HttpStatus status) {
-        final Error<E> error = Error.<E>builder().status(status).body(errorDescription).build();
-        return badRequestComplete(() -> CmdResponse.<T, E>builder().error(error).build(), CmdResponse.class);
-    }
-
-    default <E> Mono<ServerResponse> badRequestError(E errorDescription) {
-        return errorWithSatus(errorDescription, HttpStatus.BAD_REQUEST);
-    }
-
-    @SuppressWarnings("unchecked")
-    default <Q, T> Mono<ServerResponse> queryComplete(Supplier<Q> querySupplier, Class<T> responseType, QueryGateway gateway) {
-        try {
-            beanValidate(querySupplier, responseType, gateway);
-            return ServerResponse.ok().body((Publisher<T>) gateway.query(querySupplier.get(), Object.class).get(), responseType);
-        } catch (Exception e) {
-            return internalErrorResponse(() -> e.getLocalizedMessage());
-        }
-    }
-
-    default <E> Mono<ServerResponse> internalErrorResponse(Supplier<E> message) {
-        return errorWithSatus(message.get(), HttpStatus.INTERNAL_SERVER_ERROR);
+    default   <E> Mono<ServerResponse> badRequestError(E errorDescription) {
+        return errorWithStatus(errorDescription, HttpStatus.BAD_REQUEST);
     }
 
     default void beanValidate(Object... beans) {

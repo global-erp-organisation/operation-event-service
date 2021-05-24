@@ -8,17 +8,28 @@ axon:
     default-event-routing-key: event
     default-cmd-routing-key: cmd
     class-path-package: com.ia
-spring:
-  main:
-    allow-bean-definition-overriding: true
-  application:
-    name: operation-cmd
-  data:
-    mongodb:
-      database: operation-view-store
-
 server:
   port: 8093
 logging:
   level:
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
+spring:
+  data:
+    mongodb:
+      database: operation-view-store
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate.format_sql: false
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  datasource:
+    url: jdbc:mysql://localhost:3306/operation
+    username: root
+    password: ephesus
+    driver-class-name: com.mysql.jdbc.Driver
+  application:
+    name: operation-cmd
+  main:
+    allow-bean-definition-overriding: true
