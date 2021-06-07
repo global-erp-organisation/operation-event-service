@@ -1,10 +1,12 @@
 package com.ia.operation.handlers.event;
 
+import com.corundumstudio.socketio.SocketIOServer;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.Period;
 import com.ia.operation.documents.views.DailyHistoryView;
 import com.ia.operation.documents.views.MonthlyHistoryView;
+import com.ia.operation.enums.WebSocketEvents;
 import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.deleted.OperationDeletedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
@@ -32,6 +34,7 @@ public class OperationEventHandler {
     private final OperationRepository operationRepository;
     private final HistoryUpdater<DailyHistoryView> dailyUpdater;
     private final HistoryUpdater<MonthlyHistoryView> monthlyUpdate;
+    private final SocketIOServer socketIOServer;
     
     @EventHandler
     public void on(OperationCreatedEvent event) {
@@ -39,10 +42,11 @@ public class OperationEventHandler {
         final Flux<Period> periods =
                 periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> p.contains(event.getOperationDate()));
         final Mono<Account> acc = accountRepository.findById(event.getAccountId());
-        periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(opration -> {
-            log.info("Operation succesfully saved. [{}]", opration);
-            dailyUpdater.update(opration, opration, UpdateType.A);
-            monthlyUpdate.update(opration, opration, UpdateType.A);
+        periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(operation -> {
+            log.info("Operation succesfully saved. [{}]", operation);
+            dailyUpdater.update(operation, operation, UpdateType.A);
+            monthlyUpdate.update(operation, operation, UpdateType.A);
+            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
         })));
     }
 
@@ -56,6 +60,7 @@ public class OperationEventHandler {
             log.info("Operation succesfully upodated. [{}]", current);
             dailyUpdater.update(current, old, UpdateType.U);
             monthlyUpdate.update(current, old, UpdateType.U);
+            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
         }))));
     }
 
@@ -66,6 +71,7 @@ public class OperationEventHandler {
             operationRepository.deleteById(event.getId()).subscribe(e -> log.info("Operation succesfully removed. [{}]", event.getId()));
             dailyUpdater.update(old, old, UpdateType.R);
             monthlyUpdate.update(old, old, UpdateType.R);
+            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
         });
     }
 }

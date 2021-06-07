@@ -1,22 +1,19 @@
 package com.ia.operation.commands.creation;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
-import org.springframework.util.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ia.operation.aggregates.CompanyAggregate;
 import com.ia.operation.events.created.PeriodCreatedEvent;
 import com.ia.operation.helper.AggregateHelper;
 import com.ia.operation.helper.validator.CommandValidator;
-
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Value
 @Builder
@@ -24,41 +21,36 @@ import lombok.Value;
 public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
-
-    private String year;
-    private String description;
-    private LocalDate start;
-    private LocalDate end;
+     String year;
+     String description;
+     LocalDate start;
+     LocalDate end;
     @Builder.Default
-    private Boolean close = false;
-
+     boolean close = false;
     @JsonIgnore
-    private PeriodCreatedEvent event;
+     PeriodCreatedEvent event;
 
     public static PeriodCreatedEvent.PeriodCreatedEventBuilder eventFrom(PeriodCreationCmd cmd) {
-        /*@formatter:off*/
         return PeriodCreatedEvent.builder()
                 .year(cmd.getYear())
                 .id(cmd.getId())
+                .description(cmd.getDescription())
                 .start(cmd.getStart())
                 .end(cmd.getEnd())
-                .close(cmd.getClose());
-        /*@formatter:on*/
+                .close(cmd.isClose());
     }
 
     public static PeriodCreationCmdBuilder cmdFrom(PeriodCreationCmd cmd) {
-        /*@formatter:off*/
         return PeriodCreationCmd.builder()
                 .year(cmd.getYear())
+                .description(cmd.getDescription())
                 .id(cmd.getId())
                 .start(cmd.getStart())
                 .end(cmd.getEnd())
-                 .close(cmd.getClose());
-        /*@formatter:on*/
+                 .close(cmd.isClose());
     }
 
     public static PeriodCreationCmdBuilder cmdFrom(PeriodCreatedEvent event) {
-        /*@formatter:off*/
         return PeriodCreationCmd.builder()
                 .id(event.getId())
                 .year(event.getYear())
@@ -66,14 +58,13 @@ public class PeriodCreationCmd extends CommandValidator<PeriodCreationCmd> {
                 .start(event.getStart())
                 .end(event.getEnd())
                 .event(event)
-                .close(event.getClose());
-        /*@formatter:on*/
+                .close(event.isClose());
     }
 
     @Override
     public ValidationResult<PeriodCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtil.isNullOrEmpty(id)) {
             errors.add("period identifier shouldn't be null or empty");
         } else {
             if (util.aggregateGet(id, CompanyAggregate.class).isPresent()) {

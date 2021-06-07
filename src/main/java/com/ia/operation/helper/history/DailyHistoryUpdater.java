@@ -1,19 +1,20 @@
 package com.ia.operation.helper.history;
 
-import java.time.LocalDate;
-import java.util.stream.Stream;
-
-import org.springframework.stereotype.Component;
-
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.views.DailyHistoryView;
 import com.ia.operation.helper.ObjectIdHelper;
 import com.ia.operation.repositories.DailyHistoryRepository;
 import com.ia.operation.repositories.OperationRepository;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 @Data
@@ -113,5 +114,44 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
     @Override
     public boolean isEqual(Operation current, Operation old) {
         return current.getAccount().getId().equals(old.getAccount().getId()) && current.getOperationDate().equals(old.getOperationDate());
+    }
+
+    @Override
+    public PeriodParams getPeriodParams(LocalDate current) {
+        //TODO provided the collections of date that need to be sorted
+        final List<LocalDate> dates = new ArrayList<LocalDate>().stream().sorted().collect(Collectors.toList());
+        final PeriodParams.PeriodParamsBuilder params = PeriodParams.builder();
+        if (dates.isEmpty()) {
+            params.previous(current.minusDays(ONE_FACTOR)).next(current.plusDays(ONE_FACTOR));
+        }
+        if (dates.size() == 1) {
+            final LocalDate date = dates.get(0);
+            if (date.equals(current)) {
+                params.previous(current.minusDays(ONE_FACTOR)).next(current.plusDays(ONE_FACTOR)).build();
+            } else if (date.isBefore(current)) {
+                params.previous(date).next(current.plusDays(ONE_FACTOR));
+            } else
+                params.previous(current.minusDays(ONE_FACTOR)).next(date);
+        }
+        if (dates.size() == 2) {
+            for (int i = 0; i < dates.size(); i++) {
+                if (dates.get(i).equals(current)) {
+                    if (i == 0) {
+                         params.previous(current.minusDays(ONE_FACTOR)).next(dates.get(i + 1));
+                    }
+                     params.previous(dates.get(i - 1)).next(current.plusDays(ONE_FACTOR));
+                }
+            }
+        } else {
+            for (int i = 0; i < dates.size(); i++) {
+                if (dates.get(i).equals(current)) {
+                    if (i == 0) {
+                        return params.previous(current.minusDays(ONE_FACTOR)).next(dates.get(i + 1)).build();
+                    }
+                    return params.previous(dates.get(i - 1)).next(dates.get(i + 1)).build();
+                }
+            }
+        }
+        return params.build();
     }
 }

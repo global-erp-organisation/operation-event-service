@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.axonframework.common.Assert;
 import org.bson.types.ObjectId;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,8 @@ public class ObjectIdHelper {
     }
 
     public static String id() {
-        return new ObjectId(UUID.randomUUID().toString().getBytes()).toHexString();
+        //return new ObjectId(UUID.randomUUID().toString().getBytes()).toHexString();
+        return UUID.randomUUID().toString();
     }
 
     public static Collection<String> id(Collection<String> ids) {

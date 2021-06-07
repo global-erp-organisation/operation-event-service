@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@SuppressWarnings("serial")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -21,7 +20,7 @@ public class PeriodCreatedEvent implements Serializable {
     private LocalDate start;
     private LocalDate end;
     private String description;
-    private Boolean close;
+    private boolean close;
     
     
     public static PeriodCreatedEvent.PeriodCreatedEventBuilder of(PeriodCreatedEvent period, Locale locale) {
@@ -31,7 +30,7 @@ public class PeriodCreatedEvent implements Serializable {
                 .end(period.getEnd())
                 .id(period.getId())
                 .start(period.getStart())
-                .close(period.getClose());
+                .close(period.isClose());
     }
     
     public static PeriodCreatedEvent.PeriodCreatedEventBuilder of(PeriodCreatedEvent period) {

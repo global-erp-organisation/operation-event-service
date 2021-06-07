@@ -1,22 +1,18 @@
 package com.ia.operation.documents.views;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
-
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Document
 @Data
@@ -30,7 +26,7 @@ public class DailyHistoryView {
     private BigDecimal refAmount;
     @JsonProperty("cur_amount")
     private BigDecimal curAmount;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private Account account;
     private LocalDate date;
 

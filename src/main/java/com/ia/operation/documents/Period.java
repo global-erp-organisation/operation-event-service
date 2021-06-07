@@ -19,7 +19,7 @@ import lombok.Data;
 public class Period {
     @Id
     private String id;
-    @Indexed(unique = false)
+    @Indexed
     private String year;
     private LocalDate start;
     private LocalDate end;
@@ -35,7 +35,7 @@ public class Period {
                 .start(event.getStart())
                 .end(event.getEnd())
                 .description(event.getDescription())
-                .close(event.getClose())
+                .close(event.isClose())
                 .build();
         /*@formatter:on*/
     }

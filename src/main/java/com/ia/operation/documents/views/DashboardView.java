@@ -13,33 +13,33 @@ import lombok.Value;
 @Value
 @JsonInclude(value = Include.NON_EMPTY)
 public class DashboardView {
-    private History history;
+    History history;
 
     @Value
     @Builder
     public static class DashboardParams {
-        private LocalDate start;
-        private LocalDate end;
+        LocalDate start;
+        LocalDate end;
         @JsonProperty("user_id")
-        private String userId;
-        private Boolean daily;
-        private Boolean monthly;
-        private Boolean yearly;
+        String userId;
+        Boolean daily;
+        Boolean monthly;
+        Boolean yearly;
     }
 
     @Value
     @Builder
     @JsonInclude(value = Include.NON_EMPTY)
     public static class History {
-        private LocalDate start;
-        private LocalDate end;
+        LocalDate start;
+        LocalDate end;
         @JsonProperty("daily_history")
-        private HistoryView<DailyHistoryView> dailyHistory;
+        HistoryView<DailyHistoryView> dailyHistory;
         @JsonProperty("monthly_history")
-        private HistoryView<MonthlyHistoryView> monthlyHistory;
+        HistoryView<MonthlyHistoryView> monthlyHistory;
         @JsonProperty("yearly_history")
-        private HistoryView<YearlyHistoryView> yearlyHistory;
+        HistoryView<YearlyHistoryView> yearlyHistory;
         @JsonProperty("rate_view")
-        private RateView rateView;
+        RateView rateView;
     }
 }

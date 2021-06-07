@@ -1,4 +1,4 @@
-package com.ia.operation.configuration;
+package com.ia.operation.configuration.axon;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -17,4 +17,5 @@ public class AxonProperties {
     private String defaultExchange = "default-exchange";
     private String defaultEventRoutingKey = "event";
     private String defaultCmdRoutingKey = "cmd";
+    private String rootApiPath="/api/v1/";
 }

@@ -1,17 +1,13 @@
 package com.ia.operation.documents;
 
-import java.math.BigDecimal;
-
+import com.ia.operation.enums.OperationType;
+import com.ia.operation.events.created.ProjectionCreatedEvent;
+import lombok.Builder;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.ia.operation.enums.OperationType;
-import com.ia.operation.events.created.ProjectionCreatedEvent;
-
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
-import lombok.Builder;
-import lombok.Data;
+import java.math.BigDecimal;
 
 @Document
 @Builder
@@ -19,10 +15,10 @@ import lombok.Data;
 public class Projection {
     @Id
     private String id;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private Account account;
     private BigDecimal amount;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private Period period;
     private OperationType operationType;
     

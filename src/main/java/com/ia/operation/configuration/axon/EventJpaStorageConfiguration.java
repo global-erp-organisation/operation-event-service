@@ -1,45 +1,46 @@
-package com.ia.operation.configuration;
+package com.ia.operation.configuration.axon;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import lombok.RequiredArgsConstructor;
+import org.axonframework.common.jpa.EntityManagerProvider;
+import org.axonframework.common.jpa.SimpleEntityManagerProvider;
 import org.axonframework.common.transaction.TransactionManager;
 import org.axonframework.eventhandling.tokenstore.TokenStore;
+import org.axonframework.eventhandling.tokenstore.jpa.JpaTokenStore;
+import org.axonframework.eventsourcing.AggregateSnapshotter;
 import org.axonframework.eventsourcing.EventCountSnapshotTriggerDefinition;
 import org.axonframework.eventsourcing.SnapshotTriggerDefinition;
 import org.axonframework.eventsourcing.Snapshotter;
 import org.axonframework.eventsourcing.eventstore.EmbeddedEventStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.EventStore;
-import org.axonframework.extensions.mongo.DefaultMongoTemplate;
-import org.axonframework.extensions.mongo.MongoTemplate;
-import org.axonframework.extensions.mongo.eventsourcing.eventstore.MongoEventStorageEngine;
-import org.axonframework.extensions.mongo.eventsourcing.tokenstore.MongoTokenStore;
+import org.axonframework.eventsourcing.eventstore.jpa.JpaEventStorageEngine;
 import org.axonframework.messaging.annotation.ParameterResolverFactory;
 import org.axonframework.serialization.Serializer;
-import org.axonframework.spring.eventsourcing.SpringAggregateSnapshotter;
+import org.axonframework.springboot.util.RegisterDefaultEntities;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.mongodb.MongoClient;
+import javax.persistence.EntityManager;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-import lombok.RequiredArgsConstructor;
-
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
-//@ConditionalOnProperty("axon.events.database")
-public class EventStorageConfiguration {
+@ConditionalOnProperty("axon.events.database")
+@RegisterDefaultEntities(packages = {"org.axonframework.eventsourcing.eventstore.jpa"})
+public class EventJpaStorageConfiguration {
 
     private final AxonProperties properties;
 
+  @Bean
+    public EventStorageEngine eventStoreEngine(EntityManagerProvider entityManagerProvider, TransactionManager transactionManager) {
+        return JpaEventStorageEngine.builder().entityManagerProvider(entityManagerProvider).transactionManager(transactionManager).build();
+    }
+
     @Bean
-    public EventStorageEngine engineStorage(MongoTemplate template) {
-        final MongoEventStorageEngine engine =  MongoEventStorageEngine.builder()
-                .mongoTemplate(template)
-                .build();
-        engine.ensureIndexes();
-        return engine;
+    public EntityManagerProvider entityManagerProvider(EntityManager entityManager) {
+        return new SimpleEntityManagerProvider(entityManager);
     }
 
     @Bean
@@ -50,24 +51,15 @@ public class EventStorageConfiguration {
     }
 
     @Bean
-    public MongoTemplate template(MongoClient client) {
-        return DefaultMongoTemplate.builder()
-                .mongoDatabase(client, properties.getDatabase())
-                .build();
-    }
+    public TokenStore tokenStore(Serializer serializer, EntityManagerProvider entityManagerProvider) {
+        return  JpaTokenStore.builder().serializer(serializer).entityManagerProvider(entityManagerProvider).build();
+   }
 
-     @Bean
-    public TokenStore tokenStore(Serializer serializer, MongoTemplate template) {
-        return MongoTokenStore.builder()
-                .serializer(serializer)
-                .mongoTemplate(template)
-                .build();
-    }
 
      @Bean
     public Snapshotter snapshotter(ParameterResolverFactory parameterResolverFactory, EventStore eventStore, TransactionManager transactionManager) {
         final Executor executor = Executors.newSingleThreadExecutor();
-        return SpringAggregateSnapshotter.builder()
+        return AggregateSnapshotter.builder()
                 .parameterResolverFactory(parameterResolverFactory)
                 .eventStore(eventStore)
                 .executor(executor)
@@ -76,7 +68,7 @@ public class EventStorageConfiguration {
     }
 
     @Bean
-    public SnapshotTriggerDefinition snapshotTriggerDefinition(Snapshotter snapshotter) throws Exception {
+    public SnapshotTriggerDefinition snapshotTriggerDefinition(Snapshotter snapshotter)  {
         return new EventCountSnapshotTriggerDefinition(snapshotter, properties.getSnapshotLimit());
     }
 }

@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @Component
@@ -24,7 +25,8 @@ public class QueryHandler implements Handler {
     public  <Q, T> Mono<ServerResponse> query(Supplier<Q> querySupplier, Class<T> responseType) {
         try {
             beanValidate(querySupplier, responseType);
-            final Mono<T> response = Mono.fromFuture(gateway.query(querySupplier.get(), ResponseTypes.instanceOf(responseType)));
+            final CompletableFuture<T> future = gateway.query(querySupplier.get(), ResponseTypes.instanceOf(responseType));
+            final Mono<T> response = Mono.fromFuture(future);
             return ServerResponse.ok().body(response, responseType);
         } catch (Exception e) {
             return internalErrorResponse(e::getLocalizedMessage);

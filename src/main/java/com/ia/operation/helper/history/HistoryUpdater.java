@@ -1,6 +1,10 @@
 package com.ia.operation.helper.history;
 
 import com.ia.operation.documents.Operation;
+import lombok.Builder;
+import lombok.Value;
+
+import java.time.LocalDate;
 
 public interface HistoryUpdater<T> {
     /**
@@ -18,4 +22,20 @@ public interface HistoryUpdater<T> {
      * @return true if provided operations are equal according to the current hystory updater type.
      */
     boolean isEqual(Operation first, Operation second);
+
+    /**
+     *
+     * @param current current date
+     * @return The previous and the next date encapsulated in thee PeriodParams object.
+     */
+    PeriodParams getPeriodParams(LocalDate current);
+
+
+
+    @Value
+    @Builder
+    class PeriodParams {
+         LocalDate previous;
+         LocalDate next;
+    }
 }
