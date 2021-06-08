@@ -1,6 +1,7 @@
 package com.ia.operation.handlers.event;
 
 import com.corundumstudio.socketio.SocketIOServer;
+import com.ia.operation.configuration.websocket.WebSocketConfiguration;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.Period;
@@ -32,46 +33,50 @@ public class OperationEventHandler {
     private final AccountRepository accountRepository;
     private final PeriodRepository periodRepository;
     private final OperationRepository operationRepository;
-    private final HistoryUpdater<DailyHistoryView> dailyUpdater;
-    private final HistoryUpdater<MonthlyHistoryView> monthlyUpdate;
+    private final HistoryUpdater<DailyHistoryView, Operation> dailyUpdater;
+    private final HistoryUpdater<MonthlyHistoryView, Operation> monthlyUpdate;
     private final SocketIOServer socketIOServer;
-    
+
     @EventHandler
     public void on(OperationCreatedEvent event) {
-        log.info("event recieved: [{}]", event);
+        log.info("event received: [{}]", event);
         final Flux<Period> periods =
                 periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> p.contains(event.getOperationDate()));
         final Mono<Account> acc = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(operation -> {
-            log.info("Operation succesfully saved. [{}]", operation);
+            log.info("Operation successfully saved. [{}]", operation);
             dailyUpdater.update(operation, operation, UpdateType.A);
             monthlyUpdate.update(operation, operation, UpdateType.A);
-            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
+            notifyClient(operation);
         })));
     }
 
     @EventHandler
     public void on(OperationUpdatedEvent event) {
-        log.info("event recieved: [{}]", event);
+        log.info("event received: [{}]", event);
         final Flux<Period> periods =
                 periodRepository.findByYear(String.valueOf(event.getOperationDate().getYear())).filter(p -> p.contains(event.getOperationDate()));
         final Mono<Account> account = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> account.subscribe(operation -> operationRepository.findById(event.getId()).subscribe(old -> operationRepository.save(Operation.of(event, period, operation)).subscribe(current -> {
-            log.info("Operation succesfully upodated. [{}]", current);
+            log.info("Operation successfully updated. [{}]", current);
             dailyUpdater.update(current, old, UpdateType.U);
             monthlyUpdate.update(current, old, UpdateType.U);
-            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
+            notifyClient(current);
         }))));
     }
 
     @EventHandler
     public void on(OperationDeletedEvent event) {
-        log.info("event recieved: [{}]", event);
-        operationRepository.findById(event.getId()).subscribe(old -> {
-            operationRepository.deleteById(event.getId()).subscribe(e -> log.info("Operation succesfully removed. [{}]", event.getId()));
+        log.info("event received: [{}]", event);
+        operationRepository.findById(event.getId()).subscribe(old -> operationRepository.deleteById(event.getId()).subscribe(e -> {
+            log.info("Operation successfully removed. [{}]", event.getId());
             dailyUpdater.update(old, old, UpdateType.R);
             monthlyUpdate.update(old, old, UpdateType.R);
-            socketIOServer.getBroadcastOperations().sendEvent(WebSocketEvents.DASHBOARD.name());
-        });
+            notifyClient(old);
+        }));
+    }
+
+    private void notifyClient(Operation o) {
+        WebSocketConfiguration.userIdToSessionId(o.getAccount().getUser().getId()).ifPresent(sessionId -> socketIOServer.getClient(sessionId).sendEvent(WebSocketEvents.DASHBOARD.name()));
     }
 }

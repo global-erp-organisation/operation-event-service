@@ -1,6 +1,7 @@
 package com.ia.operation.configuration.doc;
 
 import com.ia.operation.documents.User;
+import com.ia.operation.documents.views.DashboardView;
 import com.ia.operation.handlers.query.DashboardQueryHandler;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -50,7 +51,7 @@ public class DashboardApiDoc {
                         .in(ParameterIn.QUERY).required(false))
                 .response(responseBuilder().responseCode("200")
                         .description("User dashboard successfully retrieved.")
-                        .implementationArray(User.class));
+                        .implementationArray(DashboardView.class));
     }
 
 }

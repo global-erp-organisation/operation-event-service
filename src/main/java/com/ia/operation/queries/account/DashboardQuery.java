@@ -1,14 +1,16 @@
 package com.ia.operation.queries.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ia.operation.documents.views.DashboardView;
 import com.ia.operation.documents.views.DashboardView.DashboardParams;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Value
+@NoArgsConstructor
+@Data
 @Builder
+@AllArgsConstructor
 public class DashboardQuery {
     LocalDate start;
     LocalDate end;
@@ -17,6 +19,7 @@ public class DashboardQuery {
     Boolean monthly;
     Boolean yearly;
 
+    @JsonIgnore
     public static DashboardView.DashboardParams from(DashboardQuery q) {
         return DashboardParams.builder()
                 .start(q.getStart())

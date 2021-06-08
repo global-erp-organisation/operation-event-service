@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Data
 @Component
-public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
+public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView, Operation> {
 
     private static final int ONE_FACTOR = 1;
     private final DailyHistoryRepository dailyHistoryRepository;
@@ -27,22 +27,11 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
 
     @Override
     public void update(Operation event, Operation old, UpdateType type) {
-        switch (type) {
-            case A:
-                onAdd(event);
-                break;
-            case U:
-                onUpdate(event, old);
-                break;
-            case R:
-                onRemove(event);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown update type.");
-        }
+        proceed(event, old, type);
     }
 
-    private void onAdd(Operation event) {
+    @Override
+    public void onAdd(Operation event) {
         final Flux<DailyHistoryView> currents = retrieve(event.getOperationDate(), event.getAccount().getId());
         currents.switchIfEmpty(a -> {
             final DailyHistoryView current = DailyHistoryView.from(event).id(ObjectIdHelper.id()).build();
@@ -53,7 +42,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         });
     }
 
-    private void onUpdate(Operation event, Operation old) {
+    @Override
+    public void onUpdate(Operation event, Operation old) {
         final Flux<DailyHistoryView> olds = retrieve(old.getOperationDate(), old.getAccount().getId());
         olds.switchIfEmpty(a -> onAdd(event)).subscribe(o -> {
             if (isEqual(event, old)) {
@@ -79,7 +69,8 @@ public class DailyHistoryUpdater implements HistoryUpdater<DailyHistoryView> {
         });
     }
 
-    private void onRemove(Operation event) {
+    @Override
+    public void onRemove(Operation event) {
         final Flux<DailyHistoryView> olds = retrieve(event.getOperationDate(), event.getAccount().getId());
         olds.subscribe(o -> {
             o.setCurAmount(o.getCurAmount().subtract(event.getAmount()));
