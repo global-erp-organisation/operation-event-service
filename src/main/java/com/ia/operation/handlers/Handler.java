@@ -54,4 +54,9 @@ public interface Handler {
             Assert.notNull(o, () -> "null is not accepted for " + o.getClass().getSimpleName() + " object");
         }
     }
+
+    default   <T> Mono<ServerResponse> badRequestComplete(Supplier<T> message, Class<T> type) {
+        beanValidate(message);
+        return ServerResponse.badRequest().body(Mono.just(message.get()), type);
+    }
 }

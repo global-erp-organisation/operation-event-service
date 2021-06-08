@@ -1,5 +1,6 @@
-package com.ia.operation.configuration;
+package com.ia.operation.configuration.amq;
 
+import com.ia.operation.configuration.axon.AxonProperties;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

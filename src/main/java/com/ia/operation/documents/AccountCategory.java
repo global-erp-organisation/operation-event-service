@@ -16,19 +16,11 @@ public class AccountCategory {
     private String description;
 
     public static AccountCategoryBuilder from(AccountCategoryCreatedEvent event) {
-        /*@formatter:off*/
-        return AccountCategory.builder()
-                .description(event.getDescription())
-                .id(event.getId());
-        /*@formatter:on*/
+        return AccountCategory.builder().description(event.getDescription()).id(event.getId());
     }
     
     public static AccountCategoryBuilder from(AccountCategoryUpdatedEvent event) {
-        /*@formatter:off*/
-        return AccountCategory.builder()
-                .description(event.getDescription())
-                .id(event.getId());
-        /*@formatter:on*/
+        return AccountCategory.builder().description(event.getDescription()).id(event.getId());
     }
 
 }

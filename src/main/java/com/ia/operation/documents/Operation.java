@@ -1,20 +1,16 @@
 package com.ia.operation.documents;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.OperationCreatedEvent;
 import com.ia.operation.events.updated.OperationUpdatedEvent;
-
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Builder
 @Data
@@ -23,17 +19,16 @@ public class Operation {
     @Id
     private String id;
     private String description;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private Account account;
     private LocalDate operationDate;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private Period period;
     private BigDecimal amount;
     @JsonProperty("operation_type")
     private OperationType operationType;
 
     public static Operation of(OperationCreatedEvent event, Period period, Account account) {
-        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -43,11 +38,9 @@ public class Operation {
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .build();
-        /*@formatter:on*/
     }
 
     public static Operation of(OperationUpdatedEvent event, Period period, Account account) {
-        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -57,11 +50,9 @@ public class Operation {
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .build();
-        /*@formatter:on*/
     }
 
     public static OperationBuilder from(Operation event) {
-        /*@formatter:off*/
         return Operation.builder()
                 .id(event.getId())
                 .description(event.getDescription())
@@ -70,7 +61,6 @@ public class Operation {
                 .period(event.getPeriod())
                 .amount(event.getAmount())
                 .operationType(event.getOperationType());
-        /*@formatter:on*/
     }
 
 }

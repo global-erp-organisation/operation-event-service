@@ -1,6 +1,6 @@
 axon:
   events:
-    database: operation-event-store
+    database: operation-view-store
     snapshot-limit: 1000
     default-exchange: operation-exchange
     projection-event-queue: projection-event-queue
@@ -8,6 +8,7 @@ axon:
     default-event-routing-key: event
     default-cmd-routing-key: cmd
     class-path-package: com.ia
+    root-api-path: /api/v1/
 server:
   port: 8093
 logging:
@@ -33,3 +34,9 @@ spring:
     name: operation-cmd
   main:
     allow-bean-definition-overriding: true
+springdoc:
+  api-docs:
+    path: /api/swagger-ui
+web-socket:
+  hostname: localhost
+  port: 9092

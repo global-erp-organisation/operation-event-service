@@ -25,7 +25,7 @@ public class AccountCmdHandler extends CommandHandler {
         final String userId = request.pathVariable(USER_ID_KEY);
         final String categoryId = request.pathVariable(CATEGORY_ID_KEY);
         final Mono<AccountCreationCmd> bodyMono = request.bodyToMono(AccountCreationCmd.class);
-        return commandComplete(
+        return doExecute(
                 bodyMono.map(body -> AccountCreationCmd.cmdFrom(body)
                         .id(ObjectIdHelper.id())
                         .userId(userId)
@@ -35,7 +35,7 @@ public class AccountCmdHandler extends CommandHandler {
     public Mono<ServerResponse> accountUpdate(ServerRequest request) {
         final Mono<AccountUpdateCmd> bodyMono = request.bodyToMono(AccountUpdateCmd.class);
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
-        return commandComplete(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(accountId).build().validate(util)));
+        return doExecute(bodyMono.map(body -> AccountUpdateCmd.cmdFrom(body).id(accountId).build().validate(util)));
     }
 
     public Mono<ServerResponse> accountDelete(ServerRequest request) {

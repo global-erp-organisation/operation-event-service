@@ -24,13 +24,13 @@ public class AccountCategoryCmdHandler extends CommandHandler {
 
     public Mono<ServerResponse> categoryAdd(ServerRequest request) {
         final Mono<AccountCategoryCreationCmd> bodyMono = request.bodyToMono(AccountCategoryCreationCmd.class);
-        return commandComplete(bodyMono.map(body -> AccountCategoryCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).build().validate(util)));
+        return doExecute(bodyMono.map(body -> AccountCategoryCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).build().validate(util)));
     }
 
     public Mono<ServerResponse> categoryUpdate(ServerRequest request) {
         final Mono<AccountCategoryUpdateCmd> bodyMono = request.bodyToMono(AccountCategoryUpdateCmd.class);
         final String categoryId = request.pathVariable(CATEGORY_ID_KEY);
-        return commandComplete(bodyMono.map(body -> AccountCategoryUpdateCmd.cmdFrom(body).id(categoryId).build().validate(util)));
+        return doExecute(bodyMono.map(body -> AccountCategoryUpdateCmd.cmdFrom(body).id(categoryId).build().validate(util)));
     }
 
     public Mono<ServerResponse> categoryDelete(ServerRequest request) {

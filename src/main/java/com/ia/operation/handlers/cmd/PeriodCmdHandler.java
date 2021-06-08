@@ -3,6 +3,7 @@ package com.ia.operation.handlers.cmd;
 import com.ia.operation.commands.creation.PeriodCreationCmd;
 import com.ia.operation.handlers.CmdResponse;
 import com.ia.operation.handlers.CommandHandler;
+import com.ia.operation.helper.AggregateHelper;
 import com.ia.operation.helper.PeriodGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Component;
@@ -11,26 +12,26 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class PeriodCmdHandler extends CommandHandler {
-    private final CommandGateway gateway;
     private final PeriodGenerator generator;
-
-    public PeriodCmdHandler(CommandGateway gateway, PeriodGenerator generator) {
+    private final AggregateHelper util;
+    public PeriodCmdHandler(CommandGateway gateway, PeriodGenerator generator, AggregateHelper util) {
         super(gateway);
-        this.gateway = gateway;
         this.generator = generator;
+        this.util = util;
     }
 
     public Mono<ServerResponse> periodAdd(ServerRequest request) {
-        final Mono<PeriodCreationCmd> bodyMono = request.bodyToMono(PeriodCreationCmd.class).filter(body -> body.getYear() != null);
-        return bodyMono.map(body -> {
-            return generator.generate(body.getYear()).stream().map(e -> gateway.sendAndWait(PeriodCreationCmd.cmdFrom(e).build())).map(Object::toString).collect(Collectors.toList());
-        }).flatMap(ids -> {
-            final CmdResponse<List<String>, List<String>> res = CmdResponse.<List<String>, List<String>>builder().body(ids).build();
-            return ServerResponse.accepted().body(Mono.just(res), CmdResponse.class);
-        }).switchIfEmpty(ServerResponse.badRequest().body(Mono.just(MISSING_REQUEST_BODY_KEY + " or the year property is missing"), String.class));
+        final Optional<String> year = request.queryParam(YEAR_KEY);
+        return year.map(y -> {
+            final List<PeriodCreationCmd> cmds = generator.generate(y).stream()
+                    .map(c -> PeriodCreationCmd.cmdFrom(c).year(y).build()).collect(Collectors.toList());
+            cmds.forEach(c -> response(c.validate(util)));
+            return doAcceptedRequest(() -> Mono.just(CmdResponse.<List<PeriodCreationCmd>, String>builder().body(cmds).build()), CmdResponse.class);
+        }).orElse(badRequestComplete(() -> CmdResponse.<String, String>builder().body(String.format("%s%s",MISSING_QUERY_PARAM_PREFIX, YEAR_KEY)).build(), CmdResponse.class));
     }
 }

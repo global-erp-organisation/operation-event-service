@@ -3,8 +3,8 @@ package com.ia.operation.commands.creation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
-import org.springframework.util.StringUtils;
 
 import com.ia.operation.aggregates.AccountCategoryAggregate;
 import com.ia.operation.events.created.AccountCategoryCreatedEvent;
@@ -22,8 +22,7 @@ import lombok.Value;
 public class AccountCategoryCreationCmd extends CommandValidator<AccountCategoryCreationCmd>{
     @TargetAggregateIdentifier
     protected String id;
-
-    private String description;
+    String description;
     
     
     public static AccountCategoryCreatedEvent.AccountCategoryCreatedEventBuilder eventFrom (AccountCategoryCreationCmd cmd){

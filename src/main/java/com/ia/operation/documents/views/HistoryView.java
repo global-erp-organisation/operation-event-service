@@ -12,5 +12,5 @@ import lombok.Value;
 @Builder
 @JsonInclude(value=Include.NON_EMPTY)
 public class HistoryView<T> {
-    private List<T> details;
+     List<T> details;
 }

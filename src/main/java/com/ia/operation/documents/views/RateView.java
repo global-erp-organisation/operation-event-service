@@ -12,7 +12,7 @@ import lombok.Value;
 @Value
 @JsonInclude(value=Include.NON_EMPTY)
 public class RateView {
-    private BigDecimal liquidityRatio;
-    private BigDecimal billPaymentRatio;
-    private BigDecimal debtRatio;
+     BigDecimal liquidityRatio;
+     BigDecimal billPaymentRatio;
+     BigDecimal debtRatio;
 }
