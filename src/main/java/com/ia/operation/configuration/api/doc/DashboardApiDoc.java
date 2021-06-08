@@ -1,4 +1,4 @@
-package com.ia.operation.configuration.doc;
+package com.ia.operation.configuration.api.doc;
 
 import com.ia.operation.documents.User;
 import com.ia.operation.documents.views.DashboardView;

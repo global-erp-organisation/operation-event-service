@@ -28,7 +28,6 @@ public class Period {
     private Boolean close = false;
 
     public static Period from(PeriodCreatedEvent event) {
-        /*@formatter:off*/
         return Period.builder()
                 .id(event.getId())
                 .year(event.getYear())
@@ -37,10 +36,10 @@ public class Period {
                 .description(event.getDescription())
                 .close(event.isClose())
                 .build();
-        /*@formatter:on*/
     }
-    
+
     public Boolean contains(LocalDate date) {
-        return (getStart().toEpochDay() <= date.toEpochDay()) && (getEnd().toEpochDay() >= date.toEpochDay());
+        //return getStart().isBefore(date) && getEnd().isAfter(date);
+         return (getStart().toEpochDay() <= date.toEpochDay()) && (getEnd().toEpochDay() >= date.toEpochDay());
     }
 }

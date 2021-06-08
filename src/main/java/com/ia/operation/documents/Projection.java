@@ -23,7 +23,6 @@ public class Projection {
     private OperationType operationType;
     
     public static Projection of(ProjectionCreatedEvent event, Account account, Period period) {
-        /*@formatter:off*/
         return Projection.builder()
                 .id(event.getId())
                 .account(account)
@@ -31,6 +30,5 @@ public class Projection {
                 .period(period)
                 .operationType(event.getOperationType())
                 .build();
-        /*@formatter:on*/
     }
 }

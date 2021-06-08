@@ -1,5 +1,6 @@
 package com.ia.operation.configuration.api;
 
+import com.ia.operation.configuration.api.doc.*;
 import com.ia.operation.configuration.axon.AxonProperties;
 import com.ia.operation.configuration.doc.*;
 import com.ia.operation.handlers.query.*;

@@ -1,4 +1,4 @@
-package com.ia.operation.configuration.doc;
+package com.ia.operation.configuration.api.doc;
 
 import com.ia.operation.commands.creation.OperationCreationCmd;
 import com.ia.operation.commands.creation.OperationTransfertCmd;
