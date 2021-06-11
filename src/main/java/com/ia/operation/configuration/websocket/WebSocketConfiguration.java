@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @Slf4j
@@ -34,7 +35,7 @@ public class WebSocketConfiguration {
     }
 
     @Autowired
-    public void socketInit(SocketIOServer server) {
+    public void socketInit(SocketIOServer server) throws  Exception {
         server.addConnectListener(client -> log.info("Client {} connected at {}", client.getSessionId(), ZonedDateTime.now()));
         server.addDisconnectListener(client -> {
             clients.remove(client.getSessionId());

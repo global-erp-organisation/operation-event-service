@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 @ProcessingGroup("operation-handler")
 @RequiredArgsConstructor
@@ -45,9 +47,11 @@ public class OperationEventHandler {
         final Mono<Account> acc = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(operation -> {
             log.info("Operation successfully saved. [{}]", operation);
-            dailyUpdater.update(operation, operation, UpdateType.A);
-            monthlyUpdate.update(operation, operation, UpdateType.A);
-            notifyClient(operation);
+            CompletableFuture.supplyAsync(() -> {
+                dailyUpdater.update(operation, operation, UpdateType.A);
+                monthlyUpdate.update(operation, operation, UpdateType.A);
+                return true;
+            }).thenAccept((b) -> notifyClient(operation));
         })));
     }
 
@@ -59,9 +63,11 @@ public class OperationEventHandler {
         final Mono<Account> account = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> account.subscribe(operation -> operationRepository.findById(event.getId()).subscribe(old -> operationRepository.save(Operation.of(event, period, operation)).subscribe(current -> {
             log.info("Operation successfully updated. [{}]", current);
-            dailyUpdater.update(current, old, UpdateType.U);
-            monthlyUpdate.update(current, old, UpdateType.U);
-            notifyClient(current);
+            CompletableFuture.supplyAsync(() -> {
+                dailyUpdater.update(current, old, UpdateType.U);
+                monthlyUpdate.update(current, old, UpdateType.U);
+                return true;
+            }).thenAccept((b) -> notifyClient(current));
         }))));
     }
 
@@ -70,9 +76,11 @@ public class OperationEventHandler {
         log.info("event received: [{}]", event);
         operationRepository.findById(event.getId()).subscribe(old -> operationRepository.deleteById(event.getId()).subscribe(e -> {
             log.info("Operation successfully removed. [{}]", event.getId());
-            dailyUpdater.update(old, old, UpdateType.R);
-            monthlyUpdate.update(old, old, UpdateType.R);
-            notifyClient(old);
+            CompletableFuture.supplyAsync(() -> {
+                dailyUpdater.update(old, old, UpdateType.R);
+                monthlyUpdate.update(old, old, UpdateType.R);
+                return true;
+            }).thenAccept((b) -> notifyClient(old));
         }));
     }
 
