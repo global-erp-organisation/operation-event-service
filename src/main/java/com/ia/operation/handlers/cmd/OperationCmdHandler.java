@@ -57,7 +57,7 @@ public class OperationCmdHandler extends CommandHandler {
     }
 
     private Mono<ServerResponse> execute(Mono<OperationCreationCmd> cmd, String accountId) {
-        return commandComplete(cmd.map(body -> {
+        return doExecute(cmd.map(body -> {
             final LocalDate date = body.getOperationDate() == null ? LocalDate.now() : body.getOperationDate();
             return OperationCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).operationDate(date).accountId(accountId).build().validate(util);
         }));
@@ -65,7 +65,7 @@ public class OperationCmdHandler extends CommandHandler {
 
     public Mono<ServerResponse> operationUpdate(ServerRequest request) {
         final String operationId = request.pathVariable(OPERATION_ID_KEY);
-        return commandComplete(request.bodyToMono(OperationUpdateCmd.class).map(body -> OperationUpdateCmd.cmdFrom(body).id(operationId).build().validate(util)));
+        return doExecute(request.bodyToMono(OperationUpdateCmd.class).map(body -> OperationUpdateCmd.cmdFrom(body).id(operationId).build().validate(util)));
     }
 
     public Mono<ServerResponse> operationDelete(ServerRequest request) {

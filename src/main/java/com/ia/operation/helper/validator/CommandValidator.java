@@ -35,7 +35,7 @@ public  abstract class CommandValidator<V extends ICommand> implements ICommand 
     @Data
     @Builder
     public static class ValidationResult<V extends ICommand> {
-        private Boolean isValid;
+        private boolean isValid;
         private List<String> errors;
         private Optional<CommandValidator<V>> validated;
     }

@@ -3,7 +3,7 @@ package com.ia.operation.handlers.cmd;
 import com.ia.operation.commands.creation.ProjectionCreationCmd;
 import com.ia.operation.commands.delete.ProjectionDeletionCmd;
 import com.ia.operation.commands.update.ProjectionUpdateCmd;
-import com.ia.operation.configuration.AxonProperties;
+import com.ia.operation.configuration.axon.AxonProperties;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.events.created.ProjectionGeneratedEvent;
 import com.ia.operation.handlers.CmdResponse;
@@ -39,14 +39,14 @@ public class ProjectionCmdHandler extends CommandHandler {
         final String accountId = request.pathVariable(ACCOUNT_ID_KEY);
         final String periodId = request.pathVariable(PERIOD_ID_KEY);
         final Mono<ProjectionCreationCmd> bodyMono = request.bodyToMono(ProjectionCreationCmd.class);
-        return commandComplete(
+        return doExecute(
                 bodyMono.map(body -> ProjectionCreationCmd.cmdFrom(body).id(ObjectIdHelper.id()).accountId(accountId).periodId(periodId).build().validate(util)));
     }
 
     public Mono<ServerResponse> projectionUpdate(ServerRequest request) {
         final Mono<ProjectionUpdateCmd> bodyMono = request.bodyToMono(ProjectionUpdateCmd.class);
         final String projectionId = request.pathVariable(PROJECTION_ID_KEY);
-        return commandComplete(bodyMono.map(body -> ProjectionUpdateCmd.cmdFrom(body).id(projectionId).build().validate(util)));
+        return doExecute(bodyMono.map(body -> ProjectionUpdateCmd.cmdFrom(body).id(projectionId).build().validate(util)));
 
     }
 
@@ -61,7 +61,7 @@ public class ProjectionCmdHandler extends CommandHandler {
             return badRequestComplete(()->"The year parametter is missing or the provided variable is not a number.", String.class);
         }
         rabbitTemplate.convertAndSend(properties.getDefaultCmdRoutingKey(), ProjectionGeneratedEvent.builder().year(year).build());
-        return acceptedRequestComplete(() ->Mono.just(CmdResponse.<String, String>builder().body("Projection generation command succesfully recieved.").build()), CmdResponse.class);
+        return doAcceptedRequest(() -> Mono.just(CmdResponse.<String, String>builder().body("Projection generation command succesfully recieved.").build()), CmdResponse.class);
     }
 
     @RabbitListener(queues = {"${axon.events.projection-event-queue}"})

@@ -1,6 +1,8 @@
 package com.ia.operation.handlers.event;
 
+import com.corundumstudio.socketio.SocketIOServer;
 import com.ia.operation.documents.Company;
+import com.ia.operation.enums.WebSocketEvents;
 import com.ia.operation.events.created.CompanyCreatedEvent;
 import com.ia.operation.events.deleted.CompanyDeletedEvent;
 import com.ia.operation.events.updated.CompanyUpdatedEvent;
@@ -13,7 +15,6 @@ import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

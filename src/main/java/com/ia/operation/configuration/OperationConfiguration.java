@@ -1,15 +1,13 @@
 package com.ia.operation.configuration;
 
-import java.util.Locale;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import io.github.kaiso.relmongo.config.EnableRelMongo;
+import java.util.Locale;
 
 @Configuration
-@EnableRelMongo
 public class OperationConfiguration {
 
     @Bean
@@ -20,6 +18,12 @@ public class OperationConfiguration {
     
     @Bean
     public WebClient webClient() {
+        WebClient.builder().filter((r,n)->{
+            HttpHeaders headers = r.headers();
+            headers.add("token", "token");
+            return  n.exchange(r);
+        });
         return WebClient.create("http://localhost:8093");
     }
+
 }

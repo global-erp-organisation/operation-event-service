@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ia.operation.configuration.AxonProperties;
+import com.ia.operation.configuration.axon.AxonProperties;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Period;
 import com.ia.operation.enums.RecurringMode;
@@ -37,16 +37,12 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
 
     @Override
     public void generate(String year) {
-        accountRepository.findAll().subscribe(account -> {
-            generate(Optional.ofNullable(year), account);
-        });
+        accountRepository.findAll().subscribe(account -> generate(Optional.ofNullable(year), account));
     }
 
     @Override
     public void generate(Period period) {
-        accountRepository.findAll().subscribe(account -> {
-            createAndSendProjection(period, account);
-        });
+        accountRepository.findAll().subscribe(account -> createAndSendProjection(period, account));
     }
 
     @Override
@@ -56,12 +52,8 @@ public class DefaultProjectionGenerator implements ProjectionGenerator {
                                  : periodRepository.findTop1ByOrderByStartDesc()
                                  .flatMap(p -> periodRepository.findByYear(p.getYear()));
 
-        periods.subscribe(period -> {
-            projectionRepository.findByAccount_IdAndPeriod_IdOrderByAccount_description(account.getId(), period.getId())
-            .switchIfEmpty(a -> {
-                createAndSendProjection(period, account);
-            }).subscribe();
-        });
+        periods.subscribe(period -> projectionRepository.findByAccount_IdAndPeriod_IdOrderByAccount_description(account.getId(), period.getId())
+        .switchIfEmpty(a -> createAndSendProjection(period, account)).subscribe());
     }
 
     private void createAndSendProjection(Period period, Account account) {

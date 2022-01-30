@@ -1,36 +1,22 @@
 package com.ia.operation.documents.views;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
 import com.ia.operation.helper.ObjectIdHelper;
-
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Document
 @Data
-@Builder
-public class YearlyHistoryView {
-    private String id;
-    @JsonProperty("ref_amount")
-    private BigDecimal refAmount;
-    @JsonProperty("cur_amount")
-    private BigDecimal curAmount;
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Account account;
+public class YearlyHistoryView extends DailyHistoryView {
     private int year;
-    private LocalDate date;
 
     public static YearlyHistoryViewBuilder from(Operation r) {
-        /*@formatter:off*/
         return YearlyHistoryView.builder()
                 .id(ObjectIdHelper.id())
                 .curAmount(r.getAmount())
@@ -38,6 +24,5 @@ public class YearlyHistoryView {
                 .year(r.getOperationDate().getYear())
                 .date(r.getOperationDate())
                 .account(r.getAccount());
-        /*@formatter:on*/
     }
 }

@@ -24,22 +24,10 @@ public class Company {
     private Map<String, Object> details;
 
     public static Company of(CompanyCreatedEvent event) {
-        /*@formatter:off*/
-        return Company.builder()
-                .id(event.getId())
-                .description(event.getDescription())
-                .details(event.getDetails())
-                .build();
-        /*@formatter:on*/
+        return Company.builder().id(event.getId()).description(event.getDescription()).details(event.getDetails()).build();
     }
 
     public static Company of(CompanyUpdatedEvent event) {
-        /*@formatter:off*/
-        return Company.builder()
-                .id(event.getId())
-                .description(event.getDescription())
-                .details(event.getDetails())
-                .build();
-        /*@formatter:on*/
+        return Company.builder().id(event.getId()).description(event.getDescription()).details(event.getDetails()).build();
     }
 }

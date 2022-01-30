@@ -1,12 +1,5 @@
 package com.ia.operation.commands.creation;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
-import org.springframework.util.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ia.operation.aggregates.AccountAggregate;
@@ -16,11 +9,15 @@ import com.ia.operation.enums.OperationType;
 import com.ia.operation.events.created.ProjectionCreatedEvent;
 import com.ia.operation.helper.AggregateHelper;
 import com.ia.operation.helper.validator.CommandValidator;
-
 import io.netty.util.internal.StringUtil;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Value
 @Builder
@@ -30,27 +27,24 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
     protected String id;
 
     @JsonProperty("account_id")
-    private String accountId;
-    private BigDecimal amount;
+     String accountId;
+     BigDecimal amount;
     @JsonProperty("period_id")
-    private String periodId;
-    private OperationType operationType;
+     String periodId;
+     OperationType operationType;
     @JsonIgnore
-    private ProjectionCreatedEvent event;
+     ProjectionCreatedEvent event;
 
     public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreationCmd cmd) {
-        /*@formatter:off*/
         return ProjectionCreationCmd.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
                 .periodId(cmd.getPeriodId())
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType());
-        /*@formatter:on*/
     }
 
     public static ProjectionCreatedEvent eventFrom(ProjectionCreationCmd cmd) {
-        /*@formatter:off*/
         return ProjectionCreatedEvent.builder()
                 .id(cmd.getId())
                 .accountId(cmd.getAccountId())
@@ -58,11 +52,9 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .amount(cmd.getAmount())
                 .operationType(cmd.getOperationType())
                 .build();
-        /*@formatter:on*/
     }
 
     public static ProjectionCreationCmdBuilder cmdFrom(ProjectionCreatedEvent event) {
-        /*@formatter:off*/
         return ProjectionCreationCmd.builder()
                 .id(event.getId())
                 .accountId(event.getAccountId())
@@ -70,13 +62,12 @@ public class ProjectionCreationCmd extends CommandValidator<ProjectionCreationCm
                 .amount(event.getAmount())
                 .operationType(event.getOperationType())
                 .event(event);
-        /*@formatter:on*/
     }
 
     @Override
     public ValidationResult<ProjectionCreationCmd> validate(AggregateHelper util) {
         final List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtil.isNullOrEmpty(id)) {
             errors.add("Projection identifier shouldn't be null or empty");
         } else {
             if (util.aggregateGet(id, CompanyAggregate.class).isPresent()) {

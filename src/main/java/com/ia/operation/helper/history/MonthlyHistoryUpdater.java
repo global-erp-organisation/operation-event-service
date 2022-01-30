@@ -15,31 +15,20 @@ import reactor.core.publisher.Flux;
 
 @Component
 @RequiredArgsConstructor
-public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView> {
+public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView, Operation> {
 
     private final MonthlyHistoryRepository monthlyHistoryRepository;
 
     @Override
     public void update(Operation event, Operation old, UpdateType type) {
-        switch (type) {
-            case A:
-                onAdd(event);
-                break;
-            case U:
-                onUpdate(event, old);
-                break;
-            case R:
-                onRemove(event);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown update type.");
-        }
+        proceed(event, old, type);
     }
 
-    private void onAdd(Operation event) {
+    @Override
+    public void onAdd(Operation event) {
         final Flux<MonthlyHistoryView> currents = retrieve(getMonth(event.getOperationDate()), event.getAccount().getId());
         currents.switchIfEmpty(a -> {
-            final MonthlyHistoryView current = MonthlyHistoryView.from(event).id(ObjectIdHelper.id()).build();
+            final MonthlyHistoryView current = (MonthlyHistoryView) MonthlyHistoryView.from(event).id(ObjectIdHelper.id()).build();
             complete(event, current);
         }).subscribe(current -> {
             current.setCurAmount(current.getCurAmount().add(event.getAmount()));
@@ -47,11 +36,10 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
         });
     }
 
-    private void onUpdate(Operation event, Operation old) {
+    @Override
+    public void onUpdate(Operation event, Operation old) {
         final Flux<MonthlyHistoryView> olds = retrieve((getMonth(old.getOperationDate())), old.getAccount().getId());
-        olds.switchIfEmpty(a -> {
-            onAdd(event);
-        }).subscribe(o -> {
+        olds.switchIfEmpty(a -> onAdd(event)).subscribe(o -> {
             if (isEqual(event, old)) {
                 o.setCurAmount(o.getCurAmount().subtract(old.getAmount()).add(event.getAmount()));
                 updateHistoryReference(event.getOperationDate().plusMonths(1), event.getAccount().getId(), o);
@@ -59,9 +47,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
                 o.setCurAmount(o.getCurAmount().subtract(old.getAmount()));
                 updateHistoryReference(event.getOperationDate().plusMonths(1), old.getAccount().getId(), o);
                 final Flux<MonthlyHistoryView> hs = retrieve(getMonth(old.getOperationDate()), event.getAccount().getId());
-                hs.switchIfEmpty(a -> {
-                    onAdd(event);
-                }).subscribe(h -> {
+                hs.switchIfEmpty(a -> onAdd(event)).subscribe(h -> {
                     h.setCurAmount(h.getCurAmount().add(event.getAmount()));
                     updateHistoryReference(event.getOperationDate().plusMonths(1), event.getAccount().getId(), h);
                 });
@@ -77,7 +63,8 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
         });
     }
 
-    private void onRemove(Operation event) {
+    @Override
+    public void onRemove(Operation event) {
         final Flux<MonthlyHistoryView> olds = retrieve(getMonth(event.getOperationDate()), event.getAccount().getId());
         olds.subscribe(o -> {
             o.setCurAmount(o.getCurAmount().subtract(event.getAmount()));
@@ -92,9 +79,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
         final String nextMonth = getMonth(nd);
         final Flux<MonthlyHistoryView> next = retrieve(nextMonth, event.getAccount().getId());
         final Flux<MonthlyHistoryView> previous = retrieve(prevMonth, event.getAccount().getId());
-        previous.switchIfEmpty(a -> {
-            updateViews(current, current, next);
-        }).subscribe(p -> {
+        previous.switchIfEmpty(a -> updateViews(current, current, next)).subscribe(p -> {
             current.setRefAmount(p.getCurAmount());
             updateViews(current, p, next);
         });
@@ -105,9 +90,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
     }
 
     private void updateViews(MonthlyHistoryView current, MonthlyHistoryView previous, Flux<MonthlyHistoryView> nexts) {
-        nexts.switchIfEmpty(a -> {
-            register(current);
-        }).subscribe(next -> {
+        nexts.switchIfEmpty(a -> register(current)).subscribe(next -> {
             next.setRefAmount(current.getCurAmount());
             register(previous, next, current);
         });
@@ -124,5 +107,10 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView>
     @Override
     public boolean isEqual(Operation current, Operation old) {
         return getMonth(current.getOperationDate()).equals(getMonth(old.getOperationDate())) && current.getAccount().getId().equals(old.getAccount().getId());
+    }
+
+    @Override
+    public PeriodParams getPeriodParams(LocalDate current) {
+        return null;
     }
 }

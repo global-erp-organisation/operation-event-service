@@ -18,12 +18,12 @@ import lombok.Value;
 public class OperationTransfertCmd extends CommandValidator<OperationCreationCmd> {
     @TargetAggregateIdentifier
     protected String id;
-    private String description;
+     String description;
     @JsonProperty("source_account_id")
-    private String sourceAccountId;
+     String sourceAccountId;
     @JsonProperty("target_account_id")
-    private String targetAccountId;
+     String targetAccountId;
     @JsonProperty("operation_date")
-    private LocalDate operationDate;
-    private BigDecimal amount;
+     LocalDate operationDate;
+     BigDecimal amount;
 }

@@ -1,10 +1,6 @@
 package com.ia.operation.documents;
 
-import java.math.BigDecimal;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,11 +9,12 @@ import com.ia.operation.enums.OperationType;
 import com.ia.operation.enums.RecurringMode;
 import com.ia.operation.events.created.AccountCreatedEvent;
 import com.ia.operation.events.updated.AccountUpdatedEvent;
-
-import io.github.kaiso.relmongo.annotation.FetchType;
-import io.github.kaiso.relmongo.annotation.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigDecimal;
 
 @Document
 @Builder
@@ -31,9 +28,10 @@ public class Account {
     private RecurringMode recurringMode;
     @JsonProperty("default_amount")
     private BigDecimal defaultAmount;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
     private AccountCategory category;
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private User user;
     private BigDecimal balance;
     @JsonProperty("account_type")
