@@ -25,6 +25,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @ProcessingGroup("operation-handler")
@@ -47,11 +50,7 @@ public class OperationEventHandler {
         final Mono<Account> acc = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(operation -> {
             log.info("Operation successfully saved. [{}]", operation);
-            CompletableFuture.supplyAsync(() -> {
-                dailyUpdater.update(operation, operation, UpdateType.A);
-                monthlyUpdate.update(operation, operation, UpdateType.A);
-                return true;
-            }).thenAccept((b) -> notifyClient(operation));
+            run((v) -> notifyClient(operation), () -> dailyUpdater.update(operation, operation, UpdateType.A), () -> monthlyUpdate.update(operation, operation, UpdateType.A));
         })));
     }
 
@@ -63,11 +62,8 @@ public class OperationEventHandler {
         final Mono<Account> account = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> account.subscribe(operation -> operationRepository.findById(event.getId()).subscribe(old -> operationRepository.save(Operation.of(event, period, operation)).subscribe(current -> {
             log.info("Operation successfully updated. [{}]", current);
-            CompletableFuture.supplyAsync(() -> {
-                dailyUpdater.update(current, old, UpdateType.U);
-                monthlyUpdate.update(current, old, UpdateType.U);
-                return true;
-            }).thenAccept((b) -> notifyClient(current));
+            run((v) -> notifyClient(current), () -> dailyUpdater.update(current, old, UpdateType.R), () -> monthlyUpdate.update(current, old, UpdateType.R));
+
         }))));
     }
 
@@ -76,15 +72,16 @@ public class OperationEventHandler {
         log.info("event received: [{}]", event);
         operationRepository.findById(event.getId()).subscribe(old -> operationRepository.deleteById(event.getId()).subscribe(e -> {
             log.info("Operation successfully removed. [{}]", event.getId());
-            CompletableFuture.supplyAsync(() -> {
-                dailyUpdater.update(old, old, UpdateType.R);
-                monthlyUpdate.update(old, old, UpdateType.R);
-                return true;
-            }).thenAccept((b) -> notifyClient(old));
+            run((v) -> notifyClient(old), () -> dailyUpdater.update(old, old, UpdateType.R), () -> monthlyUpdate.update(old, old, UpdateType.R));
         }));
     }
 
     private void notifyClient(Operation o) {
         WebSocketConfiguration.userIdToSessionId(o.getAccount().getUser().getId()).ifPresent(sessionId -> socketIOServer.getClient(sessionId).sendEvent(WebSocketEvents.DASHBOARD.name()));
+    }
+
+    private void run(Consumer<Void> callback, Runnable... runnables) {
+        final CompletableFuture[] futures = Stream.of(runnables).map(CompletableFuture::runAsync).collect(Collectors.toList()).toArray(new CompletableFuture[runnables.length]);
+        CompletableFuture.allOf(futures).thenAccept(callback);
     }
 }
