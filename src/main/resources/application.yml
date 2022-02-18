@@ -39,4 +39,5 @@ springdoc:
     path: /api/swagger-ui
 web-socket:
   hostname: localhost
-  port: 9092
+  port: 9093
+  origin: http://localhost:19002

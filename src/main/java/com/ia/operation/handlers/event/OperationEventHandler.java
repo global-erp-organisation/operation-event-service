@@ -1,7 +1,6 @@
 package com.ia.operation.handlers.event;
 
-import com.corundumstudio.socketio.SocketIOServer;
-import com.ia.operation.configuration.websocket.WebSocketConfiguration;
+import com.ia.operation.configuration.websocket.SocketService;
 import com.ia.operation.documents.Account;
 import com.ia.operation.documents.Operation;
 import com.ia.operation.documents.Period;
@@ -40,7 +39,7 @@ public class OperationEventHandler {
     private final OperationRepository operationRepository;
     private final HistoryUpdater<DailyHistoryView, Operation> dailyUpdater;
     private final HistoryUpdater<MonthlyHistoryView, Operation> monthlyUpdate;
-    private final SocketIOServer socketIOServer;
+   private final SocketService socketService;
 
     @EventHandler
     public void on(OperationCreatedEvent event) {
@@ -50,7 +49,7 @@ public class OperationEventHandler {
         final Mono<Account> acc = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> acc.subscribe(account -> operationRepository.save(Operation.of(event, period, account)).subscribe(operation -> {
             log.info("Operation successfully saved. [{}]", operation);
-            run((v) -> notifyClient(operation), () -> dailyUpdater.update(operation, operation, UpdateType.A), () -> monthlyUpdate.update(operation, operation, UpdateType.A));
+            run(v -> notifyClient(operation), () -> dailyUpdater.update(operation, operation, UpdateType.A), () -> monthlyUpdate.update(operation, operation, UpdateType.A));
         })));
     }
 
@@ -62,8 +61,7 @@ public class OperationEventHandler {
         final Mono<Account> account = accountRepository.findById(event.getAccountId());
         periods.subscribe(period -> account.subscribe(operation -> operationRepository.findById(event.getId()).subscribe(old -> operationRepository.save(Operation.of(event, period, operation)).subscribe(current -> {
             log.info("Operation successfully updated. [{}]", current);
-            run((v) -> notifyClient(current), () -> dailyUpdater.update(current, old, UpdateType.R), () -> monthlyUpdate.update(current, old, UpdateType.R));
-
+            run(v -> notifyClient(current), () -> dailyUpdater.update(current, old, UpdateType.R), () -> monthlyUpdate.update(current, old, UpdateType.R));
         }))));
     }
 
@@ -72,16 +70,20 @@ public class OperationEventHandler {
         log.info("event received: [{}]", event);
         operationRepository.findById(event.getId()).subscribe(old -> operationRepository.deleteById(event.getId()).subscribe(e -> {
             log.info("Operation successfully removed. [{}]", event.getId());
-            run((v) -> notifyClient(old), () -> dailyUpdater.update(old, old, UpdateType.R), () -> monthlyUpdate.update(old, old, UpdateType.R));
+            run(v -> notifyClient(old), () -> dailyUpdater.update(old, old, UpdateType.R), () -> monthlyUpdate.update(old, old, UpdateType.R));
         }));
     }
 
     private void notifyClient(Operation o) {
-        WebSocketConfiguration.userIdToSessionId(o.getAccount().getUser().getId()).ifPresent(sessionId -> socketIOServer.getClient(sessionId).sendEvent(WebSocketEvents.DASHBOARD.name()));
+        socketService.notify(o.getAccount().getUser().getId(), WebSocketEvents.DASHBOARD, o.toString());
     }
 
-    private void run(Consumer<Void> callback, Runnable... runnables) {
-        final CompletableFuture[] futures = Stream.of(runnables).map(CompletableFuture::runAsync).collect(Collectors.toList()).toArray(new CompletableFuture[runnables.length]);
-        CompletableFuture.allOf(futures).thenAccept(callback);
+    private void run(Consumer<Void> callback, Runnable... runnable) {
+        if (runnable.length > 0)
+            CompletableFuture
+                    .allOf(Stream.of(runnable).map(CompletableFuture::runAsync)
+                            .collect(Collectors.toList())
+                            .toArray(new CompletableFuture[runnable.length]))
+                    .thenAccept(callback);
     }
 }

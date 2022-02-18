@@ -1,11 +1,20 @@
 package com.ia.operation.configuration;
 
+import com.ia.operation.documents.Operation;
+import com.ia.operation.documents.views.DailyHistoryView;
+import com.ia.operation.documents.views.MonthlyHistoryView;
+import com.ia.operation.enums.OperationType;
+import com.ia.operation.helper.history.HistoryUpdater;
+import com.ia.operation.helper.history.UpdateType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Configuration
 public class OperationConfiguration {
@@ -25,5 +34,4 @@ public class OperationConfiguration {
         });
         return WebClient.create("http://localhost:8093");
     }
-
 }

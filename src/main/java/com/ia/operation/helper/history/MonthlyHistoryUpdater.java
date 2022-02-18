@@ -86,7 +86,7 @@ public class MonthlyHistoryUpdater implements HistoryUpdater<MonthlyHistoryView,
     }
 
     private String getMonth(LocalDate date) {
-        return date.getMonth() + "-" + date.getYear();
+        return  String.format("%s-%s",date.getMonth(), date.getYear());
     }
 
     private void updateViews(MonthlyHistoryView current, MonthlyHistoryView previous, Flux<MonthlyHistoryView> nexts) {
